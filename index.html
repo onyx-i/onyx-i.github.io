@@ -43,7 +43,16 @@
             endX = e.changedTouches[0].clientX;
             handleSwipe();
         });
+    document.getElementById('imageContainer').addEventListener('click', function(e) {
+        var rect = e.target.getBoundingClientRect();
+        var x = e.clientX - rect.left; // x position within the element
 
+        if (x < rect.width / 2) {
+            changeImage(-1);  // Left side clicked
+        } else {
+            changeImage(1);   // Right side clicked
+        }
+    });
         function handleSwipe() {
             if (startX - endX > threshold) {
                 changeImage(1);
