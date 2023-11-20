@@ -15,8 +15,9 @@
     </style>
 </head>
 <body>
-    <h1 style="margin: 20px 0;">NOAA Weather Outlook</h1> <!-- Added header with margin -->
-    <div id="imageContainer">
+    <button onclick="window.location.reload();" style="position: fixed; top: 10px; right: 10px;">Refresh</button>
+    <h1 style="margin: 20px 0;">NOAA Weather Outlook</h1>
+    <div id="imageContainer" style="margin-top: 20px;">
          <!-- 6-10 Days Outlook Images -->
         <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif" class="outlookImage" id="610temp" alt="6-10 Day Temperature Outlook">
         <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif" class="outlookImage hidden" id="610prcp" alt="6-10 Day Precipitation Outlook">
