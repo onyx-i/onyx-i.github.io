@@ -18,20 +18,26 @@
     <button onclick="window.location.reload();" style="position: fixed; top: 10px; right: 10px;">Refresh</button>
     <h1 style="margin: 20px 0;">NOAA Weather Outlook</h1>
     <div id="imageContainer" style="margin-top: 20px;">
-         <!-- 6-10 Days Outlook Images -->
-        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif" class="outlookImage" id="610temp" alt="6-10 Day Temperature Outlook">
-        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif" class="outlookImage hidden" id="610prcp" alt="6-10 Day Precipitation Outlook">
+        <!-- 6-10 Days Outlook Images -->
+        <div class="outlookImageGroup">
+            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif" id="610prcp" alt="6-10 Day Precipitation Outlook">
+            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif" id="610temp" alt="6-10 Day Temperature Outlook">
+        </div>
         <!-- 8-14 Days Outlook Images -->
-        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814temp.new.gif" class="outlookImage hidden" id="814temp" alt="8-14 Day Temperature Outlook">
-        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814prcp.new.gif" class="outlookImage hidden" id="814prcp" alt="8-14 Day Precipitation Outlook">
+        <div class="outlookImageGroup hidden">
+            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814prcp.new.gif" id="814prcp" alt="8-14 Day Precipitation Outlook">
+            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814temp.new.gif" id="814temp" alt="8-14 Day Temperature Outlook">
+        </div>
         <!-- 30 Days Outlook Images -->
-        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_temp.gif" class="outlookImage hidden" id="30temp" alt="30 Day Temperature Outlook">
-        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_prcp.gif" class="outlookImage hidden" id="30prcp" alt="30 Day Precipitation Outlook">
+        <div class="outlookImageGroup hidden">
+            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_prcp.gif" id="30prcp" alt="30 Day Precipitation Outlook">
+            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_temp.gif" id="30temp" alt="30 Day Temperature Outlook">
+        </div>
     </div>
 
     <script>
         var currentIndex = 0;
-        var images = document.getElementsByClassName('outlookImage');
+        var imageGroups = document.getElementsByClassName('outlookImageGroup');
         var startX, endX;
         var threshold = 50; // Minimum swipe distance
 
@@ -43,16 +49,18 @@
             endX = e.changedTouches[0].clientX;
             handleSwipe();
         });
-    document.getElementById('imageContainer').addEventListener('click', function(e) {
-        var rect = e.target.getBoundingClientRect();
-        var x = e.clientX - rect.left; // x position within the element
 
-        if (x < rect.width / 2) {
-            changeImage(-1);  // Left side clicked
-        } else {
-            changeImage(1);   // Right side clicked
-        }
-    });
+        document.getElementById('imageContainer').addEventListener('click', function(e) {
+            var rect = e.target.getBoundingClientRect();
+            var x = e.clientX - rect.left; // x position within the element
+
+            if (x < rect.width / 2) {
+                changeImage(-1);  // Left side clicked
+            } else {
+                changeImage(1);   // Right side clicked
+            }
+        });
+
         function handleSwipe() {
             if (startX - endX > threshold) {
                 changeImage(1);
@@ -62,16 +70,16 @@
         }
 
         function changeImage(direction) {
-            images[currentIndex].classList.add('hidden');
+            imageGroups[currentIndex].classList.add('hidden');
             currentIndex += direction;
 
-            if (currentIndex >= images.length) {
+            if (currentIndex >= imageGroups.length) {
                 currentIndex = 0;
             } else if (currentIndex < 0) {
-                currentIndex = images.length - 1;
+                currentIndex = imageGroups.length - 1;
             }
 
-            images[currentIndex].classList.remove('hidden');
+            imageGroups[currentIndex].classList.remove('hidden');
         }
     </script>
 </body>
