@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOAA Weather Outlooks</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 0; }
+        #imageContainer { max-width: 100%; overflow: hidden; }
+        img { width: 100%; max-width: 600px; }
+        .arrow { cursor: pointer; font-size: 24px; padding: 10px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>NOAA Weather Outlooks</h1>
+    <div id="imageContainer">
+        <!-- 6-10 Days Outlook Images -->
+        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif" class="outlookImage" id="610temp" alt="6-10 Day Temperature Outlook">
+        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif" class="outlookImage hidden" id="610prcp" alt="6-10 Day Precipitation Outlook">
+        <!-- 8-14 Days Outlook Images -->
+        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814temp.new.gif" class="outlookImage hidden" id="814temp" alt="8-14 Day Temperature Outlook">
+        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814prcp.new.gif" class="outlookImage hidden" id="814prcp" alt="8-14 Day Precipitation Outlook">
+        <!-- 30 Days Outlook Images -->
+        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_temp.gif" class="outlookImage hidden" id="30temp" alt="30 Day Temperature Outlook">
+        <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_prcp.gif" class="outlookImage hidden" id="30prcp" alt="30 Day Precipitation Outlook">
+    </div>
+    <div>
+        <span class="arrow" onclick="changeImage(-1)">&#8592;</span>
+        <span class="arrow" onclick="changeImage(1)">&#8594;</span>
+    </div>
+
+    <script>
+        var currentIndex = 0;
+        var images = document.getElementsByClassName('outlookImage');
+
+        function changeImage(direction) {
+            images[currentIndex].classList.add('hidden');
+            currentIndex += direction;
+
+            if (currentIndex >= images.length) {
+                currentIndex = 0;
+            } else if (currentIndex < 0) {
+                currentIndex = images.length - 1;
+            }
+
+            images[currentIndex].classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
