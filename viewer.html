@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Tracker Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const REFERENCE_START = new Date(2024, 9, 5, 0, 0, 0);
+        const PERIOD_LENGTH = 14;
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+        function App() {
+            const [shifts, setShifts] = React.useState([]);
+            const [error, setError] = React.useState(null);
+            const [url, setUrl] = React.useState('');
+            const [loading, setLoading] = React.useState(false);
+
+            const parseICalData = React.useCallback((icalData) => {
+                const shifts = [];
+                let currentEvent = {};
+
+                const cleanData = icalData.replace(/^﻿/, '').replace(/\r\n/g, '\n');
+                const lines = cleanData.split('\n');
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+
+                    while (i + 1 < lines.length && /^\s/.test(lines[i + 1])) {
+                        line += lines[i + 1].trim();
+                        i++;
+                    }
+
+                    switch (true) {
+                        case line === 'BEGIN:VEVENT':
+                            currentEvent = {};
+                            break;
+
+                        case line.startsWith('LOCATION'):
+                            currentEvent.location = line.substring(9)
+                                .replace(/\\,/g, ',')
+                                .replace(/\\n/g, ', ')
+                                .replace(/\\{2}/g, '\\');
+                            break;
+
+                        case /DTSTART.*TZID=US\/Pacific:/.test(line):
+                            const startMatch = line.match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/);
+                            if (startMatch) {
+                                currentEvent.date = `${startMatch[1]}-${startMatch[2]}-${startMatch[3]}`;
+                                currentEvent.startTime = `${startMatch[4]}:${startMatch[5]}`;
+                            }
+                            break;
+
+                        case /DTEND.*TZID=US\/Pacific:/.test(line):
+                            const endMatch = line.match(/T(\d{2})(\d{2})/);
+                            if (endMatch) {
+                                currentEvent.endTime = `${endMatch[1]}:${endMatch[2]}`;
+                            }
+                            break;
+
+                        case line === 'END:VEVENT':
+                            if (currentEvent.location && currentEvent.date &&
+                                currentEvent.startTime && currentEvent.endTime) {
+                                const [startH, startM] = currentEvent.startTime.split(':').map(Number);
+                                const [endH, endM] = currentEvent.endTime.split(':').map(Number);
+                                let duration = (endH - startH) + (endM - startM) / 60;
+                                if (duration < 0) duration += 24;
+
+                                const formatTime = (hours, minutes) => {
+                                    const period = hours >= 12 ? 'PM' : 'AM';
+                                    hours = hours % 12 || 12;
+                                    return `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
+                                };
+
+                                shifts.push({
+                                    ...currentEvent,
+                                    startTime: formatTime(startH, startM),
+                                    endTime: formatTime(endH, endM),
+                                    duration: Math.round(duration)
+                                });
+                            }
+                            break;
+                    }
+                }
+
+                if (shifts.length === 0) {
+                    throw new Error('No valid shifts found in calendar data');
+                }
+
+                return shifts.sort((a, b) => a.date.localeCompare(b.date));
+            }, []);
+
+            const fetchCalendarData = React.useCallback(async (calendarUrl) => {
+                setLoading(true);
+                setError(null);
+
+                try {
+                    const cleanUrl = calendarUrl.trim();
+                    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(cleanUrl)}`;
+
+                    const response = await fetch(proxyUrl);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch calendar (Status ${response.status})`);
+                    }
+
+                    const data = await response.text();
+                    if (!data.includes('BEGIN:VCALENDAR')) {
+                        throw new Error('Invalid calendar data received');
+                    }
+
+                    const parsedShifts = parseICalData(data);
+                    setShifts(parsedShifts);
+                } catch (err) {
+                    let errorMessage = 'Failed to load calendar data';
+                    if (err.message.includes('Invalid calendar')) {
+                        errorMessage = 'The URL provided does not contain valid calendar data';
+                    } else if (err.message.includes('No valid shifts')) {
+                        errorMessage = 'No shifts found in the calendar data';
+                    } else if (err.message.includes('timeout') || err.status === 408) {
+                        // Automatically retry once on timeout
+                        try {
+                            const response = await fetch(proxyUrl);
+                            if (!response.ok) throw new Error('Failed after retry');
+                            const data = await response.text();
+                            if (!data.includes('BEGIN:VCALENDAR')) {
+                                throw new Error('Invalid calendar data received');
+                            }
+                            const parsedShifts = parseICalData(data);
+                            setShifts(parsedShifts);
+                            return; // Success on retry
+                        } catch (retryErr) {
+                            errorMessage = 'Connection timed out. Please try again';
+                        }
+                    } else if (err.message.includes('Failed to fetch')) {
+                        errorMessage = 'Could not access the calendar. Please try again';
+                    }
+                    setError(errorMessage);
+                } finally {
+                    setLoading(false);
+                }
+            }, [parseICalData]);
+
+            const getPayPeriodDates = (dateStr) => {
+                const [year, month, day] = dateStr.split('-').map(num => parseInt(num, 10));
+                const date = new Date(year, month - 1, day);
+                const diffTime = date.getTime() - REFERENCE_START.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const periodOffset = Math.floor(diffDays / PERIOD_LENGTH);
+
+                const periodStart = new Date(REFERENCE_START);
+                periodStart.setDate(REFERENCE_START.getDate() + (periodOffset * PERIOD_LENGTH));
+
+                if (date < periodStart) {
+                    periodStart.setDate(periodStart.getDate() - PERIOD_LENGTH);
+                }
+
+                const periodEnd = new Date(periodStart);
+                periodEnd.setDate(periodStart.getDate() + PERIOD_LENGTH - 1);
+
+                return { start: periodStart, end: periodEnd };
+            };
+
+            const groupByPayPeriod = React.useCallback((shifts) => {
+                const periods = {};
+
+                shifts.forEach(shift => {
+                    const period = getPayPeriodDates(shift.date);
+                    const periodKey = period.start.toISOString().split('T')[0];
+
+                    if (!periods[periodKey]) {
+                        periods[periodKey] = {
+                            startDate: period.start,
+                            endDate: period.end,
+                            shifts: []
+                        };
+                    }
+
+                    periods[periodKey].shifts.push(shift);
+                });
+
+                return periods;
+            }, []);
+
+            const formatDate = (date) => {
+                if (typeof date === 'string') {
+                    const [year, month, day] = date.split('-').map(num => parseInt(num, 10));
+                    date = new Date(year, month - 1, day);
+                }
+                return date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            };
+
+            const totalShifts = shifts.length;
+            const totalHours = shifts.reduce((sum, shift) => sum + shift.duration, 0);
+            const payPeriods = groupByPayPeriod(shifts);
+            const numPeriods = Object.keys(payPeriods).length;
+            const avgHoursPerPeriod = numPeriods ? (totalHours / numPeriods).toFixed(1) : 0;
+
+            return (
+                <div className="max-w-6xl mx-auto p-6">
+                    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                            <h1 className="text-2xl font-bold">Shift Tracker Viewer</h1>
+                            <div className="flex gap-4 w-full md:w-auto">
+                                <input
+                                    type="text"
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                    placeholder="Paste calendar URL"
+                                    className="flex-1 md:w-96 px-4 py-2 border rounded-md"
+                                />
+                                <button
+                                    onClick={() => fetchCalendarData(url)}
+                                    disabled={loading || !url}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <span className="loading-spinner"></span>
+                                            Loading...
+                                        </>
+                                    ) : (
+                                        'Load Calendar'
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm text-red-700">{error}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div className="bg-gray-50 p-4 rounded-lg border">
+                                <div className="text-gray-600 text-sm mb-1">Total Shifts</div>
+                                <div className="text-2xl font-semibold text-blue-600">
+                                    {totalShifts}
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg border">
+                                <div className="text-gray-600 text-sm mb-1">Total Hours</div>
+                                <div className="text-2xl font-semibold text-blue-600">
+                                    {totalHours}
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg border">
+                                <div className="text-gray-600 text-sm mb-1">Average Hours/Period</div>
+                                <div className="text-2xl font-semibold text-blue-600">
+                                    {avgHoursPerPeriod}
+                                </div>
+                            </div>
+                        </div>
+
+                        {Object.values(payPeriods).map((period, index) => {
+                            const periodTotal = period.shifts.reduce((sum, shift) => sum + shift.duration, 0);
+
+                            return (
+                                <div key={index} className="bg-white border rounded-lg mb-6 overflow-hidden">
+                                    <div className="bg-blue-600 text-white px-6 py-3 flex justify-between">
+                                        <div>Pay Period: {formatDate(period.startDate)} - {formatDate(period.endDate)}</div>
+                                        <div>{periodTotal} hours</div>
+                                    </div>
+
+                                    {period.shifts.map((shift, shiftIndex) => (
+                                        <div
+                                            key={shiftIndex}
+                                            className="px-6 py-4 border-b last:border-b-0 grid grid-cols-1 md:grid-cols-3 gap-4"
+                                        >
+                                            <div>{formatDate(shift.date)}</div>
+                                            <div>{shift.startTime} - {shift.endTime}</div>
+                                            <div className="text-blue-600 font-medium md:text-right">
+                                                {shift.duration} hours
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
