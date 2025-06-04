@@ -8,89 +8,196 @@
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600&display=swap" rel="stylesheet">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/US-NationalWeatherService-Logo.svg/720px-US-NationalWeatherService-Logo.svg.png">
     <style>
-        html {
-            height: 100%;
-            overflow: hidden;
-        }
-        body {
-            font-family: 'Titillium Web', sans-serif;
-            text-align: center;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 0; /* Removed padding, will manage spacing with element margins */
+            padding: 0;
+        }
+        
+        html, body {
+            height: 100%;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile browsers */
+            overflow: hidden;
+            font-family: 'Titillium Web', sans-serif;
+        }
+        
+        body {
+            text-align: center;
             background-color: #f0f0f0;
             color: #333;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            /* height: 100vh; Full viewport height - CHANGED BELOW */
-            height: 100%; /* Fallback: height of html element */
-            height: -webkit-fill-available; /* Attempt to use actual available height on WebKit mobiles */
-            overflow: hidden; /* Prevent body scrolling */
-            box-sizing: border-box;
+            position: relative;
         }
+        
+        #refreshButton {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        #refreshButton:hover {
+            background-color: #0056b3;
+        }
+        
         h1 {
-            color: #0056b3; /* NOAA blue for the title */
-            margin-top: 20px; /* Adjusted for new body padding */
-            margin-bottom: 10px; /* Reduced bottom margin */
-            flex-shrink: 0; /* Prevent h1 from shrinking */
+            color: #0056b3;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 600;
+            padding: 10px 15px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            max-height: 80px;
         }
+        
         #imageContainer {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 900px; /* Slightly increased max-width */
-            flex-grow: 1; /* This will make it take available vertical space */
-            margin: 10px auto 0 auto; /* Top margin, centered, no bottom margin */
+            max-width: 900px;
+            margin: 0 auto;
             overflow: hidden;
             position: relative;
             border: 1px solid #ccc;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
         }
-        .outlookImageGroup { /* This is the one that gets shown/hidden */
+        
+        .outlookImageGroup {
             width: 100%;
-            height: 100%; /* Will fill the #imageContainer */
+            height: 100%;
             display: flex;
-            flex-direction: column; /* Stack temp and precip image wrappers */
+            flex-direction: column;
             align-items: center;
-            justify-content: space-around; /* Distribute space OR use flex: 1 on children */
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
-        .image-wrapper { /* NEW: Container for each individual image */
+        
+        .image-wrapper {
             width: 100%;
-            height: 50%; /* Each image wrapper takes half the height of .outlookImageGroup */
+            height: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Ensure image doesn't overflow its 50% slot */
+            overflow: hidden;
+            padding: 2px;
         }
-        .outlookImageGroup img { /* The actual image elements, now inside .image-wrapper */
+        
+        .outlookImageGroup img {
             max-width: 100%;
-            max-height: 100%; /* Max height within its .image-wrapper */
+            max-height: 100%;
+            width: auto;
+            height: auto;
             object-fit: contain;
             display: block;
+            border-radius: 2px;
         }
-        .hidden { display: none !important; }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+        
+        .hidden { 
+            display: none !important; 
+        }
+        
+        /* Navigation indicators */
+        .nav-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+        
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
-            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
-        button:hover {
-            background-color: #0056b3;
+        
+        .nav-dot.active {
+            background-color: #007bff;
+        }
+        
+        /* Touch/click areas for navigation */
+        .nav-area {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 50%;
+            z-index: 50;
+            cursor: pointer;
+        }
+        
+        .nav-area.left {
+            left: 0;
+        }
+        
+        .nav-area.right {
+            right: 0;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: clamp(1rem, 5vw, 1.4rem);
+                padding: 8px 10px;
+                min-height: 40px;
+                max-height: 60px;
+            }
+            
+            #imageContainer {
+                margin: 0 5px 5px 5px;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            h1 {
+                font-size: clamp(0.9rem, 4vw, 1.2rem);
+                padding: 5px 10px;
+                min-height: 35px;
+                max-height: 50px;
+            }
+            
+            #imageContainer {
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
 <body>
-    <button onclick="window.location.reload();" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">Refresh</button>
-    <h1 style="margin-top: 40px; margin-bottom: 20px;">NOAA Weather Outlook</h1>
+    <button id="refreshButton" onclick="window.location.reload();">Refresh</button>
+    
+    <h1>NOAA Weather Outlook</h1>
+    
     <div id="imageContainer">
-       <!-- 6-10 Days Outlook Images -->
+        <!-- Navigation areas -->
+        <div class="nav-area left" onclick="changeImage(-1)"></div>
+        <div class="nav-area right" onclick="changeImage(1)"></div>
+        
+        <!-- 6-10 Days Outlook Images -->
         <div class="outlookImageGroup">
             <div class="image-wrapper">
                 <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif" id="610temp" alt="6-10 Day Temperature Outlook">
@@ -99,6 +206,7 @@
                 <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif" id="610prcp" alt="6-10 Day Precipitation Outlook">
             </div>
         </div>
+        
         <!-- 8-14 Days Outlook Images -->
         <div class="outlookImageGroup hidden">
             <div class="image-wrapper">
@@ -108,6 +216,7 @@
                 <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814prcp.new.gif" id="814prcp" alt="8-14 Day Precipitation Outlook">
             </div>
         </div>
+        
         <!-- 30 Days Outlook Images -->
         <div class="outlookImageGroup hidden">
             <div class="image-wrapper">
@@ -117,44 +226,69 @@
                 <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_prcp.gif" id="30prcp" alt="30 Day Precipitation Outlook">
             </div>
         </div>
+        
+        <!-- Navigation indicators -->
+        <div class="nav-indicator">
+            <div class="nav-dot active" onclick="goToImage(0)"></div>
+            <div class="nav-dot" onclick="goToImage(1)"></div>
+            <div class="nav-dot" onclick="goToImage(2)"></div>
+        </div>
     </div>
 
     <script>
         var currentIndex = 0;
         var imageGroups = document.getElementsByClassName('outlookImageGroup');
-        var startX, endX;
+        var navDots = document.getElementsByClassName('nav-dot');
+        var startX, endX, startY, endY;
         var threshold = 50; // Minimum swipe distance
+        var isScrolling = false;
 
+        // Touch event handlers
         document.getElementById('imageContainer').addEventListener('touchstart', function(e) {
             startX = e.touches[0].clientX;
-        });
+            startY = e.touches[0].clientY;
+            isScrolling = false;
+        }, { passive: true });
+
+        document.getElementById('imageContainer').addEventListener('touchmove', function(e) {
+            if (!startX || !startY) return;
+            
+            var currentX = e.touches[0].clientX;
+            var currentY = e.touches[0].clientY;
+            var diffX = Math.abs(currentX - startX);
+            var diffY = Math.abs(currentY - startY);
+            
+            if (diffY > diffX) {
+                isScrolling = true;
+            }
+        }, { passive: true });
 
         document.getElementById('imageContainer').addEventListener('touchend', function(e) {
+            if (isScrolling) return;
+            
             endX = e.changedTouches[0].clientX;
+            endY = e.changedTouches[0].clientY;
             handleSwipe();
-        });
-
-        document.getElementById('imageContainer').addEventListener('click', function(e) {
-            var rect = e.target.getBoundingClientRect();
-            var x = e.clientX - rect.left; // x position within the element
-
-            if (x < rect.width / 2) {
-                changeImage(-1);  // Left side clicked
-            } else {
-                changeImage(1);   // Right side clicked
-            }
-        });
+        }, { passive: true });
 
         function handleSwipe() {
-            if (startX - endX > threshold) {
-                changeImage(1);
-            } else if (endX - startX > threshold) {
-                changeImage(-1);
+            var diffX = startX - endX;
+            var diffY = Math.abs(startY - endY);
+            
+            // Only process horizontal swipes
+            if (Math.abs(diffX) > threshold && Math.abs(diffX) > diffY) {
+                if (diffX > 0) {
+                    changeImage(1);  // Swipe left -> next
+                } else {
+                    changeImage(-1); // Swipe right -> previous
+                }
             }
         }
 
         function changeImage(direction) {
             imageGroups[currentIndex].classList.add('hidden');
+            navDots[currentIndex].classList.remove('active');
+            
             currentIndex += direction;
 
             if (currentIndex >= imageGroups.length) {
@@ -164,17 +298,43 @@
             }
 
             imageGroups[currentIndex].classList.remove('hidden');
+            navDots[currentIndex].classList.add('active');
         }
+        
+        function goToImage(index) {
+            if (index === currentIndex) return;
+            
+            imageGroups[currentIndex].classList.add('hidden');
+            navDots[currentIndex].classList.remove('active');
+            
+            currentIndex = index;
+            
+            imageGroups[currentIndex].classList.remove('hidden');
+            navDots[currentIndex].classList.add('active');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                changeImage(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeImage(1);
+            }
+        });
+        
+        // Prevent context menu on long press
+        document.getElementById('imageContainer').addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
     </script>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-130XL1G0EL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-130XL1G0EL');
-</script>
-
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-130XL1G0EL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-130XL1G0EL');
+    </script>
 </body>
 </html>
