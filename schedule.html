@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Առողջ սնունդի և վիտամինների օրվա ցանկ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            font-size: 16px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #3498db;
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        .header p {
+            margin: 15px 0 0 0;
+            font-size: 1.1em;
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+        
+        .time-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            border-left: 6px solid #3498db;
+        }
+        
+        .time-header {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        
+        .food-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            border: 2px solid #bdc3c7;
+        }
+        
+        .food-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .food-example {
+            color: #34495e;
+            font-size: 1em;
+            margin-left: 15px;
+            line-height: 1.5;
+        }
+        
+        .supplements {
+            margin-top: 15px;
+        }
+        
+        .supplements > strong {
+            color: #2c3e50;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .supplement-item {
+            margin: 12px 0;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .supplement-name {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        
+        .supplement-description {
+            color: #34495e;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .info-section {
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .benefits-section {
+            background: #d5f4e6;
+            border: 3px solid #27ae60;
+        }
+        
+        .warnings-section {
+            background: #fdeaea;
+            border: 3px solid #e74c3c;
+        }
+        
+        .tips-section {
+            background: #fff3cd;
+            border: 3px solid #f39c12;
+        }
+        
+        .prep-section {
+            background: #e3f2fd;
+            border: 3px solid #2196f3;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
+        .item {
+            margin: 12px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.95em;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        
+        .benefit-item {
+            margin: 12px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            padding-left: 40px;
+            position: relative;
+            font-size: 0.95em;
+            color: #2c3e50;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        
+        .benefit-item::before {
+            content: "✔️";
+            position: absolute;
+            left: 12px;
+            font-size: 1.2em;
+        }
+        
+        .benefit-title {
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .fat-sources {
+            margin: 15px 0;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 10px;
+            border: 2px solid #27ae60;
+        }
+        
+        .fat-sources-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        .fat-list {
+            margin-left: 20px;
+            font-size: 0.95em;
+        }
+        
+        .fat-list li {
+            margin: 8px 0;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+        
+        .emoji {
+            font-size: 1.3em;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            color: #856404;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                font-size: 17px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .time-header {
+                font-size: 1.3em;
+            }
+            
+            .supplement-item {
+                padding: 18px;
+            }
+            
+            .supplement-name {
+                font-size: 1.05em;
+            }
+            
+            .food-example {
+                margin-left: 10px;
+            }
+        }
+        
+        /* iPad optimizations */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body {
+                font-size: 16px;
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .time-section {
+                margin: 20px 0;
+                padding: 15px;
+            }
+            
+            .time-header {
+                font-size: 1.35em;
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+            }
+            
+            .food-section {
+                margin: 10px 0;
+                padding: 10px;
+            }
+            
+            .food-title {
+                font-size: 1em;
+                margin-bottom: 6px;
+            }
+            
+            .food-example {
+                font-size: 0.95em;
+            }
+            
+            .supplements > strong {
+                font-size: 1em;
+                margin-bottom: 8px;
+            }
+            
+            .supplement-item {
+                padding: 12px;
+                margin: 10px 0;
+            }
+            
+            .supplement-name {
+                font-size: 0.95em;
+                margin-bottom: 6px;
+            }
+            
+            .supplement-description {
+                font-size: 0.9em;
+            }
+            
+            .two-column {
+                gap: 20px;
+                margin: 25px 0;
+            }
+            
+            .info-section {
+                padding: 15px;
+            }
+            
+            .section-title {
+                font-size: 1.2em;
+                margin-bottom: 12px;
+            }
+            
+            .item, .benefit-item {
+                margin: 10px 0;
+                padding: 10px;
+                font-size: 0.9em;
+            }
+            
+            .benefit-item {
+                padding-left: 35px;
+            }
+            
+            .benefit-item::before {
+                font-size: 1.1em;
+                left: 10px;
+            }
+            
+            .benefit-title {
+                font-size: 0.95em;
+            }
+            
+            .fat-sources {
+                margin: 10px 0;
+                padding: 10px;
+            }
+            
+            .fat-sources-title {
+                font-size: 0.95em;
+                margin-bottom: 8px;
+            }
+            
+            .fat-list li {
+                font-size: 0.9em;
+                margin: 6px 0;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        .supplement-item,
+        .item,
+        .benefit-item {
+            min-height: 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Առողջ սնունդի և վիտամինների օրվա ցանկ</h1>
+        <p>Այս պարզեցված գրաֆիկը օգնում է ճիշտ ժամանակին ընդունել հավելումները, որ մարմինը լավ կարդացնի, ոսկորները մնան ամուր, հիշողությունը սուր լինի, ու սիրտը հանգիստ աշխատի։ Հատուկ մշակված է <strong>50+ տարիքային կանանց առողջության կարիքներին համապատասխան</strong>։</p>
+    </div>
+
+    <div class="time-section">
+        <div class="time-header">
+            <span class="emoji">🕗</span> Առավոտյան՝ ժամը 8:00 AM (նախաճաշի հետ)
+        </div>
+        
+        <div class="food-section">
+            <div class="food-title"><strong>Սնունդ</strong>՝ <em>ճարպով ու սպիտակուցով սնունդ</em></div>
+            <div class="food-example">▶️ ձվածեղ ավոկադոյով, պանիր, մի կտոր հաց, ձիթայուղով բանջարեղեն, յոգուրտ ընկույզներով, կամ մի բաժակ կաթ</div>
+        </div>
+        
+        <div class="supplements">
+            <strong>Ընդունել՝</strong>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Վիտամին D3 (Vitamin D3) (5000 IU)</div>
+                <div class="supplement-description">օգնում ա, որ կալցիումը (Calcium) լավ կարդացվի ու ոսկորների մեջ մնա։ Հատկապես դաշտանադադարից հետո շատ կարևոր ա։</div>
+            </div>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Վիտամին K2 Mk7 (Vitamin K2 MK7) (100 մկգ)</div>
+                <div class="supplement-description">աշխատում ա D3-ի հետ, օգնում ա, որ կալցիումը (Calcium) չմնա երակներում, գնա ճիշտ տեղ՝ ոսկոր։</div>
+            </div>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Ցինկ (Zinc) (22 մգ)</div>
+                <div class="supplement-description">բարձրացնում ա իմունիտետը, օգնում ա մաշկին, մազերին ու հիշողությանը։</div>
+            </div>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Բիոտին (Biotin) (5000 մկգ)</div>
+                <div class="supplement-description">պահում ա մազերն ու եղունգները ամուր, մաշկը՝ մաքուր։</div>
+            </div>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 B-համալիրը (B-Complex)</div>
+                <div class="supplement-description">էներգիա ա տալիս օրվա մեջ, օգնում ա սթրեսին չտրվել ու միտքը մաքուր պահել։</div>
+            </div>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Մագնեզիում (Magnesium) (1 հաբ)</div>
+                <div class="supplement-description">նյարդերն ու մկանները հանգստացնելու համար ա, օգնում ա օրվա լավ սկիզբ ունենաս։</div>
+            </div>
+        </div>
+        
+        <div class="fat-sources">
+            <div class="fat-sources-title">🫒 <strong>Ճարպի լավ աղբյուրներ</strong>՝</div>
+            <ul class="fat-list">
+                <li>Ձիթայուղ, ավոկադո</li>
+                <li>Ընկույզ, սերմեր (կտավատի, նարաջի)</li>
+                <li>Բնական կարագ, խավյար</li>
+                <li>Կնջղի յուղ, սերմի յուղեր</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="time-section">
+        <div class="time-header">
+            <span class="emoji">🕛</span> Ճաշին՝ ժամը 12:30 PM (ճաշի հետ)
+        </div>
+        
+        <div class="food-section">
+            <div class="food-title"><strong>Սնունդ</strong>՝ <em>հավասարակշռված՝ սպիտակուց + ածխաջուր</em></div>
+            <div class="food-example">▶️ ապուր, հավի միս՝ բանջարեղենով, ձուկ՝ բրինձով, ոսպ կամ պասուսով ապուր, տապակած միս՝ պատատով</div>
+        </div>
+        
+        <div class="supplements">
+            <strong>Ընդունել (կերակրից 30 րոպե հետո)՝</strong>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Կալցիում ցիտրատ (Calcium Citrate) (500 մգ / 2 հաբ)</div>
+                <div class="supplement-description">ոսկորների ամրության համար ա։ Ճարպ պետք չի, բայց լիքը ջուր խմի։</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="time-section">
+        <div class="time-header">
+            <span class="emoji">🕕</span> Երեկոյան՝ ժամը 6:30 PM (ընթրիքի հետ)
+        </div>
+        
+        <div class="food-section">
+            <div class="food-title"><strong>Սնունդ</strong>՝ <em>թեթև, բայց սպիտակուցով ու բանջարեղենով</em></div>
+            <div class="food-example">▶️ ձուկ՝ բանջարեղենով, մածուն՝ հատապտղով, ածիկ՝ պանրով, թեթև ապուր, յոգուրտ՝ սերմերով</div>
+        </div>
+        
+        <div class="supplements">
+            <strong>Ընդունել՝</strong>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Կալցիում ցիտրատ (Calcium Citrate) (500 մգ / 2 հաբ)</div>
+                <div class="supplement-description">լրացնում ա օրվա չափաբաժինը, օգնում ա ոսկորները պինդ մնան։</div>
+            </div>
+            
+            <div class="supplement-item">
+                <div class="supplement-name">💊 Մագնեզիում (Magnesium) (1 հաբ)</div>
+                <div class="supplement-description">հանգստացնում ա նյարդային համակարգը, օգնում ա, որ քունդ խորը լինի։</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="two-column">
+        <div class="info-section benefits-section">
+            <div class="section-title">📌 Օգուտները</div>
+            
+            <div class="benefit-item">
+                <div class="benefit-title">Ոսկորների ամրություն</div>
+                <div>Կալցիումը (Calcium), վիտամին D3-ն ու K2-ը</div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-title">Հիշողություն ու միտք</div>
+                <div>B-համալիրը (B-Complex), ցինկը (Zinc)</div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-title">Մաշկ, մազեր, եղունգներ</div>
+                <div>Բիոտինը (Biotin) ու ցինկը (Zinc)</div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-title">Սրտի աշխատանք</div>
+                <div>Մագնեզիումը (Magnesium) հանգստացնում ա</div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-title">Քուն ու հանգիստ</div>
+                <div>Մագնեզիումը (Magnesium) լավ քուն ա տալիս</div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-title">Իմունիտետ</div>
+                <div>Ցինկը (Zinc) պաշտպանում ա վարակներից</div>
+            </div>
+        </div>
+
+        <div class="info-section warnings-section">
+            <div class="section-title">⚠️ Զգուշացումներ</div>
+            
+            <div class="item">
+                <strong>Երբ դադարեցնել՝</strong> եթե ստամոքս ցավում ա, պորտասավ ունես, կամ ալերգիկ ռեակցիա։
+            </div>
+            
+            <div class="item">
+                <strong>Բժշկին դիմի՝</strong> եթե գլխապտույտ, սրտխփոց, կամ անսովոր ախտանիշներ ունես։
+            </div>
+            
+            <div class="item">
+                <strong>Արյան վերլուծություն՝</strong> 6 ամիսը մեկ անգամ ստուգի վիտամին D3-ի մակարդակը։
+            </div>
+            
+            <div class="item">
+                <strong>Դեղերի հետ՝</strong> եթե սրտի դեղ ես խմում, տարեց բժշկից խորհուրդ։
+            </div>
+        </div>
+    </div>
+
+    <div class="two-column">
+        <div class="info-section tips-section">
+            <div class="section-title">💡 Օգտակար խորհուրդներ</div>
+            
+            <div class="item">
+                <strong>Ստամոքսի պաշտպանություն՝</strong> միշտ կերակրի հետ խմի, որ պորտասավ չունենաս։
+            </div>
+            
+            <div class="item">
+                <strong>Հիշեցումներ՝</strong> հեռախոսում ալարմ դիր, կամ վիտամինները պահի հայտնի տեղում։
+            </div>
+            
+            <div class="item">
+                <strong>Ջուր՝</strong> ամեն վիտամինի հետ լիքը բաժակ ջուր խմի։
+            </div>
+            
+            <div class="item">
+                <strong>Պահպանում՝</strong> զով, չոր տեղում պահի, արևից հեռու։
+            </div>
+            
+            <div class="item">
+                <strong>Եթե մոռանաս՝</strong> նույն օրը հիշեցիր՝ խմի, բայց կրկնակի չարի։
+            </div>
+            
+            <div class="item">
+                <strong>Խուսափի՝</strong> սուրճ կամ թեյ ժամը մեկ առաջ ու հետո չխմի։
+            </div>
+        </div>
+
+        <div class="info-section prep-section">
+            <div class="section-title">📅 Շաբաթական պատրաստություն</div>
+            
+            <div class="item">
+                <strong>Կիրակի օրը՝</strong> շաբաթվա բոլոր վիտամինները դասավորի հատուկ տուփում։
+            </div>
+            
+            <div class="item">
+                <strong>Գնումներ՝</strong> ցանկ պատրաստի, միշտ պահի հավելումներ տանը։
+            </div>
+            
+            <div class="item">
+                <strong>Կերակուր՝</strong> առավոտյան ճարպեր նախապես պատրաստի (ձիթայուղ, ընկույզ)։
+            </div>
+            
+            <div class="item">
+                <strong>Հաջողության նշաններ՝</strong> 4-6 շաբաթից հետո էներգիա, լավ քուն, ամուր եղունգներ։
+            </div>
+            
+            <div class="item">
+                <strong>Օրագիր պահի՝</strong> գրանցի ինչպես ես զգում, որ հասկանաս արդյունքը։
+            </div>
+        </div>
+    </div>
+</body>
+</html>
