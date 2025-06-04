@@ -8,6 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600&display=swap" rel="stylesheet">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/US-NationalWeatherService-Logo.svg/720px-US-NationalWeatherService-Logo.svg.png">
     <style>
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
         body {
             font-family: 'Titillium Web', sans-serif;
             text-align: center;
@@ -18,7 +22,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh; /* Full viewport height */
+            /* height: 100vh; Full viewport height - CHANGED BELOW */
+            height: 100%; /* Fallback: height of html element */
+            height: -webkit-fill-available; /* Attempt to use actual available height on WebKit mobiles */
             overflow: hidden; /* Prevent body scrolling */
             box-sizing: border-box;
         }
