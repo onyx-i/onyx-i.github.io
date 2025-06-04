@@ -8,30 +8,108 @@
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600&display=swap" rel="stylesheet">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/US-NationalWeatherService-Logo.svg/720px-US-NationalWeatherService-Logo.svg.png">
     <style>
-        body { font-family: 'Titillium Web', sans-serif; text-align: center; margin: 0; padding: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: center; }
-        #imageContainer { align-items: center; justify-content: center; height: 80vh; }
-        img { max-width: 100%; max-height: 100%; }
-        .hidden { display: none; }
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0; /* Removed padding, will manage spacing with element margins */
+            background-color: #f0f0f0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Prevent body scrolling */
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #0056b3; /* NOAA blue for the title */
+            margin-top: 20px; /* Adjusted for new body padding */
+            margin-bottom: 10px; /* Reduced bottom margin */
+            flex-shrink: 0; /* Prevent h1 from shrinking */
+        }
+        #imageContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px; /* Slightly increased max-width */
+            flex-grow: 1; /* This will make it take available vertical space */
+            margin: 10px auto 0 auto; /* Top margin, centered, no bottom margin */
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .outlookImageGroup { /* This is the one that gets shown/hidden */
+            width: 100%;
+            height: 100%; /* Will fill the #imageContainer */
+            display: flex;
+            flex-direction: column; /* Stack temp and precip image wrappers */
+            align-items: center;
+            justify-content: space-around; /* Distribute space OR use flex: 1 on children */
+        }
+        .image-wrapper { /* NEW: Container for each individual image */
+            width: 100%;
+            height: 50%; /* Each image wrapper takes half the height of .outlookImageGroup */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Ensure image doesn't overflow its 50% slot */
+        }
+        .outlookImageGroup img { /* The actual image elements, now inside .image-wrapper */
+            max-width: 100%;
+            max-height: 100%; /* Max height within its .image-wrapper */
+            object-fit: contain;
+            display: block;
+        }
+        .hidden { display: none !important; }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <button onclick="window.location.reload();" style="position: fixed; top: 10px; right: 10px;">Refresh</button>
-    <h1 style="margin: 20px 0;">NOAA Weather Outlook</h1>
-    <div id="imageContainer" style="margin-top: 20px;">
+    <button onclick="window.location.reload();" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">Refresh</button>
+    <h1 style="margin-top: 40px; margin-bottom: 20px;">NOAA Weather Outlook</h1>
+    <div id="imageContainer">
        <!-- 6-10 Days Outlook Images -->
         <div class="outlookImageGroup">
-            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif" id="610temp" alt="6-10 Day Temperature Outlook">
-            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif" id="610prcp" alt="6-10 Day Precipitation Outlook">
+            <div class="image-wrapper">
+                <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif" id="610temp" alt="6-10 Day Temperature Outlook">
+            </div>
+            <div class="image-wrapper">
+                <img src="https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif" id="610prcp" alt="6-10 Day Precipitation Outlook">
+            </div>
         </div>
         <!-- 8-14 Days Outlook Images -->
         <div class="outlookImageGroup hidden">
-            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814temp.new.gif" id="814temp" alt="8-14 Day Temperature Outlook">
-            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814prcp.new.gif" id="814prcp" alt="8-14 Day Precipitation Outlook">
+            <div class="image-wrapper">
+                <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814temp.new.gif" id="814temp" alt="8-14 Day Temperature Outlook">
+            </div>
+            <div class="image-wrapper">
+                <img src="https://www.cpc.ncep.noaa.gov/products/predictions/814day/814prcp.new.gif" id="814prcp" alt="8-14 Day Precipitation Outlook">
+            </div>
         </div>
         <!-- 30 Days Outlook Images -->
         <div class="outlookImageGroup hidden">
-            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_temp.gif" id="30temp" alt="30 Day Temperature Outlook">
-            <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_prcp.gif" id="30prcp" alt="30 Day Precipitation Outlook">
+            <div class="image-wrapper">
+                <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_temp.gif" id="30temp" alt="30 Day Temperature Outlook">
+            </div>
+            <div class="image-wrapper">
+                <img src="https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_prcp.gif" id="30prcp" alt="30 Day Precipitation Outlook">
+            </div>
         </div>
     </div>
 
