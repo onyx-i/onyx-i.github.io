@@ -44,7 +44,7 @@
 
     html {
       height: 100%;
-      background: #0a0a0a; /* Immediate fallback to prevent white flash */
+      background: #0a0a0a;
     }
 
     html, body {
@@ -53,7 +53,10 @@
     }
 
     body {
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      background: 
+        radial-gradient(ellipse 120% 80% at 50% 20%, rgba(15, 15, 25, 0.9) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 100% at 80% 80%, rgba(20, 10, 30, 0.7) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #0f0f0f 100%);
       font-family: 'Inter', sans-serif, system-ui, -apple-system, sans-serif;
       position: relative;
       display: flex;
@@ -61,59 +64,48 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      color: #f8f8f8; /* Ensure text is visible even if fonts don't load */
+      color: #f8f8f8;
     }
 
-    .grid-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 80px 80px;
-      animation: gridFloat 8s ease-in-out infinite;
-      z-index: -2;
-    }
 
-    @keyframes gridFloat {
-      0%, 100% { opacity: 0.4; transform: translateY(0); }
-      50% { opacity: 0.2; transform: translateY(-10px); }
-    }
 
-        .ambient-overlay {
+
+
+    .ambient-overlay {
       position: fixed;
       top: -50px;
       left: -50px;
       width: calc(100% + 100px);
       height: calc(100% + 100px);
       background: 
-        radial-gradient(ellipse 800px 600px at 20% 30%, rgba(0, 255, 174, 0.08) 0%, transparent 40%),
-        radial-gradient(ellipse 600px 800px at 80% 70%, rgba(255, 100, 200, 0.06) 0%, transparent 40%),
-        radial-gradient(ellipse 400px 300px at 60% 20%, rgba(100, 100, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(ellipse 300px 500px at 30% 80%, rgba(255, 255, 100, 0.04) 0%, transparent 45%);
-      animation: ambientDrift 25s ease-in-out infinite;
+        radial-gradient(ellipse 900px 700px at 25% 30%, rgba(0, 255, 174, 0.12) 0%, transparent 45%),
+        radial-gradient(ellipse 700px 900px at 75% 70%, rgba(255, 100, 200, 0.08) 0%, transparent 45%),
+        radial-gradient(ellipse 500px 400px at 60% 20%, rgba(120, 119, 198, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 400px 600px at 30% 80%, rgba(255, 200, 100, 0.06) 0%, transparent 50%);
+      animation: ambientDrift 30s ease-in-out infinite;
       z-index: -1;
     }
 
     @keyframes ambientDrift {
       0%, 100% { 
-        transform: translate(0px, 0px);
+        transform: translate(0px, 0px) rotate(0deg);
+        filter: blur(0px);
       }
       25% { 
-        transform: translate(-15px, 10px);
+        transform: translate(-20px, 15px) rotate(1deg);
+        filter: blur(0.5px);
       }
       50% { 
-        transform: translate(10px, -12px);
+        transform: translate(15px, -18px) rotate(-0.5deg);
+        filter: blur(1px);
       }
       75% { 
-        transform: translate(8px, 15px);
+        transform: translate(12px, 20px) rotate(0.8deg);
+        filter: blur(0.3px);
       }
     }
 
-        .bokeh-container {
+    .bokeh-container {
       position: fixed;
       top: 0;
       left: 0;
@@ -126,104 +118,187 @@
     .bokeh {
       position: absolute;
       border-radius: 50%;
-      filter: blur(1px);
+      filter: blur(1.5px);
     }
 
     .bokeh-1 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(0, 255, 174, 0.04) 0%, transparent 70%);
+      width: 600px;
+      height: 600px;
+      background: 
+        radial-gradient(circle at 30% 30%, rgba(0, 255, 174, 0.08) 0%, rgba(0, 255, 174, 0.02) 40%, transparent 70%),
+        radial-gradient(circle at 70% 70%, rgba(120, 255, 200, 0.04) 0%, transparent 60%);
       top: 60%;
       left: 20%;
-      animation: windSwirl1 40s ease-in-out infinite;
+      animation: windSwirl1 45s ease-in-out infinite;
     }
 
     .bokeh-2 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(255, 100, 200, 0.05) 0%, transparent 65%);
+      width: 480px;
+      height: 480px;
+      background: 
+        radial-gradient(circle at 40% 60%, rgba(255, 100, 200, 0.09) 0%, rgba(255, 150, 220, 0.03) 35%, transparent 65%),
+        radial-gradient(circle at 60% 40%, rgba(200, 120, 255, 0.05) 0%, transparent 55%);
       top: 15%;
       left: 70%;
-      animation: windFlow2 45s ease-in-out infinite;
+      animation: windFlow2 50s ease-in-out infinite;
     }
 
     .bokeh-3 {
-      width: 360px;
-      height: 360px;
-      background: radial-gradient(circle, rgba(100, 100, 255, 0.04) 0%, transparent 70%);
+      width: 420px;
+      height: 420px;
+      background: 
+        radial-gradient(circle at 50% 50%, rgba(120, 119, 198, 0.07) 0%, rgba(150, 140, 220, 0.02) 40%, transparent 70%);
       top: 80%;
       left: 80%;
-      animation: windCircle3 38s ease-in-out infinite;
+      animation: windCircle3 42s ease-in-out infinite;
     }
 
     .bokeh-4 {
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(255, 200, 100, 0.035) 0%, transparent 65%);
+      width: 380px;
+      height: 380px;
+      background: 
+        radial-gradient(circle at 35% 65%, rgba(255, 200, 100, 0.06) 0%, rgba(255, 220, 150, 0.02) 35%, transparent 65%);
       top: 30%;
       left: 10%;
-      animation: windDrift4 42s ease-in-out infinite;
+      animation: windDrift4 47s ease-in-out infinite;
     }
 
     .bokeh-5 {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(150, 255, 200, 0.025) 0%, transparent 75%);
+      width: 720px;
+      height: 720px;
+      background: 
+        radial-gradient(circle at 45% 55%, rgba(150, 255, 200, 0.05) 0%, rgba(180, 255, 220, 0.015) 45%, transparent 75%);
       top: 10%;
       left: 40%;
-      animation: windLarge5 50s ease-in-out infinite;
+      animation: windLarge5 55s ease-in-out infinite;
     }
 
     .bokeh-6 {
-      width: 280px;
-      height: 280px;
-      background: radial-gradient(circle, rgba(200, 150, 255, 0.04) 0%, transparent 65%);
+      width: 340px;
+      height: 340px;
+      background: 
+        radial-gradient(circle at 60% 40%, rgba(200, 150, 255, 0.08) 0%, rgba(220, 180, 255, 0.025) 40%, transparent 65%);
       top: 50%;
       left: 85%;
-      animation: windSpiral6 35s ease-in-out infinite;
+      animation: windSpiral6 38s ease-in-out infinite;
     }
 
     @keyframes windSwirl1 {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(80vw, 20vh) rotate(90deg); }
-      50% { transform: translate(70vw, 70vh) rotate(180deg); }
-      75% { transform: translate(20vw, 60vh) rotate(270deg); }
+      0%, 100% { 
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        filter: blur(1px);
+      }
+      25% { 
+        transform: translate(40vw, 20vh) rotate(90deg) scale(1.1);
+        filter: blur(2px);
+      }
+      50% { 
+        transform: translate(35vw, 60vh) rotate(180deg) scale(0.9);
+        filter: blur(1.5px);
+      }
+      75% { 
+        transform: translate(20vw, 50vh) rotate(270deg) scale(1.05);
+        filter: blur(1.8px);
+      }
     }
 
     @keyframes windFlow2 {
-      0%, 100% { transform: translate(0, 0); }
-      20% { transform: translate(-30vw, 30vh); }
-      40% { transform: translate(40vw, 80vh); }
-      60% { transform: translate(80vw, 40vh); }
-      80% { transform: translate(50vw, -10vh); }
+      0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        filter: blur(1.2px);
+      }
+      20% { 
+        transform: translate(-25vw, 30vh) scale(1.15);
+        filter: blur(2.2px);
+      }
+      40% { 
+        transform: translate(30vw, 70vh) scale(0.85);
+        filter: blur(1.8px);
+      }
+      60% { 
+        transform: translate(45vw, 40vh) scale(1.1);
+        filter: blur(1.6px);
+      }
+      80% { 
+        transform: translate(35vw, 10vh) scale(0.95);
+        filter: blur(2px);
+      }
     }
 
     @keyframes windCircle3 {
-      0%, 100% { transform: translate(0, 0); }
-      25% { transform: translate(-40vw, -30vh); }
-      50% { transform: translate(-80vw, 20vh); }
-      75% { transform: translate(-60vw, 60vh); }
+      0%, 100% { 
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        filter: blur(1.4px);
+      }
+      33% { 
+        transform: translate(-35vw, 25vh) rotate(120deg) scale(1.08);
+        filter: blur(2px);
+      }
+      66% { 
+        transform: translate(25vw, 5vh) rotate(240deg) scale(0.92);
+        filter: blur(1.7px);
+      }
     }
 
     @keyframes windDrift4 {
-      0%, 100% { transform: translate(0, 0); }
-      33% { transform: translate(60vw, -40vh); }
-      66% { transform: translate(30vw, -80vh); }
+      0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        filter: blur(1.3px);
+      }
+      25% { 
+        transform: translate(40vw, 45vh) scale(1.12);
+        filter: blur(2.1px);
+      }
+      50% { 
+        transform: translate(-15vw, 70vh) scale(0.88);
+        filter: blur(1.6px);
+      }
+      75% { 
+        transform: translate(50vw, 15vh) scale(1.05);
+        filter: blur(1.9px);
+      }
     }
 
     @keyframes windLarge5 {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      20% { transform: translate(-60vw, -20vh) rotate(72deg); }
-      40% { transform: translate(-40vw, -60vh) rotate(144deg); }
-      60% { transform: translate(20vw, -40vh) rotate(216deg); }
-      80% { transform: translate(10vw, -10vh) rotate(288deg); }
+      0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        filter: blur(1.6px);
+      }
+      20% { 
+        transform: translate(-25vw, 5vh) scale(1.2);
+        filter: blur(2.5px);
+      }
+      40% { 
+        transform: translate(35vw, 25vh) scale(0.8);
+        filter: blur(2px);
+      }
+      60% { 
+        transform: translate(20vw, 65vh) scale(1.1);
+        filter: blur(1.8px);
+      }
+      80% { 
+        transform: translate(-35vw, 50vh) scale(0.9);
+        filter: blur(2.2px);
+      }
     }
 
     @keyframes windSpiral6 {
-      0%, 100% { transform: translate(0, 0); }
-      25% { transform: translate(-20vw, 40vh); }
-      50% { transform: translate(-60vw, 80vh); }
-      75% { transform: translate(-40vw, 120vh); }
+      0%, 100% { 
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        filter: blur(1.2px);
+      }
+      25% { 
+        transform: translate(-45vw, 10vh) rotate(180deg) scale(1.15);
+        filter: blur(2.3px);
+      }
+      50% { 
+        transform: translate(-25vw, 55vh) rotate(360deg) scale(0.85);
+        filter: blur(1.9px);
+      }
+      75% { 
+        transform: translate(15vw, 20vh) rotate(540deg) scale(1.1);
+        filter: blur(1.6px);
+      }
     }
 
     .particle {
@@ -243,24 +318,29 @@
     }
 
     .typing-line {
-      font-size: clamp(1.4em, 4.5vw, 3.2em);
-      white-space: nowrap;
-      overflow: hidden;
-      color: #f8f8f8;
-      margin: 40px 0;
+      font-size: clamp(1.4em, 4.5vw, 2.4em);
+      color: rgba(248, 248, 248, 0.95);
+      margin: 30px 0;
+      text-shadow: 
+        0 2px 8px rgba(255, 255, 255, 0.1),
+        0 4px 20px rgba(255, 255, 255, 0.05),
+        0 1px 3px rgba(0, 0, 0, 0.3);
       position: relative;
-      font-weight: 300;
-      letter-spacing: 1px;
-      display: inline-block;
-      font-family: 'JetBrains Mono', monospace;
-      text-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
-      transition: all 0.8s ease;
+      font-weight: 400;
+      letter-spacing: 2px;
+      display: block;
+      text-align: center;
+      transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       transform: translateY(0);
+      line-height: 1.3;
+      backdrop-filter: blur(0.5px);
+      min-height: 1em;
     }
 
     .typing-line.slide-up {
-      transform: translateY(-20px);
-      opacity: 0.85;
+      transform: translateY(-25px);
+      opacity: 0.8;
+      filter: blur(0.5px);
     }
 
     .typing-line:nth-child(1) {
@@ -292,45 +372,67 @@
 
     .cursor-span {
       display: inline-block;
-      width: 2px;
+      width: 3px;
       height: 1em;
-      background: rgba(255, 255, 255, 0.7);
-      margin-left: 4px;
-      animation: blink 1.2s ease-in-out infinite;
+      background: linear-gradient(45deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+      margin-left: 6px;
+      animation: blink 1.4s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
     }
 
     @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
+      0%, 50% { 
+        opacity: 1; 
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+      }
+      51%, 100% { 
+        opacity: 0; 
+        box-shadow: none;
+      }
     }
 
     .btn {
       display: inline-block;
-      background: rgba(255, 255, 255, 0.06);
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
+        rgba(255, 255, 255, 0.06);
       color: #f8f8f8;
-      padding: 20px 42px;
-      font-size: clamp(0.9em, 2.5vw, 1.1em);
-      margin-top: 90px;
+      padding: 22px 48px;
+      font-size: clamp(0.95em, 2.8vw, 1.15em);
+      margin-top: 100px;
       text-decoration: none;
-      border-radius: 3px;
-      font-weight: 400;
-      letter-spacing: 1.5px;
+      border-radius: 4px;
+      font-weight: 500;
+      letter-spacing: 2px;
       position: relative;
       overflow: hidden;
-      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       font-family: 'JetBrains Mono', monospace;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-      box-shadow: 0 2px 15px rgba(255, 255, 255, 0.02);
+      text-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.4),
+        0 1px 3px rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 4px 20px rgba(255, 255, 255, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
     }
 
     .btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.25);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 35px rgba(255, 255, 255, 0.08);
-      letter-spacing: 2px;
-      text-shadow: 0 1px 6px rgba(255, 255, 255, 0.1);
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 
+        0 12px 40px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      letter-spacing: 2.5px;
+      text-shadow: 
+        0 2px 8px rgba(255, 255, 255, 0.15),
+        0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     .btn::before {
@@ -340,54 +442,87 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 0.6s ease;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2) 40%, 
+        rgba(255, 255, 255, 0.25) 50%, 
+        rgba(255, 255, 255, 0.2) 60%, 
+        transparent);
+      transition: left 0.8s ease;
     }
 
     .btn:hover::before {
       left: 100%;
     }
 
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: all 0.6s ease;
+      border-radius: 50%;
+    }
+
+    .btn:hover::after {
+      width: 200px;
+      height: 200px;
+    }
+
     .logo {
       position: absolute;
-      top: 35px;
+      top: 40px;
       left: 50%;
       transform: translateX(-50%);
-      width: clamp(95px, 12vw, 140px);
+      width: clamp(100px, 13vw, 150px);
       height: auto;
       z-index: 15;
-      animation: subtleFloat 5s ease-in-out infinite;
-      filter: brightness(0.95) contrast(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.03));
-      opacity: 0.92;
-      transition: all 0.4s ease;
+      animation: subtleFloat 6s ease-in-out infinite;
+      filter: 
+        brightness(0.92) 
+        contrast(1.15) 
+        drop-shadow(0 4px 12px rgba(255, 255, 255, 0.04))
+        drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+      opacity: 0.9;
+      transition: all 0.5s ease;
     }
 
     @keyframes subtleFloat {
       0%, 100% { 
-        transform: translateX(-50%) translateY(0px);
-        opacity: 0.9;
+        transform: translateX(-50%) translateY(0px) rotate(0deg);
+        opacity: 0.88;
       }
       50% { 
-        transform: translateX(-50%) translateY(-5px);
+        transform: translateX(-50%) translateY(-8px) rotate(1deg);
         opacity: 1;
       }
     }
 
     .logo:hover {
-      animation: gentleRotate 3s ease-in-out infinite;
-      filter: brightness(1.05) contrast(1.15) drop-shadow(0 4px 15px rgba(255, 255, 255, 0.08));
+      animation: gentleRotate 4s ease-in-out infinite;
+      filter: 
+        brightness(1.08) 
+        contrast(1.2) 
+        drop-shadow(0 6px 20px rgba(255, 255, 255, 0.1))
+        drop-shadow(0 3px 8px rgba(0, 0, 0, 0.2));
       opacity: 1;
-      transform: translateX(-50%) scale(1.02);
+      transform: translateX(-50%) scale(1.05);
     }
 
     @keyframes gentleRotate {
-      0%, 100% { transform: translateX(-50%) rotate(0deg); }
-      50% { transform: translateX(-50%) rotate(2deg); }
+      0%, 100% { transform: translateX(-50%) rotate(0deg) scale(1.05); }
+      25% { transform: translateX(-50%) rotate(1deg) scale(1.06); }
+      50% { transform: translateX(-50%) rotate(3deg) scale(1.07); }
+      75% { transform: translateX(-50%) rotate(2deg) scale(1.06); }
     }
 
     .glitch {
       position: relative;
-      animation: glitchFlicker 0.3s ease-in-out;
+      animation: glitchFlicker 0.35s ease-in-out;
     }
 
     .glitch::before,
@@ -396,86 +531,100 @@
       position: absolute;
       top: 0;
       left: 0;
-      opacity: 0.6;
+      opacity: 0.7;
       pointer-events: none;
     }
 
     .glitch::before {
-      color: rgba(170, 120, 255, 0.7);
-      animation: classyGlitch1 0.15s linear;
-      text-shadow: 0 0 8px rgba(170, 120, 255, 0.4);
+      color: rgba(170, 120, 255, 0.8);
+      animation: classyGlitch1 0.18s linear;
+      text-shadow: 
+        0 0 12px rgba(170, 120, 255, 0.5),
+        0 2px 6px rgba(170, 120, 255, 0.3);
       transform-origin: center;
     }
 
     .glitch::after {
-      color: rgba(200, 150, 255, 0.6);
-      animation: classyGlitch2 0.18s linear;
-      text-shadow: 0 0 6px rgba(200, 150, 255, 0.3);
+      color: rgba(200, 150, 255, 0.7);
+      animation: classyGlitch2 0.22s linear;
+      text-shadow: 
+        0 0 10px rgba(200, 150, 255, 0.4),
+        0 2px 4px rgba(200, 150, 255, 0.2);
       transform-origin: center;
     }
 
     @keyframes classyGlitch1 {
       0%, 100% { 
         transform: translate(0) skew(0deg);
-        opacity: 0.6;
+        opacity: 0.7;
       }
       20% { 
-        transform: translate(-8px, 2px) skew(3deg);
-        opacity: 0.9;
+        transform: translate(-10px, 3px) skew(4deg);
+        opacity: 1;
       }
       40% { 
-        transform: translate(6px, -4px) skew(-4deg);
-        opacity: 0.2;
+        transform: translate(8px, -5px) skew(-5deg);
+        opacity: 0.3;
       }
       60% { 
-        transform: translate(-4px, 6px) skew(5deg);
-        opacity: 0.8;
+        transform: translate(-6px, 8px) skew(6deg);
+        opacity: 0.9;
       }
       80% { 
-        transform: translate(7px, -3px) skew(-3.5deg);
-        opacity: 0.4;
+        transform: translate(9px, -4px) skew(-4.5deg);
+        opacity: 0.5;
       }
     }
 
     @keyframes classyGlitch2 {
       0%, 100% { 
         transform: translate(0) skew(0deg);
-        opacity: 0.5;
+        opacity: 0.6;
       }
       25% { 
-        transform: translate(5px, -7px) skew(-4.5deg);
-        opacity: 0.8;
+        transform: translate(7px, -9px) skew(-5.5deg);
+        opacity: 0.9;
       }
       50% { 
-        transform: translate(-6px, 3px) skew(6deg);
-        opacity: 0.3;
+        transform: translate(-8px, 4px) skew(7deg);
+        opacity: 0.4;
       }
       75% { 
-        transform: translate(4px, 5px) skew(-5.5deg);
-        opacity: 0.7;
+        transform: translate(6px, 7px) skew(-3deg);
+        opacity: 0.8;
       }
     }
 
     @keyframes glitchFlicker {
       0%, 100% { 
-        color: #f8f8f8;
-        text-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
-        transform: skew(0deg) scale(1);
+        filter: hue-rotate(0deg) brightness(1);
+        text-shadow: 
+          0 2px 8px rgba(255, 255, 255, 0.1),
+          0 4px 20px rgba(255, 255, 255, 0.05);
       }
-      15% { 
-        color: rgba(230, 200, 255, 0.95);
-        text-shadow: 0 0 12px rgba(170, 120, 255, 0.3);
-        transform: skew(0.2deg) scale(1.005);
+      20% { 
+        filter: hue-rotate(10deg) brightness(1.1);
+        text-shadow: 
+          0 2px 12px rgba(170, 120, 255, 0.2),
+          0 4px 25px rgba(200, 150, 255, 0.1);
       }
-      30% { 
-        color: rgba(240, 220, 255, 0.9);
-        text-shadow: 0 0 8px rgba(200, 150, 255, 0.2);
-        transform: skew(-0.1deg) scale(0.998);
+      40% { 
+        filter: hue-rotate(-5deg) brightness(0.9);
+        text-shadow: 
+          0 2px 10px rgba(255, 255, 255, 0.15),
+          0 4px 22px rgba(255, 255, 255, 0.08);
       }
-      75% { 
-        color: rgba(235, 210, 255, 0.92);
-        text-shadow: 0 0 10px rgba(185, 140, 255, 0.25);
-        transform: skew(0.15deg) scale(1.002);
+      60% { 
+        filter: hue-rotate(15deg) brightness(1.05);
+        text-shadow: 
+          0 2px 14px rgba(170, 120, 255, 0.25),
+          0 4px 28px rgba(200, 150, 255, 0.12);
+      }
+      80% { 
+        filter: hue-rotate(-8deg) brightness(0.95);
+        text-shadow: 
+          0 2px 9px rgba(255, 255, 255, 0.12),
+          0 4px 21px rgba(255, 255, 255, 0.06);
       }
     }
 
@@ -551,8 +700,8 @@
   </style>
 </head>
 <body>
-  <div class="grid-bg"></div>
   <div class="ambient-overlay"></div>
+  
   <div class="bokeh-container">
     <div class="bokeh bokeh-1"></div>
     <div class="bokeh bokeh-2"></div>
@@ -561,7 +710,7 @@
     <div class="bokeh bokeh-5"></div>
     <div class="bokeh bokeh-6"></div>
   </div>
-  
+
   <img src="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/rtun_logo_nobg.png" alt="RTUN.RAVE" class="logo">
 
   <div class="typing-container">
@@ -581,6 +730,8 @@
   </a>
 
   <script>
+
+
     const line1Pool = [
       "CONSCIOUSNESS REQUIRES CALIBRATION.",
       "PERCEPTION SHIFTS AT DAWN.",
@@ -713,12 +864,14 @@
     setInterval(createParticle, 800);
 
     async function typeLine(el, text, cursor) {
-      let contentEl = el.querySelector('.content');
-      if (!contentEl) {
-        contentEl = document.createElement('span');
-        contentEl.className = 'content';
-        el.insertBefore(contentEl, cursor);
-      }
+      el.innerHTML = '';
+      
+      let contentEl = document.createElement('span');
+      contentEl.className = 'content';
+      contentEl.textContent = '';
+      
+      el.appendChild(contentEl);
+      el.appendChild(cursor);
       
       for (let i = 0; i <= text.length; i++) {
         contentEl.textContent = text.slice(0, i);
@@ -744,14 +897,15 @@
           }
         }
         
-        lines[i].el.appendChild(cursor);
-        
         await typeLine(lines[i].el, lines[i].text, cursor);
         
         if (i < lines.length - 1) {
+          await new Promise(r => setTimeout(r, 300));
+          
+          lines[i + 1].el.innerHTML = '';
           lines[i + 1].el.appendChild(cursor);
           
-          await new Promise(r => setTimeout(r, 600));
+          await new Promise(r => setTimeout(r, 300));
         }
       }
       
