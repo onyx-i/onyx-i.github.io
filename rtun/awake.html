@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTUN.RAVE - Wake Up. Dance. Transcend.</title>
+  <meta name="description" content="Consciousness requires calibration. Morning is a medium. Join the frequency shift.">
+  
+  <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/favicon_rtun/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/favicon_rtun/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/favicon_rtun/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/favicon_rtun/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/favicon_rtun/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/favicon_rtun/android-chrome-512x512.png">
+  
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RTUN.RAVE - Wake Up. Dance. Transcend.">
+  <meta property="og:description" content="Consciousness requires calibration. Morning is a medium. Join the frequency shift.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/ogimage_rtun.png">
+  <meta property="og:url" content="https://rtun.rave">
+  <meta property="og:site_name" content="RTUN.RAVE">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="RTUN.RAVE - Wake Up. Dance. Transcend.">
+  <meta name="twitter:description" content="Consciousness requires calibration. Morning is a medium. Join the frequency shift.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/ogimage_rtun.png">
+  
+  <meta name="keywords" content="rave, coffee rave, sober rave, morning rave, electronic music, dance, nightlife alternative, wellness, spiritual awakening, techno, house music">
+  <meta name="author" content="RTUN.RAVE">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://rtun.rave">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      height: 100%;
+      background: #0a0a0a; /* Immediate fallback to prevent white flash */
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      font-family: 'Inter', sans-serif, system-ui, -apple-system, sans-serif;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #f8f8f8; /* Ensure text is visible even if fonts don't load */
+    }
+
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      animation: gridFloat 8s ease-in-out infinite;
+      z-index: -2;
+    }
+
+    @keyframes gridFloat {
+      0%, 100% { opacity: 0.4; transform: translateY(0); }
+      50% { opacity: 0.2; transform: translateY(-10px); }
+    }
+
+        .ambient-overlay {
+      position: fixed;
+      top: -50px;
+      left: -50px;
+      width: calc(100% + 100px);
+      height: calc(100% + 100px);
+      background: 
+        radial-gradient(ellipse 800px 600px at 20% 30%, rgba(0, 255, 174, 0.08) 0%, transparent 40%),
+        radial-gradient(ellipse 600px 800px at 80% 70%, rgba(255, 100, 200, 0.06) 0%, transparent 40%),
+        radial-gradient(ellipse 400px 300px at 60% 20%, rgba(100, 100, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse 300px 500px at 30% 80%, rgba(255, 255, 100, 0.04) 0%, transparent 45%);
+      animation: ambientDrift 25s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes ambientDrift {
+      0%, 100% { 
+        transform: translate(0px, 0px);
+      }
+      25% { 
+        transform: translate(-15px, 10px);
+      }
+      50% { 
+        transform: translate(10px, -12px);
+      }
+      75% { 
+        transform: translate(8px, 15px);
+      }
+    }
+
+        .bokeh-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bokeh {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(1px);
+    }
+
+    .bokeh-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(0, 255, 174, 0.04) 0%, transparent 70%);
+      top: 60%;
+      left: 20%;
+      animation: windSwirl1 40s ease-in-out infinite;
+    }
+
+    .bokeh-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255, 100, 200, 0.05) 0%, transparent 65%);
+      top: 15%;
+      left: 70%;
+      animation: windFlow2 45s ease-in-out infinite;
+    }
+
+    .bokeh-3 {
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(circle, rgba(100, 100, 255, 0.04) 0%, transparent 70%);
+      top: 80%;
+      left: 80%;
+      animation: windCircle3 38s ease-in-out infinite;
+    }
+
+    .bokeh-4 {
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255, 200, 100, 0.035) 0%, transparent 65%);
+      top: 30%;
+      left: 10%;
+      animation: windDrift4 42s ease-in-out infinite;
+    }
+
+    .bokeh-5 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(150, 255, 200, 0.025) 0%, transparent 75%);
+      top: 10%;
+      left: 40%;
+      animation: windLarge5 50s ease-in-out infinite;
+    }
+
+    .bokeh-6 {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(200, 150, 255, 0.04) 0%, transparent 65%);
+      top: 50%;
+      left: 85%;
+      animation: windSpiral6 35s ease-in-out infinite;
+    }
+
+    @keyframes windSwirl1 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(80vw, 20vh) rotate(90deg); }
+      50% { transform: translate(70vw, 70vh) rotate(180deg); }
+      75% { transform: translate(20vw, 60vh) rotate(270deg); }
+    }
+
+    @keyframes windFlow2 {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-30vw, 30vh); }
+      40% { transform: translate(40vw, 80vh); }
+      60% { transform: translate(80vw, 40vh); }
+      80% { transform: translate(50vw, -10vh); }
+    }
+
+    @keyframes windCircle3 {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-40vw, -30vh); }
+      50% { transform: translate(-80vw, 20vh); }
+      75% { transform: translate(-60vw, 60vh); }
+    }
+
+    @keyframes windDrift4 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(60vw, -40vh); }
+      66% { transform: translate(30vw, -80vh); }
+    }
+
+    @keyframes windLarge5 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-60vw, -20vh) rotate(72deg); }
+      40% { transform: translate(-40vw, -60vh) rotate(144deg); }
+      60% { transform: translate(20vw, -40vh) rotate(216deg); }
+      80% { transform: translate(10vw, -10vh) rotate(288deg); }
+    }
+
+    @keyframes windSpiral6 {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-20vw, 40vh); }
+      50% { transform: translate(-60vw, 80vh); }
+      75% { transform: translate(-40vw, 120vh); }
+    }
+
+    .particle {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .typing-container {
+      text-align: center;
+      z-index: 10;
+      max-width: 90vw;
+      margin-top: 140px;
+      position: relative;
+    }
+
+    .typing-line {
+      font-size: clamp(1.4em, 4.5vw, 3.2em);
+      white-space: nowrap;
+      overflow: hidden;
+      color: #f8f8f8;
+      margin: 40px 0;
+      position: relative;
+      font-weight: 300;
+      letter-spacing: 1px;
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      text-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+      transition: all 0.8s ease;
+      transform: translateY(0);
+    }
+
+    .typing-line.slide-up {
+      transform: translateY(-20px);
+      opacity: 0.85;
+    }
+
+    .typing-line:nth-child(1) {
+      animation: breathe1 4s ease-in-out infinite;
+    }
+
+    .typing-line:nth-child(2) {
+      animation: breathe2 5s ease-in-out infinite;
+    }
+
+    .typing-line:nth-child(3) {
+      animation: breathe3 6s ease-in-out infinite;
+    }
+
+    @keyframes breathe1 {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.005); }
+    }
+
+    @keyframes breathe2 {
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50% { opacity: 1; transform: scale(0.998); }
+    }
+
+    @keyframes breathe3 {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.002); }
+    }
+
+    .cursor-span {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: rgba(255, 255, 255, 0.7);
+      margin-left: 4px;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .btn {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.06);
+      color: #f8f8f8;
+      padding: 20px 42px;
+      font-size: clamp(0.9em, 2.5vw, 1.1em);
+      margin-top: 90px;
+      text-decoration: none;
+      border-radius: 3px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-family: 'JetBrains Mono', monospace;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 15px rgba(255, 255, 255, 0.02);
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 35px rgba(255, 255, 255, 0.08);
+      letter-spacing: 2px;
+      text-shadow: 0 1px 6px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .logo {
+      position: absolute;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: clamp(95px, 12vw, 140px);
+      height: auto;
+      z-index: 15;
+      animation: subtleFloat 5s ease-in-out infinite;
+      filter: brightness(0.95) contrast(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.03));
+      opacity: 0.92;
+      transition: all 0.4s ease;
+    }
+
+    @keyframes subtleFloat {
+      0%, 100% { 
+        transform: translateX(-50%) translateY(0px);
+        opacity: 0.9;
+      }
+      50% { 
+        transform: translateX(-50%) translateY(-5px);
+        opacity: 1;
+      }
+    }
+
+    .logo:hover {
+      animation: gentleRotate 3s ease-in-out infinite;
+      filter: brightness(1.05) contrast(1.15) drop-shadow(0 4px 15px rgba(255, 255, 255, 0.08));
+      opacity: 1;
+      transform: translateX(-50%) scale(1.02);
+    }
+
+    @keyframes gentleRotate {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); }
+      50% { transform: translateX(-50%) rotate(2deg); }
+    }
+
+    .glitch {
+      position: relative;
+      animation: glitchFlicker 0.3s ease-in-out;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .glitch::before {
+      color: rgba(170, 120, 255, 0.7);
+      animation: classyGlitch1 0.15s linear;
+      text-shadow: 0 0 8px rgba(170, 120, 255, 0.4);
+      transform-origin: center;
+    }
+
+    .glitch::after {
+      color: rgba(200, 150, 255, 0.6);
+      animation: classyGlitch2 0.18s linear;
+      text-shadow: 0 0 6px rgba(200, 150, 255, 0.3);
+      transform-origin: center;
+    }
+
+    @keyframes classyGlitch1 {
+      0%, 100% { 
+        transform: translate(0) skew(0deg);
+        opacity: 0.6;
+      }
+      20% { 
+        transform: translate(-8px, 2px) skew(3deg);
+        opacity: 0.9;
+      }
+      40% { 
+        transform: translate(6px, -4px) skew(-4deg);
+        opacity: 0.2;
+      }
+      60% { 
+        transform: translate(-4px, 6px) skew(5deg);
+        opacity: 0.8;
+      }
+      80% { 
+        transform: translate(7px, -3px) skew(-3.5deg);
+        opacity: 0.4;
+      }
+    }
+
+    @keyframes classyGlitch2 {
+      0%, 100% { 
+        transform: translate(0) skew(0deg);
+        opacity: 0.5;
+      }
+      25% { 
+        transform: translate(5px, -7px) skew(-4.5deg);
+        opacity: 0.8;
+      }
+      50% { 
+        transform: translate(-6px, 3px) skew(6deg);
+        opacity: 0.3;
+      }
+      75% { 
+        transform: translate(4px, 5px) skew(-5.5deg);
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes glitchFlicker {
+      0%, 100% { 
+        color: #f8f8f8;
+        text-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+        transform: skew(0deg) scale(1);
+      }
+      15% { 
+        color: rgba(230, 200, 255, 0.95);
+        text-shadow: 0 0 12px rgba(170, 120, 255, 0.3);
+        transform: skew(0.2deg) scale(1.005);
+      }
+      30% { 
+        color: rgba(240, 220, 255, 0.9);
+        text-shadow: 0 0 8px rgba(200, 150, 255, 0.2);
+        transform: skew(-0.1deg) scale(0.998);
+      }
+      75% { 
+        color: rgba(235, 210, 255, 0.92);
+        text-shadow: 0 0 10px rgba(185, 140, 255, 0.25);
+        transform: skew(0.15deg) scale(1.002);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .typing-line {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.3;
+      }
+      
+      .btn {
+        padding: 14px 28px;
+        margin-top: 60px;
+      }
+      
+      .typing-container {
+        margin-top: 120px;
+      }
+      
+      .logo {
+        width: clamp(75px, 14vw, 100px);
+        top: 25px;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .instagram-link {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 20;
+      transition: all 0.3s ease;
+      opacity: 0.6;
+    }
+
+    .instagram-link:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .instagram-icon {
+      width: 28px;
+      height: 28px;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+    }
+
+    .instagram-link:hover .instagram-icon {
+      color: rgba(255, 255, 255, 0.9);
+      filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+    }
+
+    @media (max-width: 768px) {
+      .instagram-link {
+        bottom: 20px;
+        right: 20px;
+      }
+      
+      .instagram-icon {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="ambient-overlay"></div>
+  <div class="bokeh-container">
+    <div class="bokeh bokeh-1"></div>
+    <div class="bokeh bokeh-2"></div>
+    <div class="bokeh bokeh-3"></div>
+    <div class="bokeh bokeh-4"></div>
+    <div class="bokeh bokeh-5"></div>
+    <div class="bokeh bokeh-6"></div>
+  </div>
+  
+  <img src="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun/rtun_logo_nobg.png" alt="RTUN.RAVE" class="logo">
+
+  <div class="typing-container">
+    <div id="line1" class="typing-line"></div>
+    <div id="line2" class="typing-line"></div>
+    <div id="line3" class="typing-line"></div>
+  </div>
+  
+  <a class="btn" id="cta" href="https://posh.vip/e/rtunrave-2" target="_blank" style="display: none;"></a>
+
+  <a href="https://www.instagram.com/rtun.rave" target="_blank" class="instagram-link">
+    <svg class="instagram-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+    </svg>
+  </a>
+
+  <script>
+    const line1Pool = [
+      "CONSCIOUSNESS REQUIRES CALIBRATION.",
+      "PERCEPTION SHIFTS AT DAWN.",
+      "MORNING IS A MEDIUM.",
+      "RITUAL DEMANDS REPETITION.",
+      "THE VESSEL SEEKS ALIGNMENT.",
+      "FREQUENCY ADJUSTMENT REQUIRED.",
+      "REALITY REQUIRES RECALIBRATION.",
+      "DAWN IS A PERFORMANCE.",
+      "CONSCIOUSNESS IS A PRACTICE.",
+      "THE BODY IS AN INSTRUMENT.",
+      "MOTION IS MEDICINE."
+    ];
+
+    const line2Pool = [
+      "THE SIGNAL IS GETTING STRONGER.",
+      "WE'VE ISOLATED THE ACTIVE INGREDIENT IN TRANSCENDENCE.",
+      "AWARENESS EXPANDS THROUGH MOVEMENT.",
+      "THE ALGORITHM SUGGESTS MOVEMENT.",
+      "WE'VE FOUND THE FREQUENCY.",
+      "THE PATTERN EMERGES AT SUNRISE.",
+      "CLARITY COMES THROUGH MOTION.",
+      "THE TRANSMISSION IS BEGINNING.",
+      "THE RESEARCH IS CONCLUSIVE: YOU NEED THIS.",
+      "MOVEMENT WITHOUT AGENDA.",
+      "ENERGY FLOWS WHERE ATTENTION GOES."
+    ];
+
+    const line3Pool = [
+      "JOIN THE MORNING EXPERIMENT.",
+      "ENTER THE RITUAL SPACE.",
+      "PARTICIPATE IN THE FREQUENCY SHIFT.",
+      "ENTER THE SIGNAL.",
+      "EXPERIENCE AWAKENING AS COMMUNITY.",
+      "RECEIVE THE TRANSMISSION.",
+      "TUNE INTO THE FREQUENCY.",
+      "JOIN THE WAVELENGTH.",
+      "BECOME PART OF THE INSTALLATION.",
+      "CONTRIBUTE TO THE COLLECTIVE VIBRATION.",
+      "ALIGN WITH THE PATTERN."
+    ];
+
+    const ctaPool = [
+      "ENTER THE SPACE",
+      "BECOME THE EXPERIMENT",
+      "ACCESS THE EXPERIENCE",
+      "PARTICIPATE",
+      "ENGAGE THE RITUAL",
+      "ENTER THE FREQUENCY",
+      "ALIGN",
+      "TUNE IN",
+      "ENTER THE SIGNAL",
+      "FIND THE FREQUENCY",
+      "COMPLETE THE CIRCUIT",
+      "SYNC"
+    ];
+
+    const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    const lines = [
+      { el: document.getElementById("line1"), text: random(line1Pool) },
+      { el: document.getElementById("line2"), text: random(line2Pool) },
+      { el: document.getElementById("line3"), text: random(line3Pool) }
+    ];
+
+    const ctaText = random(ctaPool);
+
+    const particles = [];
+    
+    class Particle {
+      constructor() {
+        this.x = Math.random() * window.innerWidth;
+        this.y = window.innerHeight + 10;
+        this.size = Math.random() * 2 + 1;
+        this.speedY = Math.random() * 1 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.opacity = 0;
+        this.life = 0;
+        this.maxLife = Math.random() * 400 + 300;
+        
+        this.element = document.createElement('div');
+        this.element.className = 'particle';
+        this.element.style.width = this.size + 'px';
+        this.element.style.height = this.size + 'px';
+        document.body.appendChild(this.element);
+      }
+      
+      update() {
+        this.life++;
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        
+        if (this.life < 60) {
+          this.opacity = this.life / 60 * 0.3;
+        } else if (this.life > this.maxLife - 60) {
+          this.opacity = (this.maxLife - this.life) / 60 * 0.3;
+        } else {
+          this.opacity = 0.3;
+        }
+        
+        this.element.style.left = this.x + 'px';
+        this.element.style.top = this.y + 'px';
+        this.element.style.opacity = this.opacity;
+        
+        return this.y > -20 && this.life < this.maxLife;
+      }
+      
+      destroy() {
+        this.element.remove();
+      }
+    }
+    
+    function createParticle() {
+      if (Math.random() < 0.7) { // Reduced particle frequency
+        particles.push(new Particle());
+      }
+    }
+    
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        if (!particles[i].update()) {
+          particles[i].destroy();
+          particles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(updateParticles);
+    }
+    
+    updateParticles();
+    setInterval(createParticle, 800); // Less frequent particles
+
+    async function typeLine(el, text, cursor) {
+      // Create content span if it doesn't exist
+      let contentEl = el.querySelector('.content');
+      if (!contentEl) {
+        contentEl = document.createElement('span');
+        contentEl.className = 'content';
+        el.insertBefore(contentEl, cursor); // Insert before cursor to keep cursor at end
+      }
+      
+      for (let i = 0; i <= text.length; i++) {
+        contentEl.textContent = text.slice(0, i);
+        
+        if (Math.random() < 0.12) { // Much higher frequency during typing
+          contentEl.classList.add('glitch');
+          contentEl.setAttribute('data-text', text.slice(0, i));
+          setTimeout(() => contentEl.classList.remove('glitch'), 150);
+        }
+        
+        await new Promise(r => setTimeout(r, 45));
+      }
+    }
+
+    async function startTyping() {
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor-span';
+      
+      for (let i = 0; i < lines.length; i++) {
+        // Add slide-up animation to previous lines
+        if (i > 0) {
+          for (let j = 0; j < i; j++) {
+            lines[j].el.classList.add('slide-up');
+          }
+        }
+        
+        // Add cursor to current line before typing
+        lines[i].el.appendChild(cursor);
+        
+        await typeLine(lines[i].el, lines[i].text, cursor);
+        
+        if (i < lines.length - 1) {
+          // Move cursor to next line immediately after typing completes
+          lines[i + 1].el.appendChild(cursor);
+          
+          // Now pause with cursor already on the next line
+          await new Promise(r => setTimeout(r, 600));
+        }
+      }
+      
+      // Keep cursor blinking at the end (don't remove it)
+      
+      // Start persistent glitching on all completed text
+      startPersistentGlitch();
+      
+      const cta = document.getElementById("cta");
+      cta.textContent = ctaText;
+      cta.style.display = "inline-block";
+      cta.classList.add('fade-in');
+    }
+
+    function startPersistentGlitch() {
+      function randomGlitch() {
+        // Randomly pick one of the completed lines to glitch
+        const randomLine = lines[Math.floor(Math.random() * lines.length)];
+        const contentEl = randomLine.el.querySelector('.content');
+        
+        if (contentEl && !contentEl.classList.contains('glitch')) {
+          contentEl.classList.add('glitch');
+          contentEl.setAttribute('data-text', contentEl.textContent);
+          setTimeout(() => contentEl.classList.remove('glitch'), 400);
+        }
+        
+        // Schedule next random glitch between 2-8 seconds
+        const nextGlitch = Math.random() * 6000 + 2000;
+        setTimeout(randomGlitch, nextGlitch);
+      }
+      
+      // Start the persistent glitching cycle
+      setTimeout(randomGlitch, 1500);
+    }
+
+    startTyping();
+
+    document.getElementById('cta').addEventListener('click', function() {
+      this.style.transform = 'scale(0.98) translateY(-1px)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 150);
+    });
+  </script>
+</body>
+</html> 
