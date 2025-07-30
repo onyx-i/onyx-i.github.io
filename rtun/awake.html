@@ -318,9 +318,9 @@
     }
 
     .typing-line {
-      font-size: clamp(1.4em, 4.5vw, 2.4em);
+      font-size: clamp(1.6em, 5vw, 2.8em);
       color: rgba(248, 248, 248, 0.95);
-      margin: 30px 0;
+      margin: 40px 0;
       text-shadow: 
         0 2px 8px rgba(255, 255, 255, 0.1),
         0 4px 20px rgba(255, 255, 255, 0.05),
@@ -417,6 +417,8 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         inset 0 -1px 0 rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(60px);
     }
 
     .btn:hover {
@@ -697,6 +699,31 @@
         height: 24px;
       }
     }
+    .typing-line.slide-up-final {
+      transform: translateY(-50px);
+      transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .btn.swoop-in {
+      opacity: 1;
+      transform: translateY(0);
+      animation: swoopIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    @keyframes swoopIn {
+      0% {
+        opacity: 0;
+        transform: translateY(60px) scale(0.9);
+      }
+      60% {
+        opacity: 0.8;
+        transform: translateY(-5px) scale(1.02);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
   </style>
 </head>
 <body>
@@ -914,7 +941,13 @@
       const cta = document.getElementById("cta");
       cta.textContent = ctaText;
       cta.style.display = "inline-block";
-      cta.classList.add('fade-in');
+      
+      setTimeout(() => {
+        for (let i = 0; i < lines.length; i++) {
+          lines[i].el.classList.add('slide-up-final');
+        }
+        cta.classList.add('swoop-in');
+      }, 500);
     }
 
     function startPersistentGlitch() {
