@@ -6,7 +6,6 @@
   <title>RTUN.RAVE - Wake Up. Dance. Transcend.</title>
   <meta name="description" content="Stop pretending that club was fun. Your liver needs a break. Wake up at a coffee rave. We're dancing. We're sober. We're changing lives.">
   
-  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/favicon_rtun/favicon.ico">
   <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/favicon_rtun/favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/favicon_rtun/favicon-32x32.png">
@@ -14,7 +13,6 @@
   <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/favicon_rtun/android-chrome-192x192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/favicon_rtun/android-chrome-512x512.png">
   
-  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="RTUN.RAVE - Wake Up. Dance. Transcend.">
   <meta property="og:description" content="Stop pretending that club was fun. Your liver needs a break. Wake up at a coffee rave. We're dancing. We're sober. We're changing lives.">
@@ -22,13 +20,11 @@
   <meta property="og:url" content="https://rtun.rave">
   <meta property="og:site_name" content="RTUN.RAVE">
   
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="RTUN.RAVE - Wake Up. Dance. Transcend.">
   <meta name="twitter:description" content="Stop pretending that club was fun. Your liver needs a break. Wake up at a coffee rave. We're dancing. We're sober. We're changing lives.">
   <meta name="twitter:image" content="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/ogimage_rtun.png">
   
-  <!-- Additional SEO -->
   <meta name="keywords" content="rave, coffee rave, sober rave, morning rave, electronic music, dance, nightlife alternative, wellness, spiritual awakening, techno, house music">
   <meta name="author" content="RTUN.RAVE">
   <meta name="robots" content="index, follow">
@@ -59,7 +55,6 @@
       padding: 20px;
     }
 
-    /* Animated background grid */
     .grid-bg {
       position: fixed;
       top: 0;
@@ -79,7 +74,6 @@
       50% { opacity: 0.1; transform: scale(1.05); }
     }
 
-    /* Glitch overlay */
     .glitch-overlay {
       position: fixed;
       top: 0;
@@ -103,7 +97,6 @@
       100% { transform: translateX(0) skew(0deg); }
     }
 
-    /* Floating particles */
     .particle {
       position: fixed;
       background: #00ffae;
@@ -244,7 +237,6 @@
       50% { background-position: 100% 50%; }
     }
 
-    /* Logo dancing animation */
     .logo {
       position: absolute;
       top: 20px;
@@ -352,7 +344,6 @@
       100% { transform: translate(0); }
     }
 
-    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .typing-line {
         white-space: normal;
@@ -374,7 +365,6 @@
       }
     }
 
-    /* Screen shake effect */
     @keyframes screenShake {
       0%, 100% { transform: translate(0); }
       25% { transform: translate(-1px, 1px); }
@@ -480,7 +470,6 @@
 
     const ctaText = random(ctaPool);
 
-    // Particle system
     const particles = [];
     
     class Particle {
@@ -506,7 +495,6 @@
         this.y -= this.speedY;
         this.x += this.speedX;
         
-        // Fade in and out
         if (this.life < 30) {
           this.opacity = this.life / 30 * 0.6;
         } else if (this.life > this.maxLife - 30) {
@@ -515,12 +503,10 @@
           this.opacity = 0.6;
         }
         
-        // Update DOM
         this.element.style.left = this.x + 'px';
         this.element.style.top = this.y + 'px';
         this.element.style.opacity = this.opacity;
         
-        // Remove if off screen or dead
         return this.y > -20 && this.life < this.maxLife;
       }
       
@@ -543,11 +529,9 @@
       requestAnimationFrame(updateParticles);
     }
     
-    // Start particle system
     updateParticles();
     setInterval(createParticle, 400);
 
-    // Screen shake effect
     function shakeScreen() {
       document.body.classList.add('shake');
       setTimeout(() => document.body.classList.remove('shake'), 100);
@@ -561,14 +545,12 @@
       for (let i = 0; i <= text.length; i++) {
         contentEl.textContent = text.slice(0, i);
         
-        // Random glitch effect
         if (Math.random() < 0.05) {
           contentEl.classList.add('glitch');
           contentEl.setAttribute('data-text', text.slice(0, i));
           setTimeout(() => contentEl.classList.remove('glitch'), 100);
         }
         
-        // Random screen shake
         if (Math.random() < 0.02) {
           shakeScreen();
         }
@@ -578,7 +560,6 @@
     }
 
     async function startTyping() {
-      // Create single cursor
       const cursor = document.createElement('span');
       cursor.className = 'cursor-span';
       
@@ -594,13 +575,11 @@
       cta.textContent = ctaText;
       cta.style.display = "inline-block";
       
-      // Final screen shake when button appears
       setTimeout(shakeScreen, 200);
     }
 
     startTyping();
 
-    // Add click sound simulation (visual feedback)
     document.getElementById('cta').addEventListener('click', function() {
       this.style.transform = 'scale(0.95)';
       setTimeout(() => {
