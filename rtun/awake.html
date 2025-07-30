@@ -694,7 +694,7 @@
     }
     
     function createParticle() {
-      if (Math.random() < 0.7) { // Reduced particle frequency
+      if (Math.random() < 0.7) {
         particles.push(new Particle());
       }
     }
@@ -710,21 +710,20 @@
     }
     
     updateParticles();
-    setInterval(createParticle, 800); // Less frequent particles
+    setInterval(createParticle, 800);
 
     async function typeLine(el, text, cursor) {
-      // Create content span if it doesn't exist
       let contentEl = el.querySelector('.content');
       if (!contentEl) {
         contentEl = document.createElement('span');
         contentEl.className = 'content';
-        el.insertBefore(contentEl, cursor); // Insert before cursor to keep cursor at end
+        el.insertBefore(contentEl, cursor);
       }
       
       for (let i = 0; i <= text.length; i++) {
         contentEl.textContent = text.slice(0, i);
         
-        if (Math.random() < 0.12) { // Much higher frequency during typing
+        if (Math.random() < 0.12) {
           contentEl.classList.add('glitch');
           contentEl.setAttribute('data-text', text.slice(0, i));
           setTimeout(() => contentEl.classList.remove('glitch'), 150);
@@ -739,30 +738,23 @@
       cursor.className = 'cursor-span';
       
       for (let i = 0; i < lines.length; i++) {
-        // Add slide-up animation to previous lines
         if (i > 0) {
           for (let j = 0; j < i; j++) {
             lines[j].el.classList.add('slide-up');
           }
         }
         
-        // Add cursor to current line before typing
         lines[i].el.appendChild(cursor);
         
         await typeLine(lines[i].el, lines[i].text, cursor);
         
         if (i < lines.length - 1) {
-          // Move cursor to next line immediately after typing completes
           lines[i + 1].el.appendChild(cursor);
           
-          // Now pause with cursor already on the next line
           await new Promise(r => setTimeout(r, 600));
         }
       }
       
-      // Keep cursor blinking at the end (don't remove it)
-      
-      // Start persistent glitching on all completed text
       startPersistentGlitch();
       
       const cta = document.getElementById("cta");
@@ -773,7 +765,6 @@
 
     function startPersistentGlitch() {
       function randomGlitch() {
-        // Randomly pick one of the completed lines to glitch
         const randomLine = lines[Math.floor(Math.random() * lines.length)];
         const contentEl = randomLine.el.querySelector('.content');
         
@@ -783,12 +774,10 @@
           setTimeout(() => contentEl.classList.remove('glitch'), 400);
         }
         
-        // Schedule next random glitch between 2-8 seconds
-        const nextGlitch = Math.random() * 6000 + 2000;
+        const nextGlitch = Math.random() * 3000 + 2000;
         setTimeout(randomGlitch, nextGlitch);
       }
       
-      // Start the persistent glitching cycle
       setTimeout(randomGlitch, 1500);
     }
 

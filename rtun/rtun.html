@@ -632,12 +632,11 @@
     }
 
     async function typeLine(el, text, cursor) {
-      // Create content span if it doesn't exist
       let contentEl = el.querySelector('.content');
       if (!contentEl) {
         contentEl = document.createElement('span');
         contentEl.className = 'content';
-        el.insertBefore(contentEl, cursor); // Insert before cursor to keep cursor at end
+        el.insertBefore(contentEl, cursor);
       }
       
       for (let i = 0; i <= text.length; i++) {
@@ -662,28 +661,22 @@
       cursor.className = 'cursor-span';
       
       for (let i = 0; i < lines.length; i++) {
-        // Add slide-up animation to previous lines
         if (i > 0) {
           for (let j = 0; j < i; j++) {
             lines[j].el.classList.add('slide-up');
           }
         }
         
-        // Add cursor to current line before typing
         lines[i].el.appendChild(cursor);
         
         await typeLine(lines[i].el, lines[i].text, cursor);
         
         if (i < lines.length - 1) {
-          // Move cursor to next line immediately after typing completes
           lines[i + 1].el.appendChild(cursor);
           
-          // Now pause with cursor already on the next line
           await new Promise(r => setTimeout(r, 600));
         }
       }
-      
-      // Keep cursor blinking at the end (don't remove it)
       
       const cta = document.getElementById("cta");
       cta.textContent = ctaText;
