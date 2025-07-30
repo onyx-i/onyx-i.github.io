@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTUN.RAVE</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: #000;
+      font-family: 'Space Mono', monospace;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Animated background grid */
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 255, 174, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 174, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridPulse 4s ease-in-out infinite;
+      z-index: -2;
+    }
+
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.1; transform: scale(1.05); }
+    }
+
+    /* Glitch overlay */
+    .glitch-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, 
+        rgba(255, 0, 150, 0.03) 0%, 
+        rgba(0, 255, 174, 0.03) 50%, 
+        rgba(255, 255, 0, 0.03) 100%);
+      animation: glitchShift 3s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes glitchShift {
+      0% { transform: translateX(0) skew(0deg); }
+      20% { transform: translateX(-2px) skew(0.1deg); }
+      40% { transform: translateX(2px) skew(-0.1deg); }
+      60% { transform: translateX(-1px) skew(0.05deg); }
+      80% { transform: translateX(1px) skew(-0.05deg); }
+      100% { transform: translateX(0) skew(0deg); }
+    }
+
+    /* Floating particles */
+    .particle {
+      position: fixed;
+      background: #00ffae;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #00ffae80;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .typing-container {
+      text-align: center;
+      z-index: 10;
+      max-width: 90vw;
+      margin-top: 140px;
+      position: relative;
+    }
+
+    .typing-line {
+      font-size: clamp(1.2em, 4vw, 2.8em);
+      white-space: nowrap;
+      overflow: hidden;
+      color: #00ffae;
+      margin: 25px 0;
+      text-shadow: 
+        0 0 10px #00ffae,
+        0 0 20px #00ffae40,
+        0 0 40px #00ffae20;
+      position: relative;
+      font-weight: 700;
+      letter-spacing: 1px;
+      display: inline-block;
+    }
+
+    .typing-line:nth-child(1) {
+      animation: pulse1 2s ease-in-out infinite alternate;
+    }
+
+    .typing-line:nth-child(2) {
+      animation: pulse2 2.5s ease-in-out infinite alternate;
+    }
+
+    .typing-line:nth-child(3) {
+      animation: pulse3 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse1 {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(1.02); filter: brightness(1.2); }
+    }
+
+    @keyframes pulse2 {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(0.98); filter: brightness(1.3); }
+    }
+
+    @keyframes pulse3 {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(1.01); filter: brightness(1.1); }
+    }
+
+    .cursor-span {
+      display: inline-block;
+      width: 3px;
+      height: 1em;
+      background: #00ffae;
+      margin-left: 3px;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .btn {
+      display: inline-block;
+      background: linear-gradient(45deg, #00ffae, #00c28c, #ff0096);
+      background-size: 300% 300%;
+      color: #000;
+      padding: 20px 40px;
+      font-size: clamp(1em, 3vw, 1.5em);
+      margin-top: 60px;
+      text-decoration: none;
+      border-radius: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 2px solid #00ffae;
+      animation: gradientShift 3s linear infinite, buttonGlow 2s ease-in-out infinite alternate;
+      font-family: 'Space Mono', monospace;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes buttonGlow {
+      0% { 
+        box-shadow: 0 0 20px #00ffae40, 0 0 40px #00ffae20, 0 0 60px #00ffae10;
+        transform: scale(1);
+      }
+      100% { 
+        box-shadow: 0 0 30px #00ffae60, 0 0 60px #00ffae40, 0 0 90px #00ffae20;
+        transform: scale(1.03);
+      }
+    }
+
+    .btn:hover {
+      transform: scale(1.08) !important;
+      animation-duration: 0.5s;
+      box-shadow: 
+        0 0 40px #00ffae80, 
+        0 0 80px #00ffae60, 
+        0 0 120px #00ffae40,
+        inset 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff0096, #00ffae, #ffff00, #00ffae);
+      background-size: 400% 400%;
+      border-radius: 15px;
+      z-index: -1;
+      animation: borderGlow 4s linear infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Logo dancing animation */
+    .logo {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: clamp(60px, 12vw, 120px);
+      height: auto;
+      z-index: 15;
+      animation: 
+        dance 2s ease-in-out infinite,
+        bounce 3s ease-in-out infinite,
+        wiggle 1.5s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 15px #00ffae40);
+    }
+
+    @keyframes dance {
+      0%, 100% { 
+        transform: translateX(-50%) rotate(-5deg) scale(1);
+      }
+      25% { 
+        transform: translateX(-50%) rotate(5deg) scale(1.1);
+      }
+      50% { 
+        transform: translateX(-50%) rotate(-3deg) scale(0.95);
+      }
+      75% { 
+        transform: translateX(-50%) rotate(3deg) scale(1.05);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% { 
+        top: 20px;
+      }
+      50% { 
+        top: 10px;
+      }
+    }
+
+    @keyframes wiggle {
+      0% { 
+        transform: translateX(-50%) translateY(0px);
+      }
+      100% { 
+        transform: translateX(-50%) translateY(-3px);
+      }
+    }
+
+    .logo:hover {
+      animation: 
+        partyMode 0.5s ease-in-out infinite,
+        spinOut 2s linear infinite;
+      filter: drop-shadow(0 0 25px #00ffae80) hue-rotate(90deg);
+    }
+
+    @keyframes partyMode {
+      0%, 100% { transform: translateX(-50%) scale(1) rotate(0deg); }
+      25% { transform: translateX(-50%) scale(1.2) rotate(5deg); }
+      50% { transform: translateX(-50%) scale(0.8) rotate(-5deg); }
+      75% { transform: translateX(-50%) scale(1.1) rotate(3deg); }
+    }
+
+    @keyframes spinOut {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(-50%) rotate(360deg); }
+    }
+    .glitch {
+      position: relative;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.8;
+    }
+
+    .glitch::before {
+      color: #ff0096;
+      animation: glitch1 0.5s infinite linear alternate-reverse;
+    }
+
+    .glitch::after {
+      color: #ffff00;
+      animation: glitch2 0.5s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch1 {
+      0% { transform: translate(0); }
+      20% { transform: translate(-1px, 1px); }
+      40% { transform: translate(-1px, -1px); }
+      60% { transform: translate(1px, 1px); }
+      80% { transform: translate(1px, -1px); }
+      100% { transform: translate(0); }
+    }
+
+    @keyframes glitch2 {
+      0% { transform: translate(0); }
+      20% { transform: translate(1px, -1px); }
+      40% { transform: translate(1px, 1px); }
+      60% { transform: translate(-1px, -1px); }
+      80% { transform: translate(-1px, 1px); }
+      100% { transform: translate(0); }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .typing-line {
+        white-space: normal;
+        word-break: break-word;
+      }
+      
+      .btn {
+        padding: 15px 25px;
+        margin-top: 40px;
+      }
+      
+      .typing-container {
+        margin-top: 100px;
+      }
+      
+      .logo {
+        width: clamp(50px, 15vw, 80px);
+        top: 15px;
+      }
+    }
+
+    /* Screen shake effect */
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0); }
+      25% { transform: translate(-1px, 1px); }
+      50% { transform: translate(1px, -1px); }
+      75% { transform: translate(-1px, -1px); }
+    }
+
+    .shake {
+      animation: screenShake 0.1s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="glitch-overlay"></div>
+  
+  <img src="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/refs/heads/main/rtun_logo_nobg.png" alt="RTUN.RAVE" class="logo">
+
+  <div class="typing-container">
+    <div id="line1" class="typing-line"></div>
+    <div id="line2" class="typing-line"></div>
+    <div id="line3" class="typing-line"></div>
+  </div>
+  
+  <a class="btn" id="cta" href="https://posh.vip/e/rtunrave-2" target="_blank" style="display: none;"></a>
+
+  <script>
+    const line1Pool = [
+      "YOUR LIVER NEEDS A BREAK.",
+      "THIS IS ROCK BOTTOM CALLING TO CONFIRM YOUR RESERVATION.",
+      "YOUR CHAKRAS ARE BLOCKED BY FIREBALL SHOTS.",
+      "YOUR FUTURE SELF IS ACTIVELY REGRETTING THIS MOMENT.",
+      "DRUNK AGAIN?",
+      "TIRED OF VODKA & REGRET?",
+      "YOU'RE NOT HAVING A SPIRITUAL AWAKENING. YOU'RE JUST DEHYDRATED.",
+      "YOU LEFT YOUR CARD AT THE BAR AGAIN.",
+      "THIS IS YOUR SIGN TO STOP DOING COKE IN THE BATHROOM.",
+      "THE UNIVERSE ISN'T MAD. IT'S JUST TIRED OF YOUR B.S.",
+      "YOU DON'T NEED THERAPY. YOU NEED COFFEE. AND BASS.",
+      "YOUR THIRD MISTAKE TONIGHT WAS OPENING THIS.",
+      "CONGRATULATIONS. YOU'VE ACHIEVED PEAK MEDIOCRITY.",
+      "THE VOID IS STARING BACK. IT LOOKS DISAPPOINTED."
+    ];
+
+    const line2Pool = [
+      "STOP PRETENDING THAT CLUB WAS FUN.",
+      "YOUR THIRD EYE IS BLOODSHOT AND ASKING FOR WATER.",
+      "YOUR EX ISN'T TEXTING. THAT'S YOUR BANK.",
+      "YOU DRANK TEQUILA AND CALLED IT SELF-CARE.",
+      "THE CLUB WAS MID. YOU WERE MID.",
+      "YOU'RE 3 WHITE CLAWS AWAY FROM A BREAKDOWN.",
+      "YOU'RE NOT THE MAIN CHARACTER. JUST GO HOME."
+    ];
+
+    const line3Pool = [
+      "WAKE UP AT A COFFEE RAVE.",
+      "WE'RE DANCING. WE'RE SOBER. WE'RE CHANGING LIVES.",
+      "BRING YOUR HANGOVER. LEAVE WITH CLARITY.",
+      "YOU DON'T NEED A DETOX, YOU NEED THIS.",
+      "WE'RE STARTING RAVES BEFORE YOUR REGRET KICKS IN.",
+      "MORNINGS SHOULDN'T BE THIS LOUD. AND YET.",
+      "YOUR RESURRECTION STARTS WITH AN ESPRESSO SHOT.",
+      "YOUR COMEUP STARTS WITH COMING UP... EARLY.",
+      "THIS VIBE CHECK IS NON-NEGOTIABLE.",
+      "WAKE UP WRONG, DANCE IT OUT.",
+      "YOU CAN'T OUTDRINK WHAT YOU're RUNNING FROM.",
+      "WHO NEEDS A COMEDOWN WHEN YOU NEVER PEAKED?",
+      "THE VESSEL IS PREPARED. THE VESSEL IS YOU.",
+      "THE ANCIENT ONES DEMAND MOVEMENT AT UNNATURAL HOURS.",
+      "YOUR DNA REMEMBERS WHEN MORNINGS WERE SACRED.",
+      "YOUR BODY IS REQUESTING REALIGNMENT.",
+      "WE'VE FOUND THE ERROR IN YOUR PROGRAMMING.",
+      "WELCOME TO THE ALTAR OF NO REGRET.",
+      "IT'S NOT A PHASE. IT'S A 9AM RITUAL.",
+      "DIVINE INTERVENTION TASTES LIKE DARK ROAST."
+    ];
+
+    const ctaPool = [
+      "REDEEM YOUR SECOND CHANCE",
+      "FIX YOUR VIBE",
+      "ATONE THROUGH DANCE",
+      "WAKE UP. SHOW UP.",
+      "BUY THE TICKET. CLEANSE YOUR SOUL.",
+      "CLICK TO REPENT",
+      "EXIT THE CYCLE",
+      "THIS ISN'T A BUTTON, IT'S A DOOR",
+      "SACRIFICE YOUR SATURDAY",
+      "REWRITE YOUR LORE",
+      "AWAKEN. AGAIN.",
+      "CLAIM YOUR ENLIGHTENMENT",
+      "UNLOCK YOUR FINAL FORM",
+      "SELL YOUR SOUL",
+      "STEP INTO THE CIRCLE"
+    ];
+
+    const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    const lines = [
+      { el: document.getElementById("line1"), text: random(line1Pool) },
+      { el: document.getElementById("line2"), text: random(line2Pool) },
+      { el: document.getElementById("line3"), text: random(line3Pool) }
+    ];
+
+    const ctaText = random(ctaPool);
+
+    // Particle system
+    const particles = [];
+    
+    class Particle {
+      constructor() {
+        this.x = Math.random() * window.innerWidth;
+        this.y = window.innerHeight + 10;
+        this.size = Math.random() * 4 + 2;
+        this.speedY = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.opacity = 0;
+        this.life = 0;
+        this.maxLife = Math.random() * 300 + 200;
+        
+        this.element = document.createElement('div');
+        this.element.className = 'particle';
+        this.element.style.width = this.size + 'px';
+        this.element.style.height = this.size + 'px';
+        document.body.appendChild(this.element);
+      }
+      
+      update() {
+        this.life++;
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        
+        // Fade in and out
+        if (this.life < 30) {
+          this.opacity = this.life / 30 * 0.6;
+        } else if (this.life > this.maxLife - 30) {
+          this.opacity = (this.maxLife - this.life) / 30 * 0.6;
+        } else {
+          this.opacity = 0.6;
+        }
+        
+        // Update DOM
+        this.element.style.left = this.x + 'px';
+        this.element.style.top = this.y + 'px';
+        this.element.style.opacity = this.opacity;
+        
+        // Remove if off screen or dead
+        return this.y > -20 && this.life < this.maxLife;
+      }
+      
+      destroy() {
+        this.element.remove();
+      }
+    }
+    
+    function createParticle() {
+      particles.push(new Particle());
+    }
+    
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        if (!particles[i].update()) {
+          particles[i].destroy();
+          particles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(updateParticles);
+    }
+    
+    // Start particle system
+    updateParticles();
+    setInterval(createParticle, 400);
+
+    // Screen shake effect
+    function shakeScreen() {
+      document.body.classList.add('shake');
+      setTimeout(() => document.body.classList.remove('shake'), 100);
+    }
+
+    async function typeLine(el, text, cursor) {
+      el.innerHTML = '<span class="content"></span>';
+      el.appendChild(cursor);
+      const contentEl = el.querySelector(".content");
+      
+      for (let i = 0; i <= text.length; i++) {
+        contentEl.textContent = text.slice(0, i);
+        
+        // Random glitch effect
+        if (Math.random() < 0.05) {
+          contentEl.classList.add('glitch');
+          contentEl.setAttribute('data-text', text.slice(0, i));
+          setTimeout(() => contentEl.classList.remove('glitch'), 100);
+        }
+        
+        // Random screen shake
+        if (Math.random() < 0.02) {
+          shakeScreen();
+        }
+        
+        await new Promise(r => setTimeout(r, 35));
+      }
+    }
+
+    async function startTyping() {
+      // Create single cursor
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor-span';
+      
+      for (let i = 0; i < lines.length; i++) {
+        await typeLine(lines[i].el, lines[i].text, cursor);
+        
+        if (i < lines.length - 1) {
+          await new Promise(r => setTimeout(r, 600));
+        }
+      }
+      
+      const cta = document.getElementById("cta");
+      cta.textContent = ctaText;
+      cta.style.display = "inline-block";
+      
+      // Final screen shake when button appears
+      setTimeout(shakeScreen, 200);
+    }
+
+    startTyping();
+
+    // Add click sound simulation (visual feedback)
+    document.getElementById('cta').addEventListener('click', function() {
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 100);
+    });
+  </script>
+</body>
+</html>
