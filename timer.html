@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Timer</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-sprint: #ff4757;
+            --accent-rest: #2ed573;
+            --accent-neutral: #3742fa;
+            --border-color: #333;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+```
+    [data-theme="light"] {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --text-primary: #1a1a1a;
+        --text-secondary: #6c757d;
+        --accent-sprint: #dc3545;
+        --accent-rest: #28a745;
+        --accent-neutral: #007bff;
+        --border-color: #dee2e6;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        height: 100vh;
+        overflow: hidden;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+    }
+
+    .status-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: var(--accent-neutral);
+        transition: all 0.3s ease;
+    }
+
+    .status-bar.sprint {
+        background: var(--accent-sprint);
+    }
+
+    .status-bar.rest {
+        background: var(--accent-rest);
+    }
+
+    .header {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .mode-indicator {
+        font-size: 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--accent-neutral);
+        transition: all 0.3s ease;
+    }
+
+    .mode-indicator.sprint {
+        color: var(--accent-sprint);
+    }
+
+    .mode-indicator.rest {
+        color: var(--accent-rest);
+    }
+
+    .controls-header {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-icon {
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: 12px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow);
+    }
+
+    .btn-icon:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-icon:active {
+        transform: translateY(0);
+    }
+
+    .timer-display {
+        font-size: clamp(80px, 20vw, 160px);
+        font-weight: 800;
+        text-align: center;
+        margin: 40px 0;
+        transition: all 0.3s ease;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .timer-display.sprint {
+        color: var(--accent-sprint);
+    }
+
+    .timer-display.rest {
+        color: var(--accent-rest);
+    }
+
+    .progress-container {
+        width: 100%;
+        max-width: 400px;
+        height: 8px;
+        background: var(--bg-secondary);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 40px;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--accent-neutral);
+        transition: all 0.1s linear;
+        border-radius: 4px;
+    }
+
+    .progress-bar.sprint {
+        background: var(--accent-sprint);
+    }
+
+    .progress-bar.rest {
+        background: var(--accent-rest);
+    }
+
+    .controls {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .btn {
+        padding: 16px 32px;
+        border: none;
+        border-radius: 16px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow);
+        min-width: 120px;
+    }
+
+    .btn-primary {
+        background: var(--accent-neutral);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    .session-info {
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .settings-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+    }
+
+    .settings-panel {
+        background: var(--bg-secondary);
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: var(--shadow);
+    }
+
+    .settings-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .setting-group {
+        margin-bottom: 25px;
+    }
+
+    .setting-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .setting-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 16px;
+        transition: border-color 0.2s ease;
+    }
+
+    .setting-input:focus {
+        outline: none;
+        border-color: var(--accent-neutral);
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .checkbox {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--bg-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .checkbox.checked {
+        background: var(--accent-neutral);
+        border-color: var(--accent-neutral);
+    }
+
+    .checkbox.checked::after {
+        content: '✓';
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .settings-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        padding: 20px 30px;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        box-shadow: var(--shadow);
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .notification.show {
+        opacity: 1;
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .header {
+            top: 40px;
+            left: 10px;
+            right: 10px;
+        }
+        
+        .mode-indicator {
+            font-size: 20px;
+        }
+        
+        .controls {
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+```
+
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <div class="status-bar" id="statusBar"></div>
+
+```
+    <div class="header">
+        <div class="mode-indicator" id="modeIndicator">Ready</div>
+        <div class="controls-header">
+            <button class="btn-icon" id="themeToggle" title="Toggle theme">🌙</button>
+            <button class="btn-icon" id="settingsBtn" title="Settings">⚙️</button>
+        </div>
+    </div>
+
+    <div class="timer-display" id="timerDisplay">00:30</div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="session-info" id="sessionInfo">
+        Sprint: 30s | Rest: 90s | Rounds: ∞
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" id="startBtn">Start</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+    </div>
+</div>
+
+<div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-panel">
+        <h2 class="settings-title">Timer Settings</h2>
+        
+        <div class="setting-group">
+            <label class="setting-label">Sprint Duration (seconds)</label>
+            <input type="number" class="setting-input" id="sprintTime" value="30" min="1" max="300">
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">Rest Duration (seconds)</label>
+            <input type="number" class="setting-input" id="restTime" value="90" min="1" max="600">
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">Number of Rounds (0 = infinite)</label>
+            <input type="number" class="setting-input" id="rounds" value="0" min="0" max="100">
+        </div>
+
+        <div class="checkbox-container">
+            <div class="checkbox checked" id="soundToggle"></div>
+            <label class="setting-label">Sound notifications</label>
+        </div>
+
+        <div class="settings-actions">
+            <button class="btn btn-primary" id="saveSettings">Save</button>
+            <button class="btn btn-secondary" id="cancelSettings">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+    class SprintTimer {
+        constructor() {
+            this.sprintDuration = 30;
+            this.restDuration = 90;
+            this.totalRounds = 0; // 0 = infinite
+            this.soundEnabled = true;
+            
+            this.currentPhase = 'sprint'; // 'sprint' or 'rest'
+            this.timeRemaining = this.sprintDuration;
+            this.currentRound = 1;
+            this.isRunning = false;
+            this.intervalId = null;
+            
+            this.initElements();
+            this.setupEventListeners();
+            this.updateDisplay();
+            this.updateSessionInfo();
+            this.loadSettings();
+        }
+
+        initElements() {
+            this.timerDisplay = document.getElementById('timerDisplay');
+            this.modeIndicator = document.getElementById('modeIndicator');
+            this.statusBar = document.getElementById('statusBar');
+            this.progressBar = document.getElementById('progressBar');
+            this.startBtn = document.getElementById('startBtn');
+            this.resetBtn = document.getElementById('resetBtn');
+            this.sessionInfo = document.getElementById('sessionInfo');
+            this.settingsOverlay = document.getElementById('settingsOverlay');
+            this.notification = document.getElementById('notification');
+        }
+
+        setupEventListeners() {
+            document.getElementById('startBtn').addEventListener('click', () => this.toggleTimer());
+            document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+            document.getElementById('settingsBtn').addEventListener('click', () => this.openSettings());
+            document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+            document.getElementById('saveSettings').addEventListener('click', () => this.saveSettings());
+            document.getElementById('cancelSettings').addEventListener('click', () => this.closeSettings());
+            document.getElementById('soundToggle').addEventListener('click', () => this.toggleSound());
+            
+            // Close settings when clicking overlay
+            document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) this.closeSettings();
+            });
+
+            // Prevent screen sleep
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && this.isRunning) {
+                    // Keep timer running in background
+                }
+            });
+        }
+
+        toggleTimer() {
+            if (this.isRunning) {
+                this.pause();
+            } else {
+                this.start();
+            }
+        }
+
+        start() {
+            this.isRunning = true;
+            this.startBtn.textContent = 'Pause';
+            this.startBtn.className = 'btn btn-secondary';
+            
+            this.intervalId = setInterval(() => {
+                this.tick();
+            }, 1000);
+            
+            this.showNotification(`${this.currentPhase === 'sprint' ? 'Sprint' : 'Rest'} started!`);
+        }
+
+        pause() {
+            this.isRunning = false;
+            this.startBtn.textContent = 'Start';
+            this.startBtn.className = 'btn btn-primary';
+            
+            if (this.intervalId) {
+                clearInterval(this.intervalId);
+                this.intervalId = null;
+            }
+        }
+
+        reset() {
+            this.pause();
+            this.currentPhase = 'sprint';
+            this.timeRemaining = this.sprintDuration;
+            this.currentRound = 1;
+            this.updateDisplay();
+            this.showNotification('Timer reset');
+        }
+
+        tick() {
+            this.timeRemaining--;
+            
+            if (this.timeRemaining <= 0) {
+                this.switchPhase();
+            }
+            
+            this.updateDisplay();
+        }
+
+        switchPhase() {
+            if (this.currentPhase === 'sprint') {
+                this.currentPhase = 'rest';
+                this.timeRemaining = this.restDuration;
+                this.showNotification('Rest time!');
+                this.playSound(800, 0.3); // Lower pitch for rest
+            } else {
+                this.currentPhase = 'sprint';
+                this.timeRemaining = this.sprintDuration;
+                this.currentRound++;
+                
+                // Check if we've completed all rounds
+                if (this.totalRounds > 0 && this.currentRound > this.totalRounds) {
+                    this.complete();
+                    return;
+                }
+                
+                this.showNotification('Sprint time!');
+                this.playSound(1200, 0.5); // Higher pitch for sprint
+            }
+        }
+
+        complete() {
+            this.pause();
+            this.showNotification('Workout complete! 🎉');
+            this.playSound(1000, 0.7);
+            setTimeout(() => this.reset(), 3000);
+        }
+
+        updateDisplay() {
+            const minutes = Math.floor(this.timeRemaining / 60);
+            const seconds = this.timeRemaining % 60;
+            this.timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update phase indicators
+            this.modeIndicator.textContent = this.currentPhase === 'sprint' ? 'Sprint' : 'Rest';
+            this.modeIndicator.className = `mode-indicator ${this.currentPhase}`;
+            this.timerDisplay.className = `timer-display ${this.currentPhase}`;
+            this.statusBar.className = `status-bar ${this.currentPhase}`;
+            this.progressBar.className = `progress-bar ${this.currentPhase}`;
+            
+            // Update progress bar
+            const totalTime = this.currentPhase === 'sprint' ? this.sprintDuration : this.restDuration;
+            const progress = ((totalTime - this.timeRemaining) / totalTime) * 100;
+            this.progressBar.style.width = `${progress}%`;
+            
+            // Update session info
+            this.updateSessionInfo();
+        }
+
+        updateSessionInfo() {
+            const roundsText = this.totalRounds === 0 ? '∞' : `${this.currentRound}/${this.totalRounds}`;
+            this.sessionInfo.textContent = `Sprint: ${this.sprintDuration}s | Rest: ${this.restDuration}s | Rounds: ${roundsText}`;
+        }
+
+        openSettings() {
+            document.getElementById('sprintTime').value = this.sprintDuration;
+            document.getElementById('restTime').value = this.restDuration;
+            document.getElementById('rounds').value = this.totalRounds;
+            document.getElementById('soundToggle').className = this.soundEnabled ? 'checkbox checked' : 'checkbox';
+            this.settingsOverlay.style.display = 'flex';
+        }
+
+        closeSettings() {
+            this.settingsOverlay.style.display = 'none';
+        }
+
+        saveSettings() {
+            const newSprintTime = parseInt(document.getElementById('sprintTime').value);
+            const newRestTime = parseInt(document.getElementById('restTime').value);
+            const newRounds = parseInt(document.getElementById('rounds').value);
+            
+            if (newSprintTime > 0 && newRestTime > 0 && newRounds >= 0) {
+                this.sprintDuration = newSprintTime;
+                this.restDuration = newRestTime;
+                this.totalRounds = newRounds;
+                
+                // Reset timer with new settings
+                this.reset();
+                this.updateDisplay();
+                this.closeSettings();
+                this.showNotification('Settings saved!');
+                this.saveSettingsToStorage();
+            }
+        }
+
+        toggleSound() {
+            const toggle = document.getElementById('soundToggle');
+            this.soundEnabled = !this.soundEnabled;
+            toggle.className = this.soundEnabled ? 'checkbox checked' : 'checkbox';
+        }
+
+        toggleTheme() {
+            const body = document.body;
+            const toggle = document.getElementById('themeToggle');
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            
+            localStorage.setItem('theme', newTheme);
+        }
+
+        playSound(frequency = 1000, duration = 0.3) {
+            if (!this.soundEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (e) {
+                // Audio not supported or blocked
+            }
+        }
+
+        showNotification(message) {
+            this.notification.textContent = message;
+            this.notification.classList.add('show');
+            setTimeout(() => {
+                this.notification.classList.remove('show');
+            }, 2000);
+        }
+
+        saveSettingsToStorage() {
+            const settings = {
+                sprintDuration: this.sprintDuration,
+                restDuration: this.restDuration,
+                totalRounds: this.totalRounds,
+                soundEnabled: this.soundEnabled
+            };
+            localStorage.setItem('sprintTimerSettings', JSON.stringify(settings));
+        }
+
+        loadSettings() {
+            const saved = localStorage.getItem('sprintTimerSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                this.sprintDuration = settings.sprintDuration || 30;
+                this.restDuration = settings.restDuration || 90;
+                this.totalRounds = settings.totalRounds || 0;
+                this.soundEnabled = settings.soundEnabled !== false;
+                this.timeRemaining = this.sprintDuration;
+                this.updateDisplay();
+            }
+
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+        }
+    }
+
+    // Initialize the timer when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        new SprintTimer();
+    });
+
+    // Prevent context menu on long press (mobile)
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    
+    // Keep screen awake (request)
+    if ('wakeLock' in navigator) {
+        let wakeLock = null;
+        const requestWakeLock = async () => {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } catch (err) {
+                // Wake lock not supported or failed
+            }
+        };
+        
+        document.addEventListener('visibilitychange', () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
+        });
+        
+        requestWakeLock();
+    }
+</script>
+```
+
+</body>
+</html>
