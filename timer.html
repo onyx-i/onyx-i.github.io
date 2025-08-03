@@ -524,6 +524,15 @@
         margin-bottom: 20px;
     }
 
+    .version-info {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
     .settings-overlay {
         position: fixed;
         top: 0;
@@ -728,6 +737,10 @@
         <button class="btn btn-primary" id="startBtn">Start</button>
         <button class="btn btn-secondary" id="resetBtn">Reset</button>
     </div>
+
+    <div class="version-info">
+        Sprint Timer v2.1.0
+    </div>
 </div>
 
 <div class="settings-overlay" id="settingsOverlay">
@@ -754,6 +767,52 @@
             <label class="setting-label">Sound notifications</label>
         </div>
 
+        <div class="checkbox-container">
+            <div class="checkbox" id="debugToggle"></div>
+            <label class="setting-label">Debug mode</label>
+        </div>
+
+        <div class="debug-panel" id="debugPanel" style="display: none;">
+            <div class="debug-header">
+                <h3 style="margin: 20px 0 15px 0; color: var(--accent-neutral);">🔧 Debug Console</h3>
+            </div>
+            
+            <div class="debug-tests">
+                <div class="debug-test-group">
+                    <h4 style="margin: 10px 0 8px 0; color: var(--text-secondary);">Browser Support Tests</h4>
+                    <div class="debug-buttons">
+                        <button class="btn-debug" id="testBrowserSupport">Test Browser Support</button>
+                        <button class="btn-debug" id="testBluetoothAPI">Test Bluetooth API</button>
+                        <button class="btn-debug" id="testSecureContext">Test HTTPS Context</button>
+                    </div>
+                </div>
+                
+                <div class="debug-test-group">
+                    <h4 style="margin: 15px 0 8px 0; color: var(--text-secondary);">Bluetooth Tests</h4>
+                    <div class="debug-buttons">
+                        <button class="btn-debug" id="testBluetoothScan">Test Device Scan</button>
+                        <button class="btn-debug" id="testHeartRateService">Test HR Service</button>
+                        <button class="btn-debug" id="simulateHeartRate">Simulate HR Data</button>
+                        <button class="btn-debug" id="testDisconnection">Test Disconnection</button>
+                    </div>
+                </div>
+                
+                <div class="debug-test-group">
+                    <h4 style="margin: 15px 0 8px 0; color: var(--text-secondary);">System Tests</h4>
+                    <div class="debug-buttons">
+                        <button class="btn-debug" id="testPermissions">Test Permissions</button>
+                        <button class="btn-debug" id="testWakeLock">Test Wake Lock</button>
+                        <button class="btn-debug" id="clearDebugLog">Clear Console</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="debug-console">
+                <h4 style="margin: 15px 0 8px 0; color: var(--text-secondary);">Console Output</h4>
+                <div class="debug-output" id="debugOutput"></div>
+            </div>
+        </div>
+
         <div class="settings-actions">
             <button class="btn btn-primary" id="saveSettings">Save</button>
             <button class="btn btn-secondary" id="cancelSettings">Cancel</button>
@@ -770,6 +829,7 @@
             this.restDuration = 90;
             this.totalRounds = 0; // 0 = infinite
             this.soundEnabled = true;
+            this.debugMode = false;
             
             this.currentPhase = 'sprint'; // 'sprint' or 'rest'
             this.timeRemaining = this.sprintDuration;
@@ -784,6 +844,8 @@
             this.isBluetoothConnected = false;
             this.currentHeartRate = 0;
             this.heartRateHistory = [];
+            this.debugConsole = null;
+            this.version = "2.1.0";
             
             this.initElements();
             this.setupEventListeners();
@@ -810,6 +872,10 @@
             this.heartRateValue = document.getElementById('heartRateValue');
             this.heartIcon = document.getElementById('heartIcon');
             this.heartRateZone = document.getElementById('heartRateZone');
+            
+            // Debug elements
+            this.debugPanel = document.getElementById('debugPanel');
+            this.debugConsole = document.getElementById('debugOutput');
         }
 
         setupEventListeners() {
@@ -821,6 +887,19 @@
             document.getElementById('saveSettings').addEventListener('click', () => this.saveSettings());
             document.getElementById('cancelSettings').addEventListener('click', () => this.closeSettings());
             document.getElementById('soundToggle').addEventListener('click', () => this.toggleSound());
+            document.getElementById('debugToggle').addEventListener('click', () => this.toggleDebug());
+            
+            // Debug test listeners
+            document.getElementById('testBrowserSupport').addEventListener('click', () => this.testBrowserSupport());
+            document.getElementById('testBluetoothAPI').addEventListener('click', () => this.testBluetoothAPI());
+            document.getElementById('testSecureContext').addEventListener('click', () => this.testSecureContext());
+            document.getElementById('testBluetoothScan').addEventListener('click', () => this.testBluetoothScan());
+            document.getElementById('testHeartRateService').addEventListener('click', () => this.testHeartRateService());
+            document.getElementById('simulateHeartRate').addEventListener('click', () => this.simulateHeartRate());
+            document.getElementById('testDisconnection').addEventListener('click', () => this.testDisconnection());
+            document.getElementById('testPermissions').addEventListener('click', () => this.testPermissions());
+            document.getElementById('testWakeLock').addEventListener('click', () => this.testWakeLock());
+            document.getElementById('clearDebugLog').addEventListener('click', () => this.clearDebugLog());
             
             // Close settings when clicking overlay
             document.getElementById('settingsOverlay').addEventListener('click', (e) => {
@@ -984,6 +1063,7 @@
             document.getElementById('restTime').value = this.restDuration;
             document.getElementById('rounds').value = this.totalRounds;
             document.getElementById('soundToggle').className = this.soundEnabled ? 'checkbox checked' : 'checkbox';
+            document.getElementById('debugToggle').className = this.debugMode ? 'checkbox checked' : 'checkbox';
             this.settingsOverlay.style.display = 'flex';
         }
 
@@ -1014,6 +1094,283 @@
             const toggle = document.getElementById('soundToggle');
             this.soundEnabled = !this.soundEnabled;
             toggle.className = this.soundEnabled ? 'checkbox checked' : 'checkbox';
+        }
+
+        toggleDebug() {
+            const toggle = document.getElementById('debugToggle');
+            this.debugMode = !this.debugMode;
+            toggle.className = this.debugMode ? 'checkbox checked' : 'checkbox';
+            
+            // Show/hide debug panel
+            this.debugPanel.style.display = this.debugMode ? 'block' : 'none';
+            
+            if (this.debugMode) {
+                this.debugLog('🟢 Debug mode enabled', 'success');
+                this.debugLog(`Sprint Timer v${this.version}`, 'info');
+                this.debugLog(`Browser: ${navigator.userAgent}`, 'info');
+                this.debugLog(`Platform: ${navigator.platform}`, 'info');
+                this.debugLog('='.repeat(50), 'info');
+            } else {
+                this.debugLog('🔴 Debug mode disabled', 'warning');
+            }
+        }
+
+        debugLog(message, type = 'info') {
+            if (!this.debugConsole) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = logEntry;
+            
+            this.debugConsole.appendChild(span);
+            this.debugConsole.scrollTop = this.debugConsole.scrollHeight;
+            
+            // Also log to browser console in debug mode
+            if (this.debugMode) {
+                console.log(`[Sprint Timer] ${message}`);
+            }
+        }
+
+        clearDebugLog() {
+            if (this.debugConsole) {
+                this.debugConsole.innerHTML = '';
+                this.debugLog('🧹 Debug console cleared', 'info');
+            }
+        }
+
+        // Debug Test Functions
+        testBrowserSupport() {
+            this.debugLog('🔍 Testing Browser Support...', 'info');
+            
+            const tests = [
+                { name: 'Web Bluetooth API', supported: !!navigator.bluetooth },
+                { name: 'Service Worker', supported: 'serviceWorker' in navigator },
+                { name: 'Wake Lock API', supported: 'wakeLock' in navigator },
+                { name: 'Notifications API', supported: 'Notification' in window },
+                { name: 'Vibration API', supported: 'vibrate' in navigator },
+                { name: 'Local Storage', supported: 'localStorage' in window },
+                { name: 'WebGL', supported: !!window.WebGLRenderingContext },
+                { name: 'Audio Context', supported: !!(window.AudioContext || window.webkitAudioContext) }
+            ];
+            
+            tests.forEach(test => {
+                const status = test.supported ? '✅' : '❌';
+                const type = test.supported ? 'success' : 'error';
+                this.debugLog(`${status} ${test.name}: ${test.supported ? 'Supported' : 'Not Supported'}`, type);
+            });
+            
+            this.debugLog(`📊 Browser Support Score: ${tests.filter(t => t.supported).length}/${tests.length}`, 'info');
+        }
+
+        testBluetoothAPI() {
+            this.debugLog('🔵 Testing Bluetooth API...', 'info');
+            
+            if (!navigator.bluetooth) {
+                this.debugLog('❌ Bluetooth API not available', 'error');
+                return;
+            }
+            
+            this.debugLog('✅ Bluetooth API available', 'success');
+            
+            // Test availability
+            navigator.bluetooth.getAvailability()
+                .then(available => {
+                    const status = available ? '✅' : '❌';
+                    const type = available ? 'success' : 'error';
+                    this.debugLog(`${status} Bluetooth adapter available: ${available}`, type);
+                })
+                .catch(error => {
+                    this.debugLog(`❌ Error checking Bluetooth availability: ${error.message}`, 'error');
+                });
+            
+            // Test device list (if supported)
+            if (navigator.bluetooth.getDevices) {
+                navigator.bluetooth.getDevices()
+                    .then(devices => {
+                        this.debugLog(`📱 Previously paired devices: ${devices.length}`, 'info');
+                        devices.forEach((device, index) => {
+                            this.debugLog(`  ${index + 1}. ${device.name || 'Unknown'} (${device.id})`, 'info');
+                        });
+                    })
+                    .catch(error => {
+                        this.debugLog(`⚠️ Could not get device list: ${error.message}`, 'warning');
+                    });
+            }
+        }
+
+        testSecureContext() {
+            this.debugLog('🔒 Testing Secure Context...', 'info');
+            
+            const isSecure = window.isSecureContext;
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            
+            const status = isSecure ? '✅' : '❌';
+            const type = isSecure ? 'success' : 'error';
+            
+            this.debugLog(`${status} Secure Context: ${isSecure}`, type);
+            this.debugLog(`🌐 Protocol: ${protocol}`, 'info');
+            this.debugLog(`🏠 Hostname: ${hostname}`, 'info');
+            
+            if (!isSecure) {
+                this.debugLog('⚠️ Web Bluetooth requires HTTPS or localhost', 'warning');
+                this.debugLog('💡 Try: https://your-domain.com or localhost', 'info');
+            }
+        }
+
+        async testBluetoothScan() {
+            this.debugLog('📡 Testing Bluetooth Device Scan...', 'info');
+            
+            if (!navigator.bluetooth) {
+                this.debugLog('❌ Bluetooth API not available', 'error');
+                return;
+            }
+            
+            try {
+                this.debugLog('🔍 Requesting device with heart rate service...', 'info');
+                
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [0x180D] }],
+                    optionalServices: [0x180D]
+                });
+                
+                this.debugLog(`✅ Device selected: ${device.name || 'Unknown'}`, 'success');
+                this.debugLog(`📱 Device ID: ${device.id}`, 'info');
+                this.debugLog(`🔗 GATT Connected: ${device.gatt?.connected || false}`, 'info');
+                
+            } catch (error) {
+                if (error.name === 'NotFoundError') {
+                    this.debugLog('⚠️ No device selected by user', 'warning');
+                } else {
+                    this.debugLog(`❌ Scan failed: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async testHeartRateService() {
+            this.debugLog('❤️ Testing Heart Rate Service...', 'info');
+            
+            if (!this.bluetoothDevice || !this.bluetoothDevice.gatt?.connected) {
+                this.debugLog('❌ No connected Bluetooth device', 'error');
+                this.debugLog('💡 Connect to a device first', 'warning');
+                return;
+            }
+            
+            try {
+                this.debugLog('🔍 Getting heart rate service...', 'info');
+                const service = await this.bluetoothDevice.gatt.getPrimaryService(0x180D);
+                this.debugLog(`✅ Heart rate service found: ${service.uuid}`, 'success');
+                
+                this.debugLog('🔍 Getting characteristics...', 'info');
+                const characteristics = await service.getCharacteristics();
+                
+                this.debugLog(`📊 Found ${characteristics.length} characteristics:`, 'info');
+                characteristics.forEach(char => {
+                    this.debugLog(`  • ${char.uuid} (properties: ${Array.from(char.properties).join(', ')})`, 'info');
+                });
+                
+            } catch (error) {
+                this.debugLog(`❌ Service test failed: ${error.message}`, 'error');
+            }
+        }
+
+        simulateHeartRate() {
+            this.debugLog('🫀 Simulating heart rate data...', 'info');
+            
+            let bpm = 60;
+            let increasing = true;
+            let count = 0;
+            
+            const simulate = () => {
+                if (count >= 20) {
+                    this.debugLog('✅ Heart rate simulation complete', 'success');
+                    return;
+                }
+                
+                // Simulate realistic heart rate changes
+                if (increasing) {
+                    bpm += Math.random() * 10;
+                    if (bpm > 180) increasing = false;
+                } else {
+                    bpm -= Math.random() * 8;
+                    if (bpm < 60) increasing = true;
+                }
+                
+                const heartRate = Math.round(bpm);
+                this.updateHeartRate(heartRate);
+                this.debugLog(`💓 Simulated HR: ${heartRate} BPM`, 'success');
+                
+                count++;
+                setTimeout(simulate, 1000);
+            };
+            
+            // Show heart rate display for simulation
+            this.heartRateContainer.classList.add('connected');
+            this.heartIcon.classList.remove('disconnected');
+            
+            simulate();
+        }
+
+        testDisconnection() {
+            this.debugLog('🔌 Testing disconnection handling...', 'info');
+            
+            if (this.isBluetoothConnected) {
+                this.debugLog('📱 Simulating device disconnection...', 'warning');
+                this.onBluetoothDisconnected();
+                this.debugLog('✅ Disconnection handled', 'success');
+            } else {
+                this.debugLog('⚠️ No active connection to test', 'warning');
+            }
+        }
+
+        async testPermissions() {
+            this.debugLog('🔐 Testing Permissions...', 'info');
+            
+            const permissions = ['bluetooth'];
+            
+            for (const permission of permissions) {
+                try {
+                    if (navigator.permissions && navigator.permissions.query) {
+                        const result = await navigator.permissions.query({ name: permission });
+                        const status = result.state === 'granted' ? '✅' : 
+                                      result.state === 'prompt' ? '⚠️' : '❌';
+                        this.debugLog(`${status} ${permission}: ${result.state}`, 
+                                     result.state === 'granted' ? 'success' : 
+                                     result.state === 'prompt' ? 'warning' : 'error');
+                    } else {
+                        this.debugLog(`⚠️ ${permission}: Cannot check (API not supported)`, 'warning');
+                    }
+                } catch (error) {
+                    this.debugLog(`❌ ${permission}: Error checking permission`, 'error');
+                }
+            }
+        }
+
+        async testWakeLock() {
+            this.debugLog('🔋 Testing Wake Lock API...', 'info');
+            
+            if (!('wakeLock' in navigator)) {
+                this.debugLog('❌ Wake Lock API not supported', 'error');
+                return;
+            }
+            
+            try {
+                const wakeLock = await navigator.wakeLock.request('screen');
+                this.debugLog('✅ Wake lock acquired successfully', 'success');
+                this.debugLog(`🔒 Wake lock type: ${wakeLock.type}`, 'info');
+                
+                // Release after 2 seconds for testing
+                setTimeout(() => {
+                    wakeLock.release();
+                    this.debugLog('🔓 Wake lock released', 'info');
+                }, 2000);
+                
+            } catch (error) {
+                this.debugLog(`❌ Wake lock failed: ${error.message}`, 'error');
+            }
         }
 
         toggleTheme() {
@@ -1065,7 +1422,8 @@
                 sprintDuration: this.sprintDuration,
                 restDuration: this.restDuration,
                 totalRounds: this.totalRounds,
-                soundEnabled: this.soundEnabled
+                soundEnabled: this.soundEnabled,
+                debugMode: this.debugMode
             };
             localStorage.setItem('sprintTimerSettings', JSON.stringify(settings));
         }
@@ -1074,8 +1432,18 @@
         checkBluetoothSupport() {
             if (!navigator.bluetooth) {
                 this.bluetoothBtn.style.display = 'none';
-                console.log('Web Bluetooth API not supported');
+                console.log('Web Bluetooth API not supported in this browser');
+                return;
             }
+            
+            // Check if we're in a secure context (HTTPS)
+            if (!window.isSecureContext) {
+                this.bluetoothBtn.style.display = 'none';
+                console.log('Web Bluetooth requires HTTPS');
+                return;
+            }
+            
+            console.log('Bluetooth support detected');
         }
 
         async toggleBluetooth() {
@@ -1089,49 +1457,71 @@
         async connectHeartRate() {
             try {
                 this.bluetoothBtn.classList.add('bluetooth-connecting');
-                this.showNotification('Connecting to WHOOP...');
+                this.showNotification('Scanning for heart rate devices...');
+                this.debugLog('🔍 Starting Bluetooth connection process...', 'info');
 
                 // Request Bluetooth device with Heart Rate service
+                this.debugLog('📱 Requesting device with heart rate service...', 'info');
                 this.bluetoothDevice = await navigator.bluetooth.requestDevice({
                     filters: [
-                        { services: ['heart_rate'] },
-                        { namePrefix: 'WHOOP' },
-                        { namePrefix: 'Polar' },
-                        { namePrefix: 'Garmin' }
+                        { services: [0x180D] } // Heart Rate Service UUID
                     ],
-                    optionalServices: ['heart_rate']
+                    optionalServices: [0x180D]
                 });
+
+                this.debugLog(`✅ Device selected: ${this.bluetoothDevice.name || 'Unknown'}`, 'success');
+                this.showNotification(`Connecting to ${this.bluetoothDevice.name || 'device'}...`);
 
                 // Add disconnect event listener
                 this.bluetoothDevice.addEventListener('gattserverdisconnected', () => {
+                    this.debugLog('📱 Device disconnected event triggered', 'warning');
                     this.onBluetoothDisconnected();
                 });
 
                 // Connect to GATT server
+                this.debugLog('🔗 Connecting to GATT server...', 'info');
                 const server = await this.bluetoothDevice.gatt.connect();
+                this.debugLog('✅ Connected to GATT server', 'success');
                 
                 // Get Heart Rate service
-                this.heartRateService = await server.getPrimaryService('heart_rate');
+                this.debugLog('❤️ Getting heart rate service...', 'info');
+                this.heartRateService = await server.getPrimaryService(0x180D);
+                this.debugLog('✅ Heart rate service acquired', 'success');
                 
                 // Get Heart Rate Measurement characteristic
-                this.heartRateCharacteristic = await this.heartRateService.getCharacteristic('heart_rate_measurement');
+                this.debugLog('📊 Getting heart rate measurement characteristic...', 'info');
+                this.heartRateCharacteristic = await this.heartRateService.getCharacteristic(0x2A37);
+                this.debugLog('✅ Heart rate characteristic acquired', 'success');
                 
                 // Start notifications
+                this.debugLog('🔔 Starting heart rate notifications...', 'info');
                 await this.heartRateCharacteristic.startNotifications();
+                this.debugLog('✅ Notifications started successfully', 'success');
+                
                 this.heartRateCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
                     this.parseHeartRateData(event.target.value);
                 });
 
                 this.onBluetoothConnected();
-                this.showNotification(`Connected to ${this.bluetoothDevice.name}!`);
+                this.showNotification(`Connected to ${this.bluetoothDevice.name || 'heart rate monitor'}!`);
+                this.debugLog('🎉 Bluetooth connection completed successfully!', 'success');
 
             } catch (error) {
-                console.error('Bluetooth connection failed:', error);
-                this.showNotification('Failed to connect to device');
+                this.debugLog(`❌ Bluetooth connection failed: ${error.name} - ${error.message}`, 'error');
                 this.bluetoothBtn.classList.remove('bluetooth-connecting');
                 
-                if (error.name !== 'NotFoundError') {
-                    this.showNotification('Bluetooth error: ' + error.message);
+                if (error.name === 'NotFoundError') {
+                    this.showNotification('No heart rate device selected');
+                    this.debugLog('⚠️ User cancelled device selection', 'warning');
+                } else if (error.name === 'SecurityError') {
+                    this.showNotification('Bluetooth access denied. Enable in browser settings.');
+                    this.debugLog('🔒 Security error - check browser permissions', 'error');
+                } else if (error.name === 'NotSupportedError') {
+                    this.showNotification('Heart rate service not supported by this device');
+                    this.debugLog('❌ Device does not support heart rate service', 'error');
+                } else {
+                    this.showNotification(`Connection failed: ${error.message}`);
+                    this.debugLog(`💥 Unexpected error: ${error.stack}`, 'error');
                 }
             }
         }
@@ -1173,37 +1563,48 @@
         }
 
         parseHeartRateData(value) {
-            // Parse heart rate data according to Bluetooth specification
-            const flags = value.getUint8(0);
-            let heartRate;
+            try {
+                // Parse heart rate data according to Bluetooth Heart Rate specification
+                const flags = value.getUint8(0);
+                let heartRate;
 
-            if (flags & 0x01) {
-                // Heart rate format is 16-bit
-                heartRate = value.getUint16(1, true);
-            } else {
-                // Heart rate format is 8-bit
-                heartRate = value.getUint8(1);
+                if (flags & 0x01) {
+                    // Heart rate format is 16-bit
+                    heartRate = value.getUint16(1, true); // little endian
+                } else {
+                    // Heart rate format is 8-bit
+                    heartRate = value.getUint8(1);
+                }
+
+                this.debugLog(`💓 Received heart rate: ${heartRate} BPM (flags: 0x${flags.toString(16)})`, 'success');
+                this.updateHeartRate(heartRate);
+            } catch (error) {
+                this.debugLog(`❌ Error parsing heart rate data: ${error.message}`, 'error');
             }
-
-            this.updateHeartRate(heartRate);
         }
 
         updateHeartRate(heartRate) {
-            if (heartRate > 0 && heartRate < 220) { // Sanity check
-                this.currentHeartRate = heartRate;
-                this.heartRateValue.textContent = heartRate;
-                
-                // Update heart rate history (keep last 10 readings)
-                this.heartRateHistory.push(heartRate);
-                if (this.heartRateHistory.length > 10) {
-                    this.heartRateHistory.shift();
+            // Validate heart rate reading
+            if (heartRate > 0 && heartRate < 250) {
+                if (heartRate !== this.currentHeartRate) {
+                    this.debugLog(`🫀 Heart rate updated: ${this.currentHeartRate} → ${heartRate} BPM`, 'info');
+                    this.currentHeartRate = heartRate;
+                    this.heartRateValue.textContent = heartRate;
+                    
+                    // Update heart rate history (keep last 10 readings for smoothing)
+                    this.heartRateHistory.push(heartRate);
+                    if (this.heartRateHistory.length > 10) {
+                        this.heartRateHistory.shift();
+                    }
+                    
+                    // Update heart rate zone indicator
+                    this.updateHeartRateZone(heartRate);
+                    
+                    // Sync heartbeat animation with actual heart rate
+                    this.syncHeartbeatAnimation(heartRate);
                 }
-                
-                // Update heart rate zone
-                this.updateHeartRateZone(heartRate);
-                
-                // Sync heartbeat animation with actual heart rate
-                this.syncHeartbeatAnimation(heartRate);
+            } else {
+                this.debugLog(`⚠️ Invalid heart rate reading: ${heartRate} BPM (out of range)`, 'warning');
             }
         }
 
@@ -1235,6 +1636,7 @@
                 this.restDuration = settings.restDuration || 90;
                 this.totalRounds = settings.totalRounds || 0;
                 this.soundEnabled = settings.soundEnabled !== false;
+                this.debugMode = settings.debugMode || false;
                 this.timeRemaining = this.sprintDuration;
                 this.updateDisplay();
             }
