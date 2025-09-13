@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEEE-754 Educational Converter - Step-by-Step</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a; color: #e0e0e0; line-height: 1.6; padding: 20px;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        h1 { text-align: center; color: #4a9eff; margin-bottom: 10px; font-size: 2.2em; }
+        .subtitle { text-align: center; color: #b0b0b0; margin-bottom: 30px; font-style: italic; }
+        
+        .input-section {
+            background: #2a2a2a; padding: 25px; border-radius: 10px;
+            margin-bottom: 25px; border: 1px solid #404040;
+        }
+        
+        input[type="number"] {
+            width: 100%; padding: 12px; background: #1a1a1a;
+            border: 2px solid #404040; border-radius: 6px; color: #e0e0e0;
+            font-size: 18px; transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus { outline: none; border-color: #4a9eff; }
+        
+        button {
+            background: #4a9eff; color: white; border: none; padding: 12px 25px;
+            border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500;
+            transition: background-color 0.3s; margin: 10px 10px 10px 0;
+        }
+        
+        button:hover { background: #357abd; }
+        .example-btn { background: #666; padding: 8px 15px; font-size: 14px; }
+        .example-btn:hover { background: #777; }
+        
+        .step-container {
+            background: #2a2a2a; border-radius: 10px; margin-bottom: 20px;
+            border: 1px solid #404040; overflow: hidden;
+        }
+        
+        .step-header {
+            background: #4a9eff; color: white; padding: 15px 20px;
+            font-weight: bold; font-size: 16px;
+        }
+        
+        .step-content { padding: 20px; }
+        
+        .calculation {
+            background: #1a1a1a; border: 1px solid #404040; border-radius: 6px;
+            padding: 15px; margin: 10px 0; font-family: 'Courier New', monospace;
+        }
+        
+        .calculation-title { color: #4ecdc4; font-weight: bold; margin-bottom: 10px; }
+        .calculation-step { margin: 5px 0; padding-left: 20px; color: #e0e0e0; }
+        .calculation-result {
+            color: #ffe66d; font-weight: bold; margin-top: 10px; padding: 8px;
+            background: #2a2a2a; border-radius: 4px;
+        }
+        
+        .binary-work {
+            font-family: 'Courier New', monospace; font-size: 14px; background: #0a0a0a;
+            padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #404040;
+            white-space: pre-wrap;
+        }
+        
+        .highlight-number { color: #ff6b6b; font-weight: bold; }
+        .highlight-operation { color: #4ecdc4; font-weight: bold; }
+        .highlight-result {
+            color: #ffe66d; font-weight: bold; background: #404040;
+            padding: 2px 4px; border-radius: 3px;
+        }
+        
+        .final-result {
+            background: #2a2a2a; padding: 25px; border-radius: 10px;
+            border: 1px solid #404040; text-align: center;
+        }
+        
+        .binary-display {
+            font-family: 'Courier New', monospace; font-size: 24px; letter-spacing: 2px;
+            background: #0a0a0a; padding: 20px; border-radius: 8px; margin: 15px 0;
+            border: 2px solid #4a9eff;
+        }
+        
+        .sign { color: #ff6b6b; }
+        .exponent { color: #4ecdc4; }
+        .fraction { color: #ffe66d; }
+        
+        .hex-display {
+            font-family: 'Courier New', monospace; font-size: 28px;
+            color: #4a9eff; font-weight: bold; margin-top: 15px;
+        }
+        
+        .fraction-work {
+            background: #1a1a1a; border: 1px solid #404040; border-radius: 6px;
+            padding: 15px; margin: 10px 0;
+        }
+        
+        .fraction-step {
+            font-family: 'Courier New', monospace; margin: 3px 0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .step-number { color: #4a9eff; font-weight: bold; min-width: 30px; }
+        .step-calculation { flex-grow: 1; margin: 0 15px; }
+        .step-digit { color: #ffe66d; font-weight: bold; min-width: 20px; text-align: center; }
+        
+        .conversion-table {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px; margin: 15px 0;
+        }
+        
+        .table-cell {
+            background: #1a1a1a; padding: 8px; border: 1px solid #404040;
+            border-radius: 4px; text-align: center; font-family: 'Courier New', monospace;
+        }
+        
+        .table-header { background: #4a9eff; color: white; font-weight: bold; }
+        .hidden { display: none; }
+
+        .handwritten-section {
+            background: #2a2a2a;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid #404040;
+        }
+
+        .handwritten-container {
+            position: relative;
+            background: #f8f8f8;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            overflow: hidden;
+        }
+
+        .handwritten-header {
+            background: #e8e8e8;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .copy-btn:hover {
+            background: #357abd;
+        }
+
+        .handwritten-textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 20px;
+            border: none;
+            background: #fff;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+            white-space: pre-wrap;
+        }
+
+        .handwritten-textarea:focus {
+            outline: none;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.8em; }
+            .binary-display { font-size: 18px; letter-spacing: 1px; }
+            .conversion-table { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IEEE-754 Educational Converter</h1>
+        <p class="subtitle">Every calculation step shown in detail - just like doing it by hand</p>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="decimal-input">Enter Decimal Number:</label>
+                <input type="number" id="decimal-input" step="any" placeholder="e.g., 5.75, -12.375, 0.1">
+            </div>
+            
+            <button onclick="convertNumber()">Show Complete Conversion Process</button>
+            
+            <div class="examples">
+                <strong>Try these examples:</strong><br>
+                <button class="example-btn" onclick="setExample('5.75')">5.75</button>
+                <button class="example-btn" onclick="setExample('-12.375')">-12.375</button>
+                <button class="example-btn" onclick="setExample('0.1')">0.1</button>
+                <button class="example-btn" onclick="setExample('123.456')">123.456</button>
+                <button class="example-btn" onclick="setExample('-0.625')">-0.625</button>
+                <button class="example-btn" onclick="setExample('42.0')">42.0</button>
+            </div>
+        </div>
+
+        <div id="conversion-steps" class="hidden"></div>
+
+        <div id="final-result" class="final-result hidden">
+            <h2>Final IEEE-754 Single Precision Result</h2>
+            <div class="binary-display" id="final-binary"></div>
+            <div class="hex-display" id="final-hex"></div>
+        </div>
+
+        <div id="handwritten-solution" class="handwritten-section hidden">
+            <h2>📝 Hand-Written Solution (Copy for Homework/Exams)</h2>
+            <p style="margin-bottom: 15px; color: #b0b0b0;">This is exactly what you would write on paper. Teachers love seeing the complete work!</p>
+            
+            <div class="handwritten-container">
+                <div class="handwritten-header">
+                    <strong>Student Work - IEEE-754 Single Precision Conversion</strong>
+                    <button class="copy-btn" onclick="copyHandwrittenSolution()" title="Copy to clipboard">📋 Copy</button>
+                </div>
+                <textarea id="handwritten-text" class="handwritten-textarea" readonly></textarea>
+            </div>
+            
+            <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #4ecdc4;">
+                <strong>💡 Pro Tip:</strong> This format shows your complete understanding and gets full credit on exams!
+                <br><strong>📚 What teachers look for:</strong> Clear steps, correct method, proper notation, final verification
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setExample(value) {
+            document.getElementById('decimal-input').value = value;
+            convertNumber();
+        }
+
+        function convertNumber() {
+            const input = document.getElementById('decimal-input').value;
+            if (input === '') return;
+
+            const decimalValue = parseFloat(input);
+            
+            document.getElementById('conversion-steps').innerHTML = '';
+            document.getElementById('conversion-steps').classList.remove('hidden');
+            document.getElementById('final-result').classList.remove('hidden');
+            document.getElementById('handwritten-solution').classList.remove('hidden');
+            
+            // Get IEEE-754 representation for verification
+            const buffer = new ArrayBuffer(4);
+            const view = new DataView(buffer);
+            view.setFloat32(0, decimalValue, false);
+            const uint32Value = view.getUint32(0, false);
+            const hexValue = uint32Value.toString(16).toUpperCase().padStart(8, '0');
+            
+            const finalSign = (uint32Value >>> 31) & 1;
+            const finalExponent = (uint32Value >>> 23) & 0xFF;
+            const finalFraction = uint32Value & 0x7FFFFF;
+            
+            const finalSignBit = finalSign.toString();
+            const finalExponentBits = finalExponent.toString(2).padStart(8, '0');
+            const finalFractionBits = finalFraction.toString(2).padStart(23, '0');
+
+            generateDetailedSteps(decimalValue, finalSignBit, finalExponentBits, finalFractionBits, hexValue);
+            
+            document.getElementById('final-binary').innerHTML = 
+                `<span class="sign">${finalSignBit}</span> | ` +
+                `<span class="exponent">${finalExponentBits}</span> | ` +
+                `<span class="fraction">${finalFractionBits}</span>`;
+            
+            document.getElementById('final-hex').textContent = `0x${hexValue}`;
+        }
+
+        function generateDetailedSteps(decimalValue, finalSignBit, finalExponentBits, finalFractionBits, hexValue) {
+            const stepsContainer = document.getElementById('conversion-steps');
+            let stepNumber = 1;
+
+            addStep(stepsContainer, stepNumber++, "Identify the Input Number", 
+                generateStep1Content(decimalValue));
+
+            if (!isFinite(decimalValue) || decimalValue === 0) {
+                addStep(stepsContainer, stepNumber++, "Special Case Handling", 
+                    generateSpecialCaseContent(decimalValue, finalSignBit, finalExponentBits, finalFractionBits));
+                return;
+            }
+
+            addStep(stepsContainer, stepNumber++, "Determine the Sign Bit", 
+                generateStep2Content(decimalValue));
+
+            const absValue = Math.abs(decimalValue);
+            addStep(stepsContainer, stepNumber++, "Work with Absolute Value", 
+                generateStep3Content(decimalValue, absValue));
+
+            const intPart = Math.floor(absValue);
+            addStep(stepsContainer, stepNumber++, "Convert Integer Part to Binary", 
+                generateStep4Content(intPart));
+
+            const fracPart = absValue - intPart;
+            addStep(stepsContainer, stepNumber++, "Convert Fractional Part to Binary", 
+                generateStep5Content(fracPart));
+
+            const binaryResult = convertToBinaryDetailed(absValue);
+            addStep(stepsContainer, stepNumber++, "Combine and Normalize to Scientific Notation", 
+                generateStep6Content(binaryResult));
+
+            addStep(stepsContainer, stepNumber++, "Calculate Biased Exponent", 
+                generateStep7Content(binaryResult.exponent));
+
+            addStep(stepsContainer, stepNumber++, "Extract Mantissa (Fraction)", 
+                generateStep8Content(binaryResult));
+
+            addStep(stepsContainer, stepNumber++, "Assemble IEEE-754 Components", 
+                generateStep9Content(finalSignBit, finalExponentBits, finalFractionBits));
+
+            addStep(stepsContainer, stepNumber++, "Convert to Hexadecimal", 
+                generateStep10Content(finalSignBit + finalExponentBits + finalFractionBits, hexValue));
+
+            addStep(stepsContainer, stepNumber++, "Final Verification & Summary", 
+                generateVerificationContent(decimalValue, finalSignBit, finalExponentBits, finalFractionBits, hexValue));
+
+            // Generate handwritten solution
+            generateHandwrittenSolution(decimalValue, finalSignBit, finalExponentBits, finalFractionBits, hexValue);
+        }
+
+        function addStep(container, stepNum, title, content) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step-container';
+            stepDiv.innerHTML = `
+                <div class="step-header">Step ${stepNum}: ${title}</div>
+                <div class="step-content">${content}</div>
+            `;
+            container.appendChild(stepDiv);
+        }
+
+        function generateStep1Content(decimalValue) {
+            let tips = '';
+            if (Math.abs(decimalValue) < 1 && decimalValue !== 0) {
+                tips = `<div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #4ecdc4;">
+                    <strong>💡 Mental Note:</strong> Numbers less than 1 will have negative exponents after normalization.
+                </div>`;
+            } else if (Math.abs(decimalValue) >= 2) {
+                tips = `<div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #4ecdc4;">
+                    <strong>💡 Mental Note:</strong> Numbers ≥ 2 will have positive exponents after normalization.
+                </div>`;
+            }
+            
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">Step 1: Input Analysis & Mental Preparation</div>
+                    <div class="calculation-step">Given decimal number: <span class="highlight-number">${decimalValue}</span></div>
+                    <div class="calculation-step">Type: ${typeof decimalValue === 'number' ? 'Number' : 'Invalid'}</div>
+                    <div class="calculation-step">Special case: ${!isFinite(decimalValue) ? 'Yes' : 'No'}</div>
+                    <div class="calculation-step"><strong>Quick mental check:</strong> Is this a "nice" decimal that might convert cleanly?</div>
+                </div>
+                ${tips}
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>📝 Pen & Paper Tip:</strong> Write down the number clearly and circle whether it's positive or negative. 
+                    This prevents sign errors later!
+                </div>
+            `;
+        }
+
+        function generateStep2Content(decimalValue) {
+            const isNegative = decimalValue < 0;
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">Step 2: Sign Bit Determination (Always Do This First!)</div>
+                    <div class="calculation-step">Is ${decimalValue} negative? <span class="highlight-operation">${isNegative ? 'YES' : 'NO'}</span></div>
+                    <div class="calculation-step">Sign bit = <span class="highlight-result">${isNegative ? '1' : '0'}</span></div>
+                    <div class="calculation-result">
+                        Sign bit: <span class="highlight-result">${isNegative ? '1' : '0'}</span> (${isNegative ? 'negative' : 'positive'})
+                    </div>
+                </div>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>🧠 Memory Aid:</strong> "Sign bit is Simple" - 0 for positive (including +0), 1 for negative (including -0).
+                    <br><strong>📝 Pen & Paper:</strong> Write "Sign: ${isNegative ? '1' : '0'}" at the top of your work. You're done with this part!
+                </div>
+                <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ff6b6b;">
+                    <strong>⚠️ Common Mistake:</strong> Don't forget that IEEE-754 has both +0 and -0. The sign bit still matters even for zero!
+                </div>
+            `;
+        }
+
+        function generateStep3Content(decimalValue, absValue) {
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">Absolute Value Calculation</div>
+                    <div class="calculation-step">Original: ${decimalValue}</div>
+                    <div class="calculation-step">Absolute value: |${decimalValue}| = <span class="highlight-result">${absValue}</span></div>
+                    <div class="calculation-result">
+                        Working with: <span class="highlight-result">${absValue}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateStep4Content(intPart) {
+            if (intPart === 0) {
+                return `
+                    <div class="calculation">
+                        <div class="calculation-title">Step 4: Integer Part Conversion</div>
+                        <div class="calculation-step">Integer part: <span class="highlight-number">0</span></div>
+                        <div class="calculation-step">Binary: <span class="highlight-result">0</span></div>
+                    </div>
+                    <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                        <strong>📝 Easy Case:</strong> Integer part is 0, so we write "0" and move on to the fractional part!
+                    </div>
+                `;
+            }
+
+            // Check for powers of 2 for mental shortcuts
+            let powerOfTwoTip = '';
+            if ((intPart & (intPart - 1)) === 0) {
+                const power = Math.log2(intPart);
+                powerOfTwoTip = `
+                <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #4ecdc4;">
+                    <strong>💡 Shortcut Spotted!</strong> ${intPart} is 2^${power}, so its binary is just "1" followed by ${power} zeros: ${intPart.toString(2)}
+                </div>`;
+            }
+
+            let content = `
+                <div class="calculation">
+                    <div class="calculation-title">Step 4: Integer Part → Binary (Divide by 2 Method)</div>
+                    <div class="calculation-step">Integer part: <span class="highlight-number">${intPart}</span></div>
+                    <div class="calculation-step"><strong>Method:</strong> Keep dividing by 2, write down remainders</div>
+                </div>
+                ${powerOfTwoTip}
+                <div class="binary-work">
+            `;
+
+            let temp = intPart;
+            let steps = [];
+            let remainders = [];
+
+            while (temp > 0) {
+                const quotient = Math.floor(temp / 2);
+                const remainder = temp % 2;
+                steps.push(`${temp} ÷ 2 = ${quotient} remainder ${remainder}`);
+                remainders.push(remainder);
+                temp = quotient;
+            }
+
+            content += "Division steps (keep going until quotient is 0):\n";
+            for (let i = 0; i < steps.length; i++) {
+                content += `${steps[i]}\n`;
+            }
+
+            content += `\nReading remainders from BOTTOM to TOP (this is key!):\n`;
+            content += `Binary: ${remainders.reverse().join('')}`;
+            content += `</div>`;
+
+            content += `
+                <div class="calculation">
+                    <div class="calculation-result">
+                        Integer part in binary: <span class="highlight-result">${intPart.toString(2)}</span>
+                    </div>
+                </div>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>🧠 Memory Trick:</strong> "Divide by 2, write remainder, repeat until 0, then read UP"
+                    <br><strong>📝 Verification:</strong> ${intPart.toString(2)} in binary = ${parseInt(intPart.toString(2), 2)} in decimal ✓
+                </div>
+            `;
+
+            return content;
+        }
+
+        function generateStep5Content(fracPart) {
+            if (fracPart === 0) {
+                return `
+                    <div class="calculation">
+                        <div class="calculation-title">Step 5: Fractional Part Conversion</div>
+                        <div class="calculation-step">Fractional part: <span class="highlight-number">0</span></div>
+                        <div class="calculation-step">Binary: <span class="highlight-result">(none)</span></div>
+                    </div>
+                    <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                        <strong>📝 Easy Case:</strong> No fractional part, so we're done with binary conversion!
+                    </div>
+                `;
+            }
+
+            // Check for common fractions
+            let fractionTips = '';
+            const commonFractions = {
+                0.5: '1/2 = 0.1₂',
+                0.25: '1/4 = 0.01₂', 
+                0.125: '1/8 = 0.001₂',
+                0.75: '3/4 = 0.11₂',
+                0.375: '3/8 = 0.011₂',
+                0.625: '5/8 = 0.101₂'
+            };
+            
+            if (commonFractions[fracPart]) {
+                fractionTips = `
+                <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #4ecdc4;">
+                    <strong>💡 Quick Recognition:</strong> ${fracPart} = ${commonFractions[fracPart]} (memorize common fractions!)
+                </div>`;
+            }
+
+            let content = `
+                <div class="calculation">
+                    <div class="calculation-title">Step 5: Fractional Part → Binary (Multiply by 2 Method)</div>
+                    <div class="calculation-step">Fractional part: <span class="highlight-number">${fracPart}</span></div>
+                    <div class="calculation-step"><strong>Method:</strong> Multiply by 2, take integer part, repeat with remainder</div>
+                </div>
+                ${fractionTips}
+                <div class="fraction-work">
+                    <div style="font-weight: bold; margin-bottom: 10px; color: #4ecdc4;">Multiplication steps (read digits left to right):</div>
+            `;
+
+            let temp = fracPart;
+            let binaryFrac = '';
+            let stepNum = 1;
+            const maxSteps = 20;
+
+            while (temp > 0 && stepNum <= maxSteps && binaryFrac.length < 30) {
+                temp *= 2;
+                const digit = Math.floor(temp);
+                binaryFrac += digit;
+                
+                content += `
+                    <div class="fraction-step">
+                        <span class="step-number">${stepNum}.</span>
+                        <span class="step-calculation">${(temp - digit).toFixed(6)} × 2 = ${temp.toFixed(6)}</span>
+                        <span class="step-digit">${digit}</span>
+                    </div>
+                `;
+                
+                temp = temp - digit;
+                stepNum++;
+                
+                if (temp === 0) {
+                    content += `<div style="color: #4ecdc4; margin-top: 5px;">✓ Exact representation (remainder = 0)</div>`;
+                    break;
+                }
+            }
+
+            if (temp > 0) {
+                content += `<div style="color: #ff6b6b; margin-top: 10px;">... (infinite/repeating decimal - IEEE-754 will round)</div>`;
+            }
+
+            content += `</div>`;
+            content += `
+                <div class="calculation">
+                    <div class="calculation-result">
+                        Fractional part in binary: <span class="highlight-result">${binaryFrac || '0'}</span>
+                    </div>
+                </div>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>🧠 Memory Trick:</strong> "Multiply by 2, grab the integer, keep the fraction, repeat"
+                    <br><strong>📝 Pattern Recognition:</strong> If you see repeating digits, you can predict the pattern!
+                    <br><strong>⚠️ Remember:</strong> Read the integer parts from TOP to BOTTOM (opposite of integer conversion)
+                </div>
+            `;
+
+            return content;
+        }
+
+        function generateStep6Content(binaryResult) {
+            const isSmallNumber = binaryResult.exponent < 0;
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">Step 6: Normalization (The Critical Step!)</div>
+                    <div class="calculation-step">Combined binary: <span class="highlight-number">${binaryResult.original}</span></div>
+                    <div class="calculation-step"><strong>Goal:</strong> Get it into "1.xxxxx × 2^n" form (scientific notation)</div>
+                    <div class="calculation-step">Find first significant bit (first '1') and move decimal point there</div>
+                </div>
+                <div class="binary-work">${binaryResult.normalizationSteps}</div>
+                <div class="calculation">
+                    <div class="calculation-result">
+                        Normalized: <span class="highlight-result">${binaryResult.normalized}</span> × 2<sup>${binaryResult.exponent}</sup>
+                    </div>
+                </div>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>🧠 Mental Approach:</strong> Count how many places you moved the decimal point
+                    <br>• ${isSmallNumber ? 'Moved RIGHT' : 'Moved LEFT'} → ${isSmallNumber ? 'NEGATIVE' : 'POSITIVE'} exponent
+                    <br>• The "1." part is implied in IEEE-754 (not stored!)
+                    <br><strong>📝 Key Rule:</strong> Always get exactly "1.something" - never "0.1something" or "11.something"
+                </div>
+                <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ff6b6b;">
+                    <strong>⚠️ Common Mistake:</strong> Don't confuse decimal point movement direction with exponent sign!
+                    <br>Moving decimal LEFT = positive exponent, moving RIGHT = negative exponent
+                </div>
+            `;
+        }
+
+        function generateStep7Content(exponent) {
+            const biased = exponent + 127;
+            const isSpecialRange = biased <= 0 || biased >= 255;
+            
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">Step 7: Biased Exponent (Add the Magic Number 127)</div>
+                    <div class="calculation-step">Actual exponent: <span class="highlight-number">${exponent}</span></div>
+                    <div class="calculation-step">IEEE-754 bias for single precision: <span class="highlight-number">127</span></div>
+                    <div class="calculation-step">Biased exponent = ${exponent} + 127 = <span class="highlight-result">${biased}</span></div>
+                    ${isSpecialRange ? '<div class="calculation-step" style="color: #ff6b6b;"><strong>Note:</strong> This falls in special value range!</div>' : ''}
+                </div>
+                <div class="binary-work">Converting ${biased} to 8-bit binary:
+${generateBinaryConversionWork(biased, 8)}</div>
+                <div class="calculation">
+                    <div class="calculation-result">
+                        Exponent field (8 bits): <span class="highlight-result">${biased.toString(2).padStart(8, '0')}</span>
+                    </div>
+                </div>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>🧠 Why 127?</strong> It's 2^(8-1) - 1. This bias lets us store both positive and negative exponents using only positive numbers!
+                    <br><strong>📝 Range Check:</strong> Valid range is 1-254 (0 and 255 are special cases)
+                    <br><strong>💡 Mental Shortcut:</strong> Exponent 0 → 127, Exponent 1 → 128, Exponent -1 → 126
+                </div>
+                <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #4ecdc4;">
+                    <strong>🔍 Quick Check:</strong> ${biased} in range [1,254]? ${!isSpecialRange ? '✓ Normal number' : '✗ Special case (infinity/zero/denormal)'}
+                </div>
+            `;
+        }
+
+        function generateStep8Content(binaryResult) {
+            const mantissa23 = binaryResult.fractionPart.padEnd(23, '0').substring(0, 23);
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">Mantissa Extraction</div>
+                    <div class="calculation-step">Normalized form: <span class="highlight-number">${binaryResult.normalized}</span></div>
+                    <div class="calculation-step">Remove the implied '1.' to get: <span class="highlight-number">${binaryResult.fractionPart}</span></div>
+                    <div class="calculation-step">IEEE-754 uses 23 bits for mantissa</div>
+                </div>
+                <div class="binary-work">Mantissa processing:
+Original fraction: ${binaryResult.fractionPart}
+${binaryResult.fractionPart.length < 23 ? 'Pad with zeros to 23 bits:' : 'Truncate to 23 bits:'}
+${mantissa23}</div>
+                <div class="calculation">
+                    <div class="calculation-result">
+                        Mantissa field (23 bits): <span class="highlight-result">${mantissa23}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateStep9Content(signBit, exponentBits, fractionBits) {
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">IEEE-754 Component Assembly</div>
+                    <div class="calculation-step">Sign bit (1 bit): <span class="sign">${signBit}</span></div>
+                    <div class="calculation-step">Exponent (8 bits): <span class="exponent">${exponentBits}</span></div>
+                    <div class="calculation-step">Mantissa (23 bits): <span class="fraction">${fractionBits}</span></div>
+                </div>
+                <div class="binary-work">32-bit IEEE-754 representation:
+<span class="sign">${signBit}</span> | <span class="exponent">${exponentBits}</span> | <span class="fraction">${fractionBits}</span>
+
+Bit positions:
+31   30-23        22-0
+<span class="sign"> ${signBit} </span> | <span class="exponent">${exponentBits}</span> | <span class="fraction">${fractionBits}</span></div>
+            `;
+        }
+
+        function generateStep10Content(binaryString, hexValue) {
+            const chunks = binaryString.match(/.{4}/g);
+            let content = `
+                <div class="calculation">
+                    <div class="calculation-title">Step 10: Binary → Hexadecimal (Final Encoding)</div>
+                    <div class="calculation-step">32-bit binary: <span class="highlight-number">${binaryString}</span></div>
+                    <div class="calculation-step"><strong>Method:</strong> Group into 4-bit chunks, convert each to hex</div>
+                </div>
+                <div class="conversion-table">
+                    <div class="table-cell table-header">4-bit Binary</div>
+                    <div class="table-cell table-header">Decimal</div>
+                    <div class="table-cell table-header">Hex</div>
+                    <div class="table-cell table-header">Position</div>
+            `;
+
+            chunks.forEach((chunk, index) => {
+                const decimal = parseInt(chunk, 2);
+                const hex = decimal.toString(16).toUpperCase();
+                content += `
+                    <div class="table-cell">${chunk}</div>
+                    <div class="table-cell">${decimal}</div>
+                    <div class="table-cell">${hex}</div>
+                    <div class="table-cell">Pos ${index + 1}</div>
+                `;
+            });
+
+            content += `</div>`;
+            content += `
+                <div class="calculation">
+                    <div class="calculation-result">
+                        Final hexadecimal: <span class="highlight-result">0x${hexValue}</span>
+                    </div>
+                </div>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>🧠 Hex Conversion Trick:</strong> Memorize 0000=0, 0001=1, ..., 1111=F
+                    <br><strong>📝 Quick Reference:</strong> 8=1000, 9=1001, A=1010, B=1011, C=1100, D=1101, E=1110, F=1111
+                    <br><strong>✓ Double-check:</strong> Should have exactly 8 hex digits for 32-bit float
+                </div>
+            `;
+
+            return content;
+        }
+
+        function generateVerificationContent(decimalValue, signBit, exponentBits, fractionBits, hexValue) {
+            // Reconstruct the value for verification
+            const buffer = new ArrayBuffer(4);
+            const view = new DataView(buffer);
+            view.setFloat32(0, decimalValue, false);
+            const reconstructed = view.getFloat32(0, false);
+            
+            return `
+                <div class="calculation">
+                    <div class="calculation-title">Step 11: Final Verification & Summary</div>
+                    <div class="calculation-step"><strong>Original input:</strong> ${decimalValue}</div>
+                    <div class="calculation-step"><strong>IEEE-754 representation:</strong> ${reconstructed}</div>
+                    <div class="calculation-step"><strong>Difference:</strong> ${Math.abs(decimalValue - reconstructed) < 1e-10 ? 'Exact match!' : 'Rounded due to precision limits'}</div>
+                </div>
+                <div style="background: #0a0a0a; padding: 15px; border-radius: 6px; margin: 10px 0; border: 2px solid #4a9eff;">
+                    <div style="font-family: 'Courier New', monospace; font-size: 16px;">
+                        <div><strong>Complete IEEE-754 Breakdown:</strong></div>
+                        <div style="margin: 10px 0;">
+                            Sign bit:     <span class="sign">${signBit}</span> (${signBit === '0' ? 'positive' : 'negative'})
+                        </div>
+                        <div style="margin: 10px 0;">
+                            Exponent:     <span class="exponent">${exponentBits}</span> (${parseInt(exponentBits, 2)} - 127 = ${parseInt(exponentBits, 2) - 127})
+                        </div>
+                        <div style="margin: 10px 0;">
+                            Mantissa:     <span class="fraction">${fractionBits}</span>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            Full binary:  <span class="sign">${signBit}</span>|<span class="exponent">${exponentBits}</span>|<span class="fraction">${fractionBits}</span>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            Hexadecimal:  <strong style="color: #4a9eff;">0x${hexValue}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #4ecdc4;">
+                    <strong>🎯 Pen & Paper Checklist:</strong>
+                    <br>✓ Sign bit correct (0 for +, 1 for -)
+                    <br>✓ Normalized to 1.xxxxx × 2^n form
+                    <br>✓ Exponent biased by +127
+                    <br>✓ Mantissa is 23 bits (implied 1. removed)
+                    <br>✓ Total 32 bits: 1 + 8 + 23
+                    <br>✓ Hex is 8 digits (4 bits each)
+                </div>
+                <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ffe66d;">
+                    <strong>📚 What You've Learned:</strong>
+                    <br>• How to convert decimal to binary (integer: ÷2, fraction: ×2)
+                    <br>• How to normalize binary scientific notation
+                    <br>• Why IEEE-754 uses biased exponents (+127)
+                    <br>• How the mantissa represents precision
+                    <br>• How to convert binary to hexadecimal
+                    <br><strong>🏆 You can now do IEEE-754 conversion by hand!</strong>
+                </div>
+            `;
+        }
+
+        function generateSpecialCaseContent(decimalValue, signBit, exponentBits, fractionBits) {
+            if (decimalValue === 0) {
+                return `
+                    <div class="calculation">
+                        <div class="calculation-title">Zero Representation</div>
+                        <div class="calculation-step">Zero is a special case in IEEE-754</div>
+                        <div class="calculation-step">Sign: ${signBit} (can be +0 or -0)</div>
+                        <div class="calculation-step">Exponent: All zeros (00000000)</div>
+                        <div class="calculation-step">Mantissa: All zeros</div>
+                        <div class="calculation-result">
+                            IEEE-754: <span class="sign">${signBit}</span> | <span class="exponent">${exponentBits}</span> | <span class="fraction">${fractionBits}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (decimalValue === Infinity || decimalValue === -Infinity) {
+                return `
+                    <div class="calculation">
+                        <div class="calculation-title">Infinity Representation</div>
+                        <div class="calculation-step">Infinity is a special case in IEEE-754</div>
+                        <div class="calculation-step">Sign: ${signBit} (${decimalValue > 0 ? 'positive' : 'negative'} infinity)</div>
+                        <div class="calculation-step">Exponent: All ones (11111111) = 255</div>
+                        <div class="calculation-step">Mantissa: All zeros</div>
+                        <div class="calculation-result">
+                            IEEE-754: <span class="sign">${signBit}</span> | <span class="exponent">${exponentBits}</span> | <span class="fraction">${fractionBits}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (isNaN(decimalValue)) {
+                return `
+                    <div class="calculation">
+                        <div class="calculation-title">NaN (Not a Number) Representation</div>
+                        <div class="calculation-step">NaN is a special case in IEEE-754</div>
+                        <div class="calculation-step">Sign: ${signBit} (can be 0 or 1)</div>
+                        <div class="calculation-step">Exponent: All ones (11111111) = 255</div>
+                        <div class="calculation-step">Mantissa: Non-zero (any pattern)</div>
+                        <div class="calculation-result">
+                            IEEE-754: <span class="sign">${signBit}</span> | <span class="exponent">${exponentBits}</span> | <span class="fraction">${fractionBits}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function generateBinaryConversionWork(number, bits) {
+            let work = `\n`;
+            let temp = number;
+            let steps = [];
+
+            while (temp > 0) {
+                const quotient = Math.floor(temp / 2);
+                const remainder = temp % 2;
+                steps.push(`${temp} ÷ 2 = ${quotient} remainder ${remainder}`);
+                temp = quotient;
+            }
+
+            work += steps.join('\n');
+            work += `\n\nBinary (${bits}-bit): ${number.toString(2).padStart(bits, '0')}`;
+            return work;
+        }
+
+        function convertToBinaryDetailed(decimal) {
+            const intPart = Math.floor(decimal);
+            const fracPart = decimal - intPart;
+            
+            let intBinary = intPart.toString(2);
+            let fracBinary = '';
+            
+            if (fracPart > 0) {
+                let temp = fracPart;
+                let maxSteps = 50;
+                let step = 0;
+                
+                while (temp > 0 && step < maxSteps && fracBinary.length < 50) {
+                    temp *= 2;
+                    const digit = Math.floor(temp);
+                    fracBinary += digit;
+                    temp = temp - digit;
+                    step++;
+                }
+            }
+            
+            const original = intBinary + (fracBinary ? '.' + fracBinary : '');
+            
+            let exponent = 0;
+            let normalized = '';
+            let fractionPart = '';
+            let normalizationSteps = '';
+            
+            if (intPart === 0) {
+                const firstOne = fracBinary.indexOf('1');
+                exponent = -(firstOne + 1);
+                normalized = '1.' + fracBinary.substring(firstOne + 1);
+                fractionPart = fracBinary.substring(firstOne + 1);
+                normalizationSteps = `Original: ${original}\nFirst significant bit at position ${firstOne + 1} after decimal\nMove decimal point ${Math.abs(exponent)} places right\nNormalized: ${normalized} × 2^${exponent}`;
+            } else {
+                exponent = intBinary.length - 1;
+                normalized = intBinary[0] + '.' + intBinary.substring(1) + fracBinary;
+                fractionPart = intBinary.substring(1) + fracBinary;
+                normalizationSteps = `Original: ${original}\nMove decimal point ${exponent} places left\nNormalized: ${normalized} × 2^${exponent}`;
+            }
+            
+            return { original, normalized, exponent, fractionPart, normalizationSteps };
+        }
+
+        function generateHandwrittenSolution(decimalValue, signBit, exponentBits, fractionBits, hexValue) {
+            let solution = '';
+            
+            // Sign bit determination
+            solution += `${decimalValue} is ${decimalValue >= 0 ? 'positive' : 'negative'}\n`;
+            solution += `Sign bit = ${signBit}\n`;
+            
+            if (decimalValue === 0 || !isFinite(decimalValue)) {
+                if (decimalValue === 0) {
+                    solution += `Zero: Sign=${signBit}, Exponent=00000000, Mantissa=00000000000000000000000\n`;
+                } else if (decimalValue === Infinity || decimalValue === -Infinity) {
+                    solution += `Infinity: Sign=${signBit}, Exponent=11111111, Mantissa=00000000000000000000000\n`;
+                } else {
+                    solution += `NaN: Sign=${signBit}, Exponent=11111111, Mantissa≠0\n`;
+                }
+                solution += `\nFinal Answer: 0x${hexValue}`;
+            } else {
+                const absValue = Math.abs(decimalValue);
+                const intPart = Math.floor(absValue);
+                const fracPart = absValue - intPart;
+                
+                // Absolute value
+                solution += ` absolute value:\n`;
+                solution += `|${decimalValue}| = ${absValue}\n\n`;
+                
+                // Convert integer part
+                solution += `converting integer part to binary:\n`;
+                if (intPart === 0) {
+                    solution += `Integer part = 0\n`;
+                    solution += `remainder: 0\n\n`;
+                } else {
+                    solution += `Integer part = ${intPart}\n`;
+                    let temp = intPart;
+                    let divisions = [];
+                    while (temp > 0) {
+                        divisions.push(`${temp} / 2 = ${Math.floor(temp/2)} remainder ${temp % 2}`);
+                        temp = Math.floor(temp / 2);
+                    }
+                    solution += divisions.join('\n') + '\n';
+                    solution += `remainder: ${intPart.toString(2)}\n\n`;
+                }
+                
+                // Convert fractional part
+                solution += `converting the fractional part to binary:\n`;
+                if (fracPart === 0) {
+                    solution += `decimal remainder = 0\n`;
+                    solution += `fractional binary: (none)\n\n`;
+                } else {
+                    solution += `decimal remainder = ${fracPart}\n`;
+                    let temp = fracPart;
+                    let binaryFrac = '';
+                    let count = 0;
+                    
+                    while (temp > 0 && count < 25) {
+                        const beforeMultiply = temp;
+                        temp *= 2;
+                        const digit = Math.floor(temp);
+                        binaryFrac += digit;
+                        solution += `${beforeMultiply} * 2 = ${digit}\n`;
+                        temp = temp - digit;
+                        count++;
+                        
+                        if (temp === 0) break;
+                    }
+                    
+                    solution += `fractional binary: ${binaryFrac}\n`;
+                }
+                
+                // Combine and normalize
+                const binaryResult = convertToBinaryDetailed(absValue);
+                solution += ` combining and normalizing:\n`;
+                solution += `combined: ${binaryResult.original}\n`;
+                solution += `normalized: ${binaryResult.normalized} × 2^${binaryResult.exponent}\n\n`;
+                
+                // Calculate biased exponent
+                const biased = binaryResult.exponent + 127;
+                solution += `calculating biased exponent:\n`;
+                solution += `actual exponent: ${binaryResult.exponent}\n`;
+                solution += `biased exponent: ${binaryResult.exponent} + 127 = ${biased}\n`;
+                solution += `${biased} in 8-bit binary: ${biased.toString(2).padStart(8, '0')}\n\n`;
+                
+                // Extract mantissa
+                const mantissa23 = binaryResult.fractionPart.padEnd(23, '0').substring(0, 23);
+                solution += `extracting the mantissa:\n`;
+                solution += `normalized form: ${binaryResult.normalized}\n`;
+                solution += `remove implied 1.: ${binaryResult.fractionPart}\n`;
+                if (binaryResult.fractionPart.length < 23) {
+                    solution += `pad to 23 bits: ${binaryResult.fractionPart.padEnd(23, '0')}\n`;
+                } else if (binaryResult.fractionPart.length > 23) {
+                    solution += `truncate to 23 bits: ${mantissa23}\n`;
+                }
+                solution += `mantissa: ${mantissa23}\n\n`;
+            }
+            
+            // Final assembly
+            solution += `sign bit:    ${signBit}\n`;
+            solution += `exponent:    ${exponentBits}\n`;
+            solution += `mantissa:    ${fractionBits}\n`;
+            solution += `full binary: ${signBit}|${exponentBits}|${fractionBits}\n\n`;
+            solution += `Final Answer: 0x${hexValue}`;
+            
+            document.getElementById('handwritten-text').value = solution;
+        }
+
+        function copyHandwrittenSolution() {
+            const textarea = document.getElementById('handwritten-text');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                document.execCommand('copy');
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#4a9eff';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                alert('Copy failed. Please select the text manually and copy with Ctrl+C');
+            }
+        }
+
+        document.getElementById('decimal-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                convertNumber();
+            }
+        });
+    </script>
