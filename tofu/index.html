@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTERPOL - Notificaci&oacute;n Roja | Alerta Internacional Felina</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, Helvetica, sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* TOP BAR - INTERPOL STYLE */
+        .top-bar {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 6px 0;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .top-bar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar a {
+            color: #a0a0c0;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #0d1b3e 0%, #1a2d5a 50%, #0d1b3e 100%);
+            padding: 0;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #c8102e, #f0c808, #c8102e);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .interpol-logo {
+            width: 70px;
+            height: 70px;
+            position: relative;
+        }
+
+        .interpol-logo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-titles h1 {
+            color: #fff;
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .header-titles .subtitle {
+            color: #8899bb;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .guatemala-flag {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flag-stripes {
+            width: 48px;
+            height: 32px;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            display: flex;
+        }
+
+        .flag-stripes .blue { background: #4997d0; flex: 1; }
+        .flag-stripes .white { background: #fff; flex: 1; }
+
+        .guatemala-text {
+            color: #8899bb;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* NAV */
+        .nav {
+            background: #c8102e;
+            padding: 0;
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            padding: 0 20px;
+        }
+
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: rgba(0,0,0,0.25);
+        }
+
+        /* ALERT BANNER */
+        .alert-banner {
+            background: linear-gradient(90deg, #c8102e, #e8333e, #c8102e);
+            color: #fff;
+            text-align: center;
+            padding: 14px 20px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: pulse-bg 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .alert-banner::before,
+        .alert-banner::after {
+            content: '\26A0';
+            margin: 0 12px;
+            font-size: 18px;
+        }
+
+        @keyframes pulse-bg {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .breadcrumb a {
+            color: #0d1b3e;
+            text-decoration: none;
+        }
+
+        .breadcrumb span { margin: 0 6px; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 25px;
+        }
+
+        /* RED NOTICE CARD */
+        .notice-card {
+            background: #fff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+
+        .notice-header {
+            background: linear-gradient(135deg, #b80d24, #c8102e, #d42040);
+            color: #fff;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notice-header h2 {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .notice-header .notice-id {
+            font-size: 12px;
+            opacity: 0.8;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .notice-body {
+            padding: 25px;
+        }
+
+        /* SUBJECT PROFILE */
+        .subject-profile {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .mugshot-container {
+            position: relative;
+        }
+
+        .mugshot-container img {
+            width: 100%;
+            border-radius: 3px;
+            border: 3px solid #1a1a2e;
+            display: block;
+        }
+
+        .mugshot-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.85);
+            color: #fff;
+            text-align: center;
+            padding: 6px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .subject-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            border-bottom: 1px solid #eee;
+            padding: 9px 0;
+            font-size: 13px;
+        }
+
+        .info-row:last-child { border-bottom: none; }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            align-self: center;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+
+        .info-value.highlight {
+            color: #c8102e;
+            font-weight: 700;
+        }
+
+        /* CHARGES SECTION */
+        .section-title {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #c8102e;
+            margin-bottom: 15px;
+        }
+
+        .charges-list {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .charges-list li {
+            padding: 10px 15px;
+            background: #fdf2f2;
+            border-left: 3px solid #c8102e;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #5a1a1a;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .charges-list li .charge-code {
+            font-size: 10px;
+            color: #999;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* INCIDENT REPORT */
+        .incident-report {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .incident-report p {
+            font-size: 13px;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+        }
+
+        /* EVIDENCE GALLERY */
+        .evidence-gallery {
+            margin-bottom: 25px;
+        }
+
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .evidence-item {
+            position: relative;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+            aspect-ratio: 1;
+        }
+
+        .evidence-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .evidence-item .evidence-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+            font-size: 9px;
+            padding: 4px 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* STATUS BAR */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #c8102e;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .status-bar .status-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: #856404;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: #fff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-card-header {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 15px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-card-body {
+            padding: 15px;
+        }
+
+        .danger-level {
+            text-align: center;
+            padding: 20px 15px;
+        }
+
+        .danger-meter {
+            width: 100%;
+            height: 12px;
+            background: #eee;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .danger-fill {
+            width: 92%;
+            height: 100%;
+            background: linear-gradient(90deg, #f0c808, #ff6600, #c8102e);
+            border-radius: 6px;
+            animation: danger-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes danger-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .danger-label {
+            font-size: 22px;
+            font-weight: 900;
+            color: #c8102e;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 8px;
+        }
+
+        .danger-sub {
+            font-size: 10px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .wanted-poster {
+            text-align: center;
+            padding: 20px 15px;
+        }
+
+        .wanted-poster img {
+            width: 100%;
+            border-radius: 3px;
+            border: 2px solid #c8102e;
+            margin-bottom: 10px;
+        }
+
+        .wanted-text {
+            color: #c8102e;
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .contact-list {
+            list-style: none;
+        }
+
+        .contact-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-list li:last-child { border-bottom: none; }
+
+        .contact-icon {
+            width: 28px;
+            height: 28px;
+            background: #0d1b3e;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .timeline-item {
+            padding: 10px 0;
+            border-left: 2px solid #c8102e;
+            padding-left: 15px;
+            margin-left: 8px;
+            position: relative;
+            font-size: 12px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #c8102e;
+            border-radius: 50%;
+            position: absolute;
+            left: -6px;
+            top: 14px;
+        }
+
+        .timeline-date {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timeline-text {
+            color: #333;
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+
+        /* FOOTER */
+        .footer {
+            background: #1a1a2e;
+            color: #8899bb;
+            padding: 30px 0;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .footer h4 {
+            color: #fff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .footer p, .footer a {
+            font-size: 11px;
+            line-height: 1.8;
+            color: #8899bb;
+            text-decoration: none;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 20px 0;
+            border-top: 1px solid #2a2a4e;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 10px;
+            color: #556;
+        }
+
+        .classification-stamp {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-size: 120px;
+            font-weight: 900;
+            color: rgba(200, 16, 46, 0.04);
+            text-transform: uppercase;
+            letter-spacing: 15px;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .subject-profile {
+                grid-template-columns: 1fr;
+            }
+            .nav-inner {
+                overflow-x: auto;
+            }
+            .header-inner {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            .header-left {
+                flex-direction: column;
+            }
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* SEAL WATERMARK */
+        .seal-watermark {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            opacity: 0.07;
+            width: 180px;
+            height: 180px;
+            pointer-events: none;
+        }
+
+        /* DOCUMENT REFERENCE */
+        .doc-ref {
+            font-size: 9px;
+            color: #bbb;
+            text-align: right;
+            padding: 8px 25px;
+            border-top: 1px solid #eee;
+            letter-spacing: 0.5px;
+        }
+
+        .confidential-banner {
+            background: repeating-linear-gradient(
+                45deg,
+                #1a1a2e,
+                #1a1a2e 10px,
+                #222244 10px,
+                #222244 20px
+            );
+            color: #f0c808;
+            text-align: center;
+            padding: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        /* LANG SWITCHER */
+        .top-bar a.lang-active {
+            color: #fff;
+            font-weight: 700;
+        }
+        .top-bar a.lang-btn {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .top-bar a.lang-btn:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="classification-stamp" data-es="CONFIDENCIAL" data-en="CLASSIFIED">CONFIDENCIAL</div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div class="top-bar-inner">
+        <span data-es="ORGANIZACI&Oacute;N INTERNACIONAL DE POLIC&Iacute;A CRIMINAL" data-en="INTERNATIONAL CRIMINAL POLICE ORGANIZATION">ORGANIZACI&Oacute;N INTERNACIONAL DE POLIC&Iacute;A CRIMINAL</span>
+        <div>
+            <a href="#" class="lang-btn lang-active" onclick="setLang('es');return false;" id="lang-es">Espa&ntilde;ol</a>
+            <a href="#" class="lang-btn" onclick="setLang('en');return false;" id="lang-en">English</a>
+            <a href="#" class="lang-btn" style="opacity:0.4;cursor:default;">Fran&ccedil;ais</a>
+        </div>
+    </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-inner">
+        <div class="header-left">
+            <div class="interpol-logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" fill="none" stroke="#fff" stroke-width="2"/>
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="#4997d0" stroke-width="1.5"/>
+                    <circle cx="50" cy="50" r="20" fill="none" stroke="#fff" stroke-width="2"/>
+                    <line x1="50" y1="8" x2="50" y2="28" stroke="#fff" stroke-width="2"/>
+                    <line x1="50" y1="72" x2="50" y2="92" stroke="#fff" stroke-width="2"/>
+                    <line x1="8" y1="50" x2="28" y2="50" stroke="#fff" stroke-width="2"/>
+                    <line x1="72" y1="50" x2="92" y2="50" stroke="#fff" stroke-width="2"/>
+                    <text x="50" y="54" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Roboto Condensed, sans-serif">ICPO</text>
+                </svg>
+            </div>
+            <div class="header-titles">
+                <h1>INTERPOL</h1>
+                <div class="subtitle" data-es="Oficina Central Nacional &mdash; Guatemala" data-en="National Central Bureau &mdash; Guatemala">Oficina Central Nacional &mdash; Guatemala</div>
+            </div>
+        </div>
+        <div class="guatemala-flag">
+            <div class="flag-stripes">
+                <div class="blue"></div>
+                <div class="white"></div>
+                <div class="blue"></div>
+            </div>
+            <div class="guatemala-text" data-es="Rep&uacute;blica de&lt;br&gt;Guatemala" data-en="Republic of&lt;br&gt;Guatemala">Rep&uacute;blica de<br>Guatemala</div>
+        </div>
+    </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+    <div class="nav-inner">
+        <a href="#" data-es="Inicio" data-en="Home">Inicio</a>
+        <a href="#" class="active" data-es="Notificaciones" data-en="Notices">Notificaciones</a>
+        <a href="#" data-es="Alertas" data-en="Alerts">Alertas</a>
+        <a href="#" data-es="Cooperaci&oacute;n" data-en="Cooperation">Cooperaci&oacute;n</a>
+        <a href="#" data-es="Delitos Felinos" data-en="Feline Crimes">Delitos Felinos</a>
+        <a href="#" data-es="Contacto" data-en="Contact">Contacto</a>
+    </div>
+</div>
+
+<!-- ALERT BANNER -->
+<div class="alert-banner" data-es="Notificaci&oacute;n Roja Activa &mdash; Sujeto Considerado Extremadamente Peludo y Peligroso" data-en="Active Red Notice &mdash; Subject Considered Extremely Fluffy and Dangerous">
+    Notificaci&oacute;n Roja Activa &mdash; Sujeto Considerado Extremadamente Peludo y Peligroso
+</div>
+
+<!-- CONFIDENTIAL -->
+<div class="confidential-banner" data-es="&#9608; DOCUMENTO CLASIFICADO &mdash; NIVEL DE SEGURIDAD: ALFA-7 &mdash; USO EXCLUSIVO DE AUTORIDADES COMPETENTES &#9608;" data-en="&#9608; CLASSIFIED DOCUMENT &mdash; SECURITY LEVEL: ALPHA-7 &mdash; AUTHORIZED PERSONNEL ONLY &#9608;">
+    &#9608; DOCUMENTO CLASIFICADO &mdash; NIVEL DE SEGURIDAD: ALFA-7 &mdash; USO EXCLUSIVO DE AUTORIDADES COMPETENTES &#9608;
+</div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+    <a href="#" data-es="Inicio" data-en="Home">Inicio</a> <span>&rsaquo;</span>
+    <a href="#" data-es="Notificaciones Rojas" data-en="Red Notices">Notificaciones Rojas</a> <span>&rsaquo;</span>
+    <a href="#" data-es="Divisi&oacute;n Felina Internacional" data-en="International Feline Division">Divisi&oacute;n Felina Internacional</a> <span>&rsaquo;</span>
+    <strong data-es='TOFU (alias "El Mea Camas")' data-en='TOFU (alias "The Bed Pisser")'>TOFU (alias "El Mea Camas")</strong>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <!-- LEFT COLUMN -->
+    <div>
+        <div class="notice-card">
+            <div class="notice-header">
+                <h2 data-es="Notificaci&oacute;n Roja / Red Notice" data-en="Red Notice / Notificaci&oacute;n Roja">Notificaci&oacute;n Roja / Red Notice</h2>
+                <div class="notice-id" data-es="N.&deg; A-7291/GUA/2026&lt;br&gt;Emitida: 12/02/2026" data-en="No. A-7291/GUA/2026&lt;br&gt;Issued: 02/12/2026">
+                    N.&deg; A-7291/GUA/2026<br>
+                    Emitida: 12/02/2026
+                </div>
+            </div>
+
+            <div class="notice-body">
+                <!-- STATUS -->
+                <div class="status-bar">
+                    <div class="status-dot"></div>
+                    <span class="status-text" data-es="Estado: PR&Oacute;FUGO &mdash; B&Uacute;SQUEDA ACTIVA EN 194 PA&Iacute;SES MIEMBROS" data-en="Status: FUGITIVE &mdash; ACTIVE SEARCH ACROSS 194 MEMBER COUNTRIES">Estado: PR&Oacute;FUGO &mdash; B&Uacute;SQUEDA ACTIVA EN 194 PA&Iacute;SES MIEMBROS</span>
+                </div>
+
+                <!-- SUBJECT PROFILE -->
+                <div class="subject-profile">
+                    <div class="mugshot-container">
+                        <img src="images/tofu_mugshot.png" alt="Foto de fichaje - TOFU">
+                        <div class="mugshot-label" data-es="Foto de fichaje &mdash; PNC Guatemala &mdash; 02/2026" data-en="Booking photo &mdash; PNC Guatemala &mdash; 02/2026">Foto de fichaje &mdash; PNC Guatemala &mdash; 02/2026</div>
+                    </div>
+                    <div class="subject-info">
+                        <div class="info-row">
+                            <div class="info-label" data-es="Nombre completo" data-en="Full name">Nombre completo</div>
+                            <div class="info-value" style="font-size:16px; font-weight:700;">TOFU</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Alias conocidos" data-en="Known aliases">Alias conocidos</div>
+                            <div class="info-value highlight" data-es='"El Mea Camas", "El Peludo", "Sr. Inocente"' data-en='"The Bed Pisser", "The Furry One", "Mr. Innocent"'>"El Mea Camas", "El Peludo", "Sr. Inocente"</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Especie" data-en="Species">Especie</div>
+                            <div class="info-value" data-es="Felis catus (Gato Dom&eacute;stico)" data-en="Felis catus (Domestic Cat)">Felis catus (Gato Dom&eacute;stico)</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Raza" data-en="Breed">Raza</div>
+                            <div class="info-value" data-es="Gris / Siamix (presuntamente)" data-en="Grey / Siamese mix (allegedly)">Gris / Siamix (presuntamente)</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Sexo" data-en="Sex">Sexo</div>
+                            <div class="info-value" data-es="Masculino" data-en="Male">Masculino</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="N.&deg; Identificaci&oacute;n" data-en="ID Number">N.&deg; Identificaci&oacute;n</div>
+                            <div class="info-value" style="font-family: monospace;">#GUA02512026</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Nacionalidad" data-en="Nationality">Nacionalidad</div>
+                            <div class="info-value" data-es="Guatemalteca" data-en="Guatemalan">Guatemalteca</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Color de pelaje" data-en="Fur color">Color de pelaje</div>
+                            <div class="info-value" data-es="Gris plateado con extremidades oscuras" data-en="Silver grey with dark extremities">Gris plateado con extremidades oscuras</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Color de ojos" data-en="Eye color">Color de ojos</div>
+                            <div class="info-value" data-es="Verde-azulado" data-en="Blue-green">Verde-azulado</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Se&ntilde;as particulares" data-en="Distinguishing marks">Se&ntilde;as particulares</div>
+                            <div class="info-value" data-es="Mirada manipuladora, ronroneo enga&ntilde;oso, apariencia de falsa inocencia" data-en="Manipulative gaze, deceptive purring, appearance of false innocence">Mirada manipuladora, ronroneo enga&ntilde;oso, apariencia de falsa inocencia</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label" data-es="Estado procesal" data-en="Legal status">Estado procesal</div>
+                            <div class="info-value highlight" data-es="PR&Oacute;FUGO &mdash; ORDEN DE CAPTURA VIGENTE" data-en="FUGITIVE &mdash; ACTIVE ARREST WARRANT">PR&Oacute;FUGO &mdash; ORDEN DE CAPTURA VIGENTE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHARGES -->
+                <h3 class="section-title" data-es="Cargos Formales" data-en="Formal Charges">Cargos Formales</h3>
+                <ul class="charges-list">
+                    <li data-es="Micci&oacute;n premeditada y con alevos&iacute;a sobre cama ajena &mdash; Art. 274 C&oacute;d. Penal Felino &lt;span class='charge-code'&gt;Ref: CPF-274-A &amp;bull; Delito Grave contra la Higiene Dom&eacute;stica&lt;/span&gt;" data-en="Premeditated urination with malice aforethought upon another's bed &mdash; Art. 274 Feline Penal Code &lt;span class='charge-code'&gt;Ref: FPC-274-A &amp;bull; Serious Offense Against Domestic Hygiene&lt;/span&gt;">
+                        Micci&oacute;n premeditada y con alevos&iacute;a sobre cama ajena &mdash; Art. 274 C&oacute;d. Penal Felino
+                        <span class="charge-code">Ref: CPF-274-A &bull; Delito Grave contra la Higiene Dom&eacute;stica</span>
+                    </li>
+                    <li data-es="Da&ntilde;o intencional a propiedad privada (s&aacute;banas, colch&oacute;n y dignidad del afectado) &lt;span class='charge-code'&gt;Ref: CPF-156-B &amp;bull; Destrucci&oacute;n de Bienes de Confort&lt;/span&gt;" data-en="Intentional damage to private property (sheets, mattress, and the victim's dignity) &lt;span class='charge-code'&gt;Ref: FPC-156-B &amp;bull; Destruction of Comfort Assets&lt;/span&gt;">
+                        Da&ntilde;o intencional a propiedad privada (s&aacute;banas, colch&oacute;n y dignidad del afectado)
+                        <span class="charge-code">Ref: CPF-156-B &bull; Destrucci&oacute;n de Bienes de Confort</span>
+                    </li>
+                    <li data-es="Conducta antisocial felina reiterada en domicilio ajeno &lt;span class='charge-code'&gt;Ref: CPF-089-C &amp;bull; Alteraci&oacute;n del Orden Dom&eacute;stico&lt;/span&gt;" data-en="Repeated antisocial feline behavior in another's residence &lt;span class='charge-code'&gt;Ref: FPC-089-C &amp;bull; Disturbance of Domestic Order&lt;/span&gt;">
+                        Conducta antisocial felina reiterada en domicilio ajeno
+                        <span class="charge-code">Ref: CPF-089-C &bull; Alteraci&oacute;n del Orden Dom&eacute;stico</span>
+                    </li>
+                    <li data-es="Fingir inocencia posterior al acto delictivo mediante ronroneo y cara tierna &lt;span class='charge-code'&gt;Ref: CPF-312-D &amp;bull; Manipulaci&oacute;n Emocional Agravada&lt;/span&gt;" data-en="Feigning innocence after the criminal act through purring and cute facial expressions &lt;span class='charge-code'&gt;Ref: FPC-312-D &amp;bull; Aggravated Emotional Manipulation&lt;/span&gt;">
+                        Fingir inocencia posterior al acto delictivo mediante ronroneo y cara tierna
+                        <span class="charge-code">Ref: CPF-312-D &bull; Manipulaci&oacute;n Emocional Agravada</span>
+                    </li>
+                    <li data-es="Huida de la escena del crimen sin mostrar remordimiento alguno &lt;span class='charge-code'&gt;Ref: CPF-401-E &amp;bull; Evasi&oacute;n de Responsabilidad Felina&lt;/span&gt;" data-en="Fleeing the crime scene without showing any remorse whatsoever &lt;span class='charge-code'&gt;Ref: FPC-401-E &amp;bull; Evasion of Feline Responsibility&lt;/span&gt;">
+                        Huida de la escena del crimen sin mostrar remordimiento alguno
+                        <span class="charge-code">Ref: CPF-401-E &bull; Evasi&oacute;n de Responsabilidad Felina</span>
+                    </li>
+                </ul>
+
+                <!-- INCIDENT REPORT -->
+                <h3 class="section-title" data-es="Reporte del Incidente" data-en="Incident Report">Reporte del Incidente</h3>
+                <div class="incident-report" id="incident-report">
+                    <p>
+                        El d&iacute;a <strong>10 de febrero de 2026</strong>, aproximadamente a las <strong>03:47 horas</strong>, el sujeto identificado como <strong>TOFU</strong> (alias "El Mea Camas"), de especie felina y bajo la tutela legal de <strong>SHARAI MELANIE MARQUEZ</strong>, ingres&oacute; de manera clandestina a la habitaci&oacute;n de <strong>ANGEL MARQUEZ</strong>, hermano de su due&ntilde;a, en el domicilio familiar ubicado en <strong>North Hills, California, Estados Unidos</strong>.
+                    </p>
+                    <br>
+                    <p>
+                        Seg&uacute;n el testimonio del afectado, <strong>ANGEL MARQUEZ</strong> lleg&oacute; a su hogar despu&eacute;s de una larga jornada y descubri&oacute; que <strong>su cama hab&iacute;a sido orinada deliberadamente y con total premeditaci&oacute;n</strong> por el sujeto TOFU, causando da&ntilde;os irreparables al colch&oacute;n, s&aacute;banas y la estabilidad emocional de la v&iacute;ctima.
+                    </p>
+                    <br>
+                    <p>
+                        An&aacute;lisis forenses del laboratorio cient&iacute;fico del LAPD confirman que el pH y composici&oacute;n qu&iacute;mica de la muestra coinciden al <strong>99.7%</strong> con el perfil biol&oacute;gico del sospechoso. El sujeto fue captado por c&aacute;maras de seguridad domiciliarias abandonando la escena con una actitud descrita por peritos como <em>"completamente indiferente y carente de cualquier tipo de arrepentimiento"</em>.
+                    </p>
+                    <br>
+                    <p>
+                        La v&iacute;ctima, <strong>ANGEL MARQUEZ</strong>, declar&oacute; ante las autoridades: <em>"Llegu&eacute; a mi cuarto y todo estaba mojado. &Eacute;l estaba sentado en la puerta mir&aacute;ndome fijamente, como si nada. Ese gato no tiene alma."</em>
+                    </p>
+                    <br>
+                    <p>
+                        Tras el incidente, el sujeto TOFU es sospechoso de haber <strong>huido a la Rep&uacute;blica de Guatemala</strong>, posiblemente utilizando documentos de identidad falsificados. El Ministerio P&uacute;blico de Guatemala ha solicitado la colaboraci&oacute;n de INTERPOL para la localizaci&oacute;n y captura internacional del sujeto, quien se presume se encuentra pr&oacute;fugo en territorio guatemalteco, posiblemente escondido debajo de alg&uacute;n mueble o durmiendo sobre ropa limpia ajena.
+                    </p>
+                </div>
+
+                <!-- EVIDENCE: CRIME SCENE -->
+                <h3 class="section-title" data-es="Evidencia Fotogr&aacute;fica &mdash; Escena del Crimen" data-en="Photographic Evidence &mdash; Crime Scene">Evidencia Fotogr&aacute;fica &mdash; Escena del Crimen</h3>
+                <div class="evidence-gallery">
+                    <div class="evidence-grid">
+                        <div class="evidence-item">
+                            <img src="images/tofu00013.jpeg" alt="Escena del crimen A">
+                            <div class="evidence-label" data-es="EXH-A: Sujeto sobre la cama de ANGEL" data-en="EXH-A: Subject on ANGEL's bed">EXH-A: Sujeto sobre la cama de ANGEL</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00016.jpeg" alt="Escena del crimen B">
+                            <div class="evidence-label" data-es="EXH-B: Ocupando la cama ilegalmente" data-en="EXH-B: Illegally occupying the bed">EXH-B: Ocupando la cama ilegalmente</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00017.jpeg" alt="Escena del crimen C">
+                            <div class="evidence-label" data-es="EXH-C: Posici&oacute;n previa al acto delictivo" data-en="EXH-C: Position prior to criminal act">EXH-C: Posici&oacute;n previa al acto delictivo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EVIDENCE: SURVEILLANCE -->
+                <h3 class="section-title" data-es="Vigilancia y Reconocimiento del Sospechoso" data-en="Surveillance and Subject Identification">Vigilancia y Reconocimiento del Sospechoso</h3>
+                <div class="evidence-gallery">
+                    <div class="evidence-grid">
+                        <div class="evidence-item">
+                            <img src="images/tofu00003.jpeg" alt="Vigilancia A">
+                            <div class="evidence-label" data-es="VIG-A: Mirada desafiante a la autoridad" data-en="VIG-A: Defiant look at authorities">VIG-A: Mirada desafiante a la autoridad</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00005.jpeg" alt="Vigilancia B">
+                            <div class="evidence-label" data-es="VIG-B: Retrato frontal del sospechoso" data-en="VIG-B: Frontal portrait of suspect">VIG-B: Retrato frontal del sospechoso</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00006.jpeg" alt="Vigilancia C">
+                            <div class="evidence-label" data-es="VIG-C: Perfil lateral derecho" data-en="VIG-C: Right side profile">VIG-C: Perfil lateral derecho</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00009.jpeg" alt="Vigilancia D">
+                            <div class="evidence-label" data-es="VIG-D: Captado en &aacute;ngulo bajo" data-en="VIG-D: Captured from low angle">VIG-D: Captado en &aacute;ngulo bajo</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00008.jpeg" alt="Vigilancia E">
+                            <div class="evidence-label" data-es="VIG-E: Actitud sospechosa nocturna" data-en="VIG-E: Suspicious nocturnal behavior">VIG-E: Actitud sospechosa nocturna</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00004.jpeg" alt="Vigilancia F">
+                            <div class="evidence-label" data-es="VIG-F: Sujeto con c&oacute;mplice (ver nota)" data-en="VIG-F: Subject with accomplice (see note)">VIG-F: Sujeto con c&oacute;mplice (ver nota)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCOMPLICE SECTION -->
+                <h3 class="section-title" data-es="Persona de Inter&eacute;s &mdash; Presunta Encubridora" data-en="Person of Interest &mdash; Suspected Accomplice">Persona de Inter&eacute;s &mdash; Presunta Encubridora</h3>
+                <div class="incident-report" style="margin-bottom:15px;" id="accomplice-report">
+                    <p>
+                        Las autoridades han identificado a <strong>SHARAI MELANIE MARQUEZ</strong>, due&ntilde;a y tutora legal del sujeto TOFU, como presunta encubridora de sus actividades delictivas. A pesar de m&uacute;ltiples reportes presentados por su hermano <strong>ANGEL MARQUEZ</strong> sobre la conducta antisocial del felino, la sospechosa ha mostrado una <strong>negaci&oacute;n sistem&aacute;tica</strong> de los hechos, argumentando repetidamente que <em>"&eacute;l no fue"</em>, <em>"es que estaba estresado"</em> y <em>"mi beb&eacute; no har&iacute;a eso"</em>.
+                    </p>
+                    <br>
+                    <p>
+                        Se le acusa de: encubrimiento felino agravado, obstrucci&oacute;n a la justicia dom&eacute;stica, suministro continuo de croquetas premium al pr&oacute;fugo a pesar de la orden de captura vigente, y posible colaboraci&oacute;n en la huida del sujeto hacia Guatemala.
+                    </p>
+                </div>
+                <div class="evidence-gallery">
+                    <div class="evidence-grid">
+                        <div class="evidence-item">
+                            <img src="images/tofu00002.jpeg" alt="Con encubridora">
+                            <div class="evidence-label" data-es="ENC-A: TOFU con SHARAI MELANIE MARQUEZ" data-en="ENC-A: TOFU with SHARAI MELANIE MARQUEZ">ENC-A: TOFU con SHARAI MELANIE MARQUEZ</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00022.jpeg" alt="Selfie con encubridora">
+                            <div class="evidence-label" data-es="ENC-B: Selfie interceptada &mdash; c&oacute;mplice" data-en="ENC-B: Intercepted selfie &mdash; accomplice">ENC-B: Selfie interceptada &mdash; c&oacute;mplice</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00004.jpeg" alt="Contacto con encubridora">
+                            <div class="evidence-label" data-es="ENC-C: Contacto f&iacute;sico con la sospechosa" data-en="ENC-C: Physical contact with suspect">ENC-C: Contacto f&iacute;sico con la sospechosa</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BEHAVIOR POST-CRIME -->
+                <h3 class="section-title" data-es="Comportamiento Post-Delictivo" data-en="Post-Crime Behavior">Comportamiento Post-Delictivo</h3>
+                <div class="incident-report" style="margin-bottom:15px;" id="postcrime-report">
+                    <p>
+                        Tras cometer el acto de micci&oacute;n premeditada, el sujeto TOFU fue observado realizando las siguientes actividades como si nada hubiera ocurrido: dormir sobre ropa limpia, acicalarse con total calma, pedir comida con insistencia y ronronear de manera <strong>manipuladora</strong> cuando se le confrontaba con la evidencia. Se sospecha que <strong>SHARAI MELANIE MARQUEZ</strong> facilit&oacute; su huida posterior hacia Guatemala.
+                    </p>
+                </div>
+                <div class="evidence-gallery">
+                    <div class="evidence-grid">
+                        <div class="evidence-item">
+                            <img src="images/tofu00019.jpeg" alt="Post-delito A">
+                            <div class="evidence-label" data-es="PD-A: Durmiendo sin remordimiento" data-en="PD-A: Sleeping without remorse">PD-A: Durmiendo sin remordimiento</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00020.jpeg" alt="Post-delito B">
+                            <div class="evidence-label" data-es="PD-B: Escondi&eacute;ndose entre s&aacute;banas" data-en="PD-B: Hiding among sheets">PD-B: Escondi&eacute;ndose entre s&aacute;banas</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00021.jpeg" alt="Post-delito C">
+                            <div class="evidence-label" data-es="PD-C: Huyendo bajo cobijas" data-en="PD-C: Fleeing under blankets">PD-C: Huyendo bajo cobijas</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00001.jpeg" alt="Post-delito D">
+                            <div class="evidence-label" data-es="PD-D: Ocult&aacute;ndose en cama ajena (otra vez)" data-en="PD-D: Hiding in someone else's bed (again)">PD-D: Ocult&aacute;ndose en cama ajena (otra vez)</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00011.jpeg" alt="Post-delito E">
+                            <div class="evidence-label" data-es="PD-E: Expresi&oacute;n de cero remordimiento" data-en="PD-E: Expression of zero remorse">PD-E: Expresi&oacute;n de cero remordimiento</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00010.jpeg" alt="Post-delito F">
+                            <div class="evidence-label" data-es="PD-F: Mirada calculadora del pr&oacute;fugo" data-en="PD-F: Calculating gaze of the fugitive">PD-F: Mirada calculadora del pr&oacute;fugo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MORE ID PHOTOS -->
+                <h3 class="section-title" data-es="Fotograf&iacute;as Adicionales de Identificaci&oacute;n" data-en="Additional Identification Photographs">Fotograf&iacute;as Adicionales de Identificaci&oacute;n</h3>
+                <div class="evidence-gallery">
+                    <div class="evidence-grid">
+                        <div class="evidence-item">
+                            <img src="images/tofu00007.jpeg" alt="ID foto 1">
+                            <div class="evidence-label" data-es="ID-001: Primer plano facial" data-en="ID-001: Facial close-up">ID-001: Primer plano facial</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00012.jpeg" alt="ID foto 2">
+                            <div class="evidence-label" data-es="ID-002: Acicalamiento sospechoso" data-en="ID-002: Suspicious grooming">ID-002: Acicalamiento sospechoso</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00014.jpeg" alt="ID foto 3">
+                            <div class="evidence-label" data-es="ID-003: Posici&oacute;n de descanso t&iacute;pica" data-en="ID-003: Typical resting position">ID-003: Posici&oacute;n de descanso t&iacute;pica</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00015.jpeg" alt="ID foto 4">
+                            <div class="evidence-label" data-es="ID-004: Perfil de sospechoso dormido" data-en="ID-004: Sleeping suspect profile">ID-004: Perfil de sospechoso dormido</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu00018.jpeg" alt="ID foto 5">
+                            <div class="evidence-label" data-es="ID-005: Expresi&oacute;n de falsa inocencia" data-en="ID-005: Expression of false innocence">ID-005: Expresi&oacute;n de falsa inocencia</div>
+                        </div>
+                        <div class="evidence-item">
+                            <img src="images/tofu_mugshot.png" alt="ID foto 6">
+                            <div class="evidence-label" data-es="ID-006: Foto oficial de fichaje PNC" data-en="ID-006: Official PNC booking photo">ID-006: Foto oficial de fichaje PNC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-ref" data-es="REF: INTERPOL/OCN-GUA/NR/2026/07291 &bull; CLASIFICACI&Oacute;N: RESTRINGIDO &bull; P&aacute;gina 1 de 1 &bull; Generado: 12-FEB-2026 14:32:07 UTC-6" data-en="REF: INTERPOL/NCB-GUA/RN/2026/07291 &bull; CLASSIFICATION: RESTRICTED &bull; Page 1 of 1 &bull; Generated: 12-FEB-2026 14:32:07 UTC-6">
+                REF: INTERPOL/OCN-GUA/NR/2026/07291 &bull; CLASIFICACI&Oacute;N: RESTRINGIDO &bull; P&aacute;gina 1 de 1 &bull; Generado: 12-FEB-2026 14:32:07 UTC-6
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <!-- DANGER LEVEL -->
+        <div class="sidebar-card">
+            <div class="sidebar-card-header" data-es="Nivel de Peligrosidad" data-en="Danger Level">Nivel de Peligrosidad</div>
+            <div class="danger-level">
+                <div class="danger-meter">
+                    <div class="danger-fill"></div>
+                </div>
+                <div class="danger-label" data-es="CR&Iacute;TICO" data-en="CRITICAL">CR&Iacute;TICO</div>
+                <div class="danger-sub" data-es="92/100 &mdash; Escala Internacional de Amenaza Felina" data-en="92/100 &mdash; International Feline Threat Scale">92/100 &mdash; Escala Internacional de Amenaza Felina</div>
+            </div>
+        </div>
+
+        <!-- WANTED POSTER -->
+        <div class="sidebar-card">
+            <div class="sidebar-card-header" data-es="Se Busca" data-en="Wanted">Se Busca</div>
+            <div class="wanted-poster">
+                <img src="images/tofu00003.jpeg" alt="Se Busca - TOFU">
+                <div class="wanted-text" data-es="SE BUSCA" data-en="WANTED">SE BUSCA</div>
+                <p style="font-size:11px; color:#666; margin-top:8px; line-height:1.5;" data-es="Recompensa: 500,000 croquetas&lt;br&gt;y un rat&oacute;n de juguete&lt;br&gt;Contactar a la autoridad m&aacute;s cercana" data-en="Reward: 500,000 kibbles&lt;br&gt;and a toy mouse&lt;br&gt;Contact nearest authority">
+                    Recompensa: 500,000 croquetas<br>y un rat&oacute;n de juguete<br>
+                    Contactar a la autoridad m&aacute;s cercana
+                </p>
+            </div>
+        </div>
+
+        <!-- ACCOMPLICE SIDEBAR -->
+        <div class="sidebar-card">
+            <div class="sidebar-card-header" style="background:#8b0000;" data-es="Persona de Inter&eacute;s" data-en="Person of Interest">Persona de Inter&eacute;s</div>
+            <div class="wanted-poster">
+                <img src="images/tofu00002.jpeg" alt="Con encubridora">
+                <p style="font-size:11px; color:#666; margin-top:4px; line-height:1.5;">
+                    <strong style="color:#c8102e;" data-es="ENCUBRIDORA IDENTIFICADA" data-en="IDENTIFIED ACCOMPLICE">ENCUBRIDORA IDENTIFICADA</strong><br>
+                    <span data-es="SHARAI MELANIE MARQUEZ &mdash; Tutora legal del sujeto. Proporciona alimento, refugio y afecto al pr&oacute;fugo. Niega todo." data-en="SHARAI MELANIE MARQUEZ &mdash; Legal guardian of the subject. Provides food, shelter, and affection to the fugitive. Denies everything.">SHARAI MELANIE MARQUEZ &mdash; Tutora legal del sujeto. Proporciona alimento, refugio y afecto al pr&oacute;fugo. Niega todo.</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- TIMELINE -->
+        <div class="sidebar-card">
+            <div class="sidebar-card-header" data-es="Cronolog&iacute;a de los Hechos" data-en="Timeline of Events">Cronolog&iacute;a de los Hechos</div>
+            <div class="sidebar-card-body">
+                <div class="timeline-item">
+                    <div class="timeline-date">10 Feb 2026 &mdash; 03:47</div>
+                    <div class="timeline-text" data-es="Sujeto ingresa sigilosamente a habitaci&oacute;n de ANGEL MARQUEZ" data-en="Subject stealthily enters ANGEL MARQUEZ's bedroom">Sujeto ingresa sigilosamente a habitaci&oacute;n de ANGEL MARQUEZ</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">10 Feb 2026 &mdash; 03:49</div>
+                    <div class="timeline-text" data-es="Se comete el acto de micci&oacute;n sobre la cama" data-en="The act of urination upon the bed is committed">Se comete el acto de micci&oacute;n sobre la cama</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">10 Feb 2026 &mdash; 03:50</div>
+                    <div class="timeline-text" data-es="Sujeto abandona la escena sin prisa alguna" data-en="Subject leaves the scene without any hurry">Sujeto abandona la escena sin prisa alguna</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">10 Feb 2026 &mdash; 17:30</div>
+                    <div class="timeline-text" data-es="ANGEL MARQUEZ llega a casa y descubre su cama orinada" data-en="ANGEL MARQUEZ arrives home and discovers his bed has been urinated on">ANGEL MARQUEZ llega a casa y descubre su cama orinada</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">10 Feb 2026 &mdash; 17:45</div>
+                    <div class="timeline-text" data-es="Se presenta denuncia verbal ante SHARAI MELANIE MARQUEZ" data-en="Verbal complaint filed with SHARAI MELANIE MARQUEZ">Se presenta denuncia verbal ante SHARAI MELANIE MARQUEZ</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">11 Feb 2026 &mdash; 02:00</div>
+                    <div class="timeline-text" data-es="Sujeto huye de North Hills, CA rumbo a Guatemala" data-en="Subject flees North Hills, CA en route to Guatemala">Sujeto huye de North Hills, CA rumbo a Guatemala</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">11 Feb 2026 &mdash; 09:00</div>
+                    <div class="timeline-text" data-es="LAPD notifica al Ministerio P&uacute;blico de Guatemala" data-en="LAPD notifies Guatemala's Public Ministry">LAPD notifica al Ministerio P&uacute;blico de Guatemala</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">12 Feb 2026 &mdash; 14:00</div>
+                    <div class="timeline-text" data-es="INTERPOL emite Notificaci&oacute;n Roja internacional" data-en="INTERPOL issues international Red Notice">INTERPOL emite Notificaci&oacute;n Roja internacional</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="sidebar-card">
+            <div class="sidebar-card-header" data-es="Denuncias y Avistamientos" data-en="Reports and Sightings">Denuncias y Avistamientos</div>
+            <div class="sidebar-card-body">
+                <ul class="contact-list">
+                    <li>
+                        <div class="contact-icon">&#9742;</div>
+                        <div>
+                            <strong data-es="L&iacute;nea directa PNC" data-en="PNC Hotline">L&iacute;nea directa PNC</strong><br>
+                            <span style="color:#666;">+502 1-800-GATO-MALO</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="contact-icon">&#9993;</div>
+                        <div>
+                            <strong data-es="Correo electr&oacute;nico" data-en="Email">Correo electr&oacute;nico</strong><br>
+                            <span style="color:#666;">delitos.felinos@pnc.gob.gt</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="contact-icon">&#9873;</div>
+                        <div>
+                            <strong data-es="Oficina Central" data-en="Central Office">Oficina Central</strong><br>
+                            <span style="color:#666;">6a Av. 13-71, Zona 1, Guatemala</span>
+                        </div>
+                    </li>
+                </ul>
+                <p style="font-size:10px; color:#999; margin-top:12px; line-height:1.5; text-align:center;" data-es="Si usted ve a este felino, NO intente capturarlo directamente. Es considerado adorable pero impredecible. Mantenga sus camas cerradas." data-en="If you see this feline, DO NOT attempt to capture him directly. He is considered adorable but unpredictable. Keep your beds locked.">
+                    Si usted ve a este felino, NO intente capturarlo directamente. Es considerado adorable pero impredecible. Mantenga sus camas cerradas.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <div class="footer-inner">
+        <div>
+            <h4>INTERPOL Guatemala</h4>
+            <p data-es="Oficina Central Nacional&lt;br&gt;Polic&iacute;a Nacional Civil&lt;br&gt;Direcci&oacute;n General de la PNC&lt;br&gt;6a Avenida 13-71, Zona 1&lt;br&gt;Ciudad de Guatemala, Guatemala" data-en="National Central Bureau&lt;br&gt;National Civil Police&lt;br&gt;PNC General Directorate&lt;br&gt;6a Avenida 13-71, Zone 1&lt;br&gt;Guatemala City, Guatemala">
+                Oficina Central Nacional<br>
+                Polic&iacute;a Nacional Civil<br>
+                Direcci&oacute;n General de la PNC<br>
+                6a Avenida 13-71, Zona 1<br>
+                Ciudad de Guatemala, Guatemala
+            </p>
+        </div>
+        <div>
+            <h4 data-es="Divisi&oacute;n Especial" data-en="Special Division">Divisi&oacute;n Especial</h4>
+            <p data-es="Unidad de Delitos Felinos Internacionales&lt;br&gt;Departamento de Cr&iacute;menes contra Mobiliario&lt;br&gt;Secci&oacute;n de Micci&oacute;n Premeditada&lt;br&gt;Grupo T&aacute;ctico Anti-Gatos" data-en="International Feline Crimes Unit&lt;br&gt;Department of Crimes Against Furniture&lt;br&gt;Premeditated Urination Section&lt;br&gt;Tactical Anti-Cat Squad">
+                Unidad de Delitos Felinos Internacionales<br>
+                Departamento de Cr&iacute;menes contra Mobiliario<br>
+                Secci&oacute;n de Micci&oacute;n Premeditada<br>
+                Grupo T&aacute;ctico Anti-Gatos
+            </p>
+        </div>
+        <div>
+            <h4 data-es="Aviso Legal" data-en="Legal Notice">Aviso Legal</h4>
+            <p data-es="Este documento es emitido por la Oficina Central Nacional de INTERPOL en Guatemala. La informaci&oacute;n contenida es de car&aacute;cter oficial y su uso indebido ser&aacute; sancionado conforme al C&oacute;digo Penal Felino Internacional, Art&iacute;culo 9, p&aacute;rrafo 3." data-en="This document is issued by the INTERPOL National Central Bureau in Guatemala. The information contained herein is of an official nature and its misuse will be sanctioned in accordance with the International Feline Penal Code, Article 9, paragraph 3.">
+                Este documento es emitido por la Oficina Central Nacional de INTERPOL en Guatemala.
+                La informaci&oacute;n contenida es de car&aacute;cter oficial y su uso indebido ser&aacute; sancionado
+                conforme al C&oacute;digo Penal Felino Internacional, Art&iacute;culo 9, p&aacute;rrafo 3.
+            </p>
+        </div>
+    </div>
+    <div class="footer-bottom" data-es="&amp;copy; 2026 INTERPOL &amp;mdash; Organizaci&oacute;n Internacional de Polic&iacute;a Criminal &amp;bull; Oficina Central Nacional Guatemala &amp;bull; Todos los derechos reservados &amp;bull; Sistema INTERPOL I-24/7" data-en="&amp;copy; 2026 INTERPOL &amp;mdash; International Criminal Police Organization &amp;bull; National Central Bureau Guatemala &amp;bull; All rights reserved &amp;bull; INTERPOL I-24/7 System">
+        &copy; 2026 INTERPOL &mdash; Organizaci&oacute;n Internacional de Polic&iacute;a Criminal &bull; Oficina Central Nacional Guatemala &bull; Todos los derechos reservados &bull; Sistema INTERPOL I-24/7
+    </div>
+</div>
+
+<script>
+// Translation engine
+var currentLang = 'es';
+
+// English content for longer sections that can't fit in data attributes
+var longTranslations = {
+    'incident-report': {
+        es: '<p>El d\u00eda <strong>10 de febrero de 2026</strong>, aproximadamente a las <strong>03:47 horas</strong>, el sujeto identificado como <strong>TOFU</strong> (alias \u201cEl Mea Camas\u201d), de especie felina y bajo la tutela legal de <strong>SHARAI MELANIE MARQUEZ</strong>, ingres\u00f3 de manera clandestina a la habitaci\u00f3n de <strong>ANGEL MARQUEZ</strong>, hermano de su due\u00f1a, en el domicilio familiar ubicado en <strong>North Hills, California, Estados Unidos</strong>.</p><br><p>Seg\u00fan el testimonio del afectado, <strong>ANGEL MARQUEZ</strong> lleg\u00f3 a su hogar despu\u00e9s de una larga jornada y descubri\u00f3 que <strong>su cama hab\u00eda sido orinada deliberadamente y con total premeditaci\u00f3n</strong> por el sujeto TOFU, causando da\u00f1os irreparables al colch\u00f3n, s\u00e1banas y la estabilidad emocional de la v\u00edctima.</p><br><p>An\u00e1lisis forenses del laboratorio cient\u00edfico del LAPD confirman que el pH y composici\u00f3n qu\u00edmica de la muestra coinciden al <strong>99.7%</strong> con el perfil biol\u00f3gico del sospechoso. El sujeto fue captado por c\u00e1maras de seguridad domiciliarias abandonando la escena con una actitud descrita por peritos como <em>\u201ccompletamente indiferente y carente de cualquier tipo de arrepentimiento\u201d</em>.</p><br><p>La v\u00edctima, <strong>ANGEL MARQUEZ</strong>, declar\u00f3 ante las autoridades: <em>\u201cLlegu\u00e9 a mi cuarto y todo estaba mojado. \u00c9l estaba sentado en la puerta mir\u00e1ndome fijamente, como si nada. Ese gato no tiene alma.\u201d</em></p><br><p>Tras el incidente, el sujeto TOFU es sospechoso de haber <strong>huido a la Rep\u00fablica de Guatemala</strong>, posiblemente utilizando documentos de identidad falsificados. El Ministerio P\u00fablico de Guatemala ha solicitado la colaboraci\u00f3n de INTERPOL para la localizaci\u00f3n y captura internacional del sujeto, quien se presume se encuentra pr\u00f3fugo en territorio guatemalteco, posiblemente escondido debajo de alg\u00fan mueble o durmiendo sobre ropa limpia ajena.</p>',
+        en: '<p>On <strong>February 10, 2026</strong>, at approximately <strong>03:47 hours</strong>, the subject identified as <strong>TOFU</strong> (alias "The Bed Pisser"), a feline species under the legal guardianship of <strong>SHARAI MELANIE MARQUEZ</strong>, clandestinely entered the bedroom of <strong>ANGEL MARQUEZ</strong>, his owner\'s brother, at the family residence located in <strong>North Hills, California, United States</strong>.</p><br><p>According to the victim\'s testimony, <strong>ANGEL MARQUEZ</strong> arrived home after a long day and discovered that <strong>his bed had been deliberately and with full premeditation urinated upon</strong> by the subject TOFU, causing irreparable damage to the mattress, sheets, and the emotional stability of the victim.</p><br><p>Forensic analysis from the LAPD scientific laboratory confirms that the pH and chemical composition of the sample match <strong>99.7%</strong> with the biological profile of the suspect. The subject was captured on home security cameras leaving the scene with an attitude described by experts as <em>"completely indifferent and devoid of any type of remorse whatsoever."</em></p><br><p>The victim, <strong>ANGEL MARQUEZ</strong>, declared to authorities: <em>"I came home to my room and everything was soaking wet. He was sitting at the door staring at me, like nothing happened. That cat has no soul."</em></p><br><p>Following the incident, the subject TOFU is suspected of having <strong>fled to the Republic of Guatemala</strong>, possibly using falsified identification documents. Guatemala\'s Public Ministry has requested INTERPOL\'s collaboration for the international location and capture of the subject, who is presumed to be at large in Guatemalan territory, possibly hiding under furniture or sleeping on someone else\'s clean laundry.</p>'
+    },
+    'accomplice-report': {
+        es: '<p>Las autoridades han identificado a <strong>SHARAI MELANIE MARQUEZ</strong>, due\u00f1a y tutora legal del sujeto TOFU, como presunta encubridora de sus actividades delictivas. A pesar de m\u00faltiples reportes presentados por su hermano <strong>ANGEL MARQUEZ</strong> sobre la conducta antisocial del felino, la sospechosa ha mostrado una <strong>negaci\u00f3n sistem\u00e1tica</strong> de los hechos, argumentando repetidamente que <em>\u201c\u00e9l no fue\u201d</em>, <em>\u201ces que estaba estresado\u201d</em> y <em>\u201cmi beb\u00e9 no har\u00eda eso\u201d</em>.</p><br><p>Se le acusa de: encubrimiento felino agravado, obstrucci\u00f3n a la justicia dom\u00e9stica, suministro continuo de croquetas premium al pr\u00f3fugo a pesar de la orden de captura vigente, y posible colaboraci\u00f3n en la huida del sujeto hacia Guatemala.</p>',
+        en: '<p>Authorities have identified <strong>SHARAI MELANIE MARQUEZ</strong>, legal owner and guardian of the subject TOFU, as a suspected accomplice in his criminal activities. Despite multiple reports filed by her brother <strong>ANGEL MARQUEZ</strong> regarding the feline\'s antisocial behavior, the suspect has shown a <strong>systematic denial</strong> of the facts, repeatedly arguing that <em>"it wasn\'t him,"</em> <em>"he was just stressed,"</em> and <em>"my baby would never do that."</em></p><br><p>She is charged with: aggravated feline harboring, obstruction of domestic justice, continuous supply of premium kibble to the fugitive despite the active arrest warrant, and possible collaboration in the subject\'s flight to Guatemala.</p>'
+    },
+    'postcrime-report': {
+        es: '<p>Tras cometer el acto de micci\u00f3n premeditada, el sujeto TOFU fue observado realizando las siguientes actividades como si nada hubiera ocurrido: dormir sobre ropa limpia, acicalarse con total calma, pedir comida con insistencia y ronronear de manera <strong>manipuladora</strong> cuando se le confrontaba con la evidencia. Se sospecha que <strong>SHARAI MELANIE MARQUEZ</strong> facilit\u00f3 su huida posterior hacia Guatemala.</p>',
+        en: '<p>After committing the act of premeditated urination, the subject TOFU was observed carrying out the following activities as if nothing had happened: sleeping on clean laundry, grooming himself with complete calm, demanding food insistently, and purring in a <strong>manipulative</strong> manner when confronted with the evidence. It is suspected that <strong>SHARAI MELANIE MARQUEZ</strong> facilitated his subsequent flight to Guatemala.</p>'
+    }
+};
+
+function setLang(lang) {
+    currentLang = lang;
+
+    // Update active lang button
+    document.getElementById('lang-es').classList.toggle('lang-active', lang === 'es');
+    document.getElementById('lang-en').classList.toggle('lang-active', lang === 'en');
+
+    // Update page lang attribute
+    document.documentElement.lang = lang;
+
+    // Update title
+    document.title = lang === 'es'
+        ? 'INTERPOL - Notificaci\u00f3n Roja | Alerta Internacional Felina'
+        : 'INTERPOL - Red Notice | International Feline Alert';
+
+    // Swap all elements with data-es/data-en attributes
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+        var text = el.getAttribute('data-' + lang);
+        if (text !== null) {
+            el.innerHTML = text;
+        }
+    });
+
+    // Swap longer report sections
+    for (var id in longTranslations) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.innerHTML = longTranslations[id][lang];
+        }
+    }
+}
+</script>
+
+</body>
+</html>
