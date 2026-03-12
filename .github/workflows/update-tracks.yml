@@ -1,0 +1,59 @@
+name: Update tracks.json
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tracks/*.mp3'
+      - 'tracks/*.txt'
+
+jobs:
+  update-tracks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate tracks.json
+        run: |
+          python3 - <<'EOF'
+          import os, json
+          from urllib.parse import quote
+
+          tracks_dir = 'tracks'
+
+          # Preserve existing metadata (artist, album, etc.) for known tracks
+          try:
+              with open('tracks.json') as f:
+                  existing = {t['file']: t for t in json.load(f)}
+          except Exception:
+              existing = {}
+
+          # Scan for MP3 files, sorted alphabetically
+          files = sorted(f for f in os.listdir(tracks_dir) if f.lower().endswith('.mp3'))
+
+          tracks = []
+          for f in files:
+              encoded = quote(f, safe='')
+              key = f"tracks/{encoded}"
+              if key in existing:
+                  tracks.append(existing[key])
+              else:
+                  # New track — just file path; player reads ID3 tags for title/artist/album
+                  tracks.append({"file": key})
+
+          with open('tracks.json', 'w') as out:
+              json.dump(tracks, out, indent=2, ensure_ascii=False)
+              out.write('\n')
+
+          print(f"Updated tracks.json with {len(tracks)} track(s)")
+          EOF
+
+      - name: Commit updated tracks.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tracks.json
+          git diff --cached --quiet || git commit -m "Auto-update tracks.json"
+          git push
