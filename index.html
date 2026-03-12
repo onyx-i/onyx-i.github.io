@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #131318;
+    --surface-2: #1a1a22;
+    --border: #25252f;
+    --text: #e8e6f0;
+    --text-muted: #8a8899;
+    --accent: #c4a0ff;
+    --accent-dim: #8b6abf;
+    --accent-glow: rgba(196, 160, 255, 0.12);
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* --- Noise overlay --- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* --- Header --- */
+  header {
+    padding: 2rem 2rem 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .site-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+
+  .site-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* --- Config banner --- */
+  #config-banner {
+    max-width: 900px;
+    margin: 1.5rem auto;
+    padding: 1.2rem 1.5rem;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    display: none;
+  }
+
+  #config-banner code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface-2);
+    padding: 0.15em 0.45em;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  /* --- Track list --- */
+  #track-list {
+    max-width: 900px;
+    margin: 1rem auto;
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .track-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .track-item:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  .track-item.active {
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+
+  .track-item .track-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    width: 1.8rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .track-item.active .track-num {
+    color: var(--accent);
+  }
+
+  .track-item .track-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--surface-2);
+    flex-shrink: 0;
+  }
+
+  .track-item .track-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .track-item .track-name {
+    font-weight: 600;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-item .track-artist {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .track-item .track-duration {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* --- Now Playing --- */
+  #now-playing {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    display: none;
+  }
+
+  #now-playing.visible { display: block; }
+
+  .player-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .album-art-container {
+    flex-shrink: 0;
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface-2);
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+
+  .album-art-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .album-art-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 3rem;
+  }
+
+  .player-details { flex: 1; min-width: 0; }
+
+  .player-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  .player-artist {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .player-album {
+    font-size: 0.82rem;
+    color: var(--accent-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Progress bar */
+  .progress-container {
+    margin-bottom: 1rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 5px;
+    background: var(--surface-2);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.15s linear;
+  }
+
+  .progress-times {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .ctrl-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ctrl-btn:hover { color: var(--text); background: var(--surface-2); }
+
+  .ctrl-btn.play-btn {
+    width: 52px;
+    height: 52px;
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 50%;
+  }
+
+  .ctrl-btn.play-btn:hover {
+    background: #d4b5ff;
+    transform: scale(1.05);
+  }
+
+  .ctrl-btn svg { width: 22px; height: 22px; }
+  .ctrl-btn.play-btn svg { width: 24px; height: 24px; }
+
+  /* Volume */
+  .volume-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 90px;
+    height: 4px;
+    background: var(--surface-2);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .volume-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* --- Lyrics Section --- */
+  .lyrics-section {
+    margin-top: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+
+  .lyrics-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .lyrics-heading svg { width: 18px; height: 18px; }
+
+  .lyrics-text {
+    white-space: pre-wrap;
+    font-size: 0.92rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+    font-family: 'Instrument Sans', sans-serif;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .lyrics-text::-webkit-scrollbar { width: 4px; }
+  .lyrics-text::-webkit-scrollbar-track { background: transparent; }
+  .lyrics-text::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .no-lyrics {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.85rem;
+  }
+
+  /* --- Footer --- */
+  footer {
+    max-width: 900px;
+    margin: 3rem auto 2rem;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 680px) {
+    .player-card { flex-direction: column; align-items: center; text-align: center; }
+    .album-art-container { width: 180px; height: 180px; }
+    .controls { justify-content: center; }
+    .volume-group { margin-left: 0; }
+    header, #track-list, #now-playing { padding-left: 1rem; padding-right: 1rem; }
+  }
+
+  /* --- Loading spinner --- */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--text-muted);
+    gap: 0.8rem;
+  }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* --- Animations --- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .track-item { animation: fadeUp 0.4s ease both; }
+  .track-item:nth-child(1) { animation-delay: 0.05s; }
+  .track-item:nth-child(2) { animation-delay: 0.1s; }
+  .track-item:nth-child(3) { animation-delay: 0.15s; }
+  .track-item:nth-child(4) { animation-delay: 0.2s; }
+  .track-item:nth-child(5) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">♫ Music Player</div>
+  <div class="site-subtitle">Select a track to play</div>
+</header>
+
+<div id="config-banner">
+  <strong style="color:var(--text);">Setup instructions:</strong><br>
+  1. Put your <code>.mp3</code> files in a <code>tracks/</code> folder<br>
+  2. Album art is extracted automatically from the MP3's embedded ID3v2 tags<br>
+  3. Lyrics are also pulled from embedded ID3 tags, or you can add a <code>.txt</code> file with matching name as an override<br>
+  4. List your tracks in <code>tracks.json</code> — see the example in the repo
+</div>
+
+<div id="track-list">
+  <div class="loading"><div class="spinner"></div> Loading tracks…</div>
+</div>
+
+<div id="now-playing">
+  <div class="player-card">
+    <div class="album-art-container">
+      <img id="album-art" src="" alt="Album Art" style="display:none;">
+      <div class="album-art-placeholder" id="art-placeholder">♫</div>
+    </div>
+    <div class="player-details">
+      <div class="player-title" id="p-title">—</div>
+      <div class="player-artist" id="p-artist">—</div>
+      <div class="player-album" id="p-album"></div>
+
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-times">
+          <span id="time-current">0:00</span>
+          <span id="time-total">0:00</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn" id="btn-prev" title="Previous">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+        </button>
+        <button class="ctrl-btn play-btn" id="btn-play" title="Play">
+          <svg id="icon-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg id="icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button class="ctrl-btn" id="btn-next" title="Next">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+        </button>
+
+        <div class="volume-group">
+          <button class="ctrl-btn" id="btn-vol" title="Volume">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          </button>
+          <input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.01" value="0.8">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lyrics-section">
+    <div class="lyrics-heading">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Lyrics
+    </div>
+    <div class="lyrics-text" id="lyrics-text">
+      <span class="no-lyrics">No lyrics available for this track.</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Hosted on GitHub Pages &middot; Add tracks to <code>tracks/</code> and update <code>tracks.json</code>
+</footer>
+
+<script>
+  /**
+   * ==============================
+   *  CONFIGURATION
+   * ==============================
+   *  
+   *  The site expects a tracks.json in the repo root:
+   *  [
+   *    {
+   *      "file": "tracks/my-song.mp3",
+   *      "title": "My Song",
+   *      "artist": "Artist Name",
+   *      "album": "Album Name (optional)",
+   *      "lyrics": "tracks/my-song.txt"   // optional override — otherwise pulled from ID3
+   *    }
+   *  ]
+   *
+   *  Album art:   extracted from embedded ID3v2 APIC frame automatically
+   *  Lyrics:      extracted from embedded ID3v2 USLT frame, OR fetched from .txt override
+   */
+
+  const audio = new Audio();
+  let tracks = [];
+  let currentIndex = -1;
+  let isPlaying = false;
+
+  // Cache parsed ID3 data so we don't re-fetch
+  const id3Cache = {};
+
+  // DOM refs
+  const $trackList = document.getElementById('track-list');
+  const $nowPlaying = document.getElementById('now-playing');
+  const $title = document.getElementById('p-title');
+  const $artist = document.getElementById('p-artist');
+  const $album = document.getElementById('p-album');
+  const $art = document.getElementById('album-art');
+  const $artPlaceholder = document.getElementById('art-placeholder');
+  const $progressBar = document.getElementById('progress-bar');
+  const $progressFill = document.getElementById('progress-fill');
+  const $timeCurrent = document.getElementById('time-current');
+  const $timeTotal = document.getElementById('time-total');
+  const $btnPlay = document.getElementById('btn-play');
+  const $iconPlay = document.getElementById('icon-play');
+  const $iconPause = document.getElementById('icon-pause');
+  const $btnPrev = document.getElementById('btn-prev');
+  const $btnNext = document.getElementById('btn-next');
+  const $volume = document.getElementById('volume');
+  const $lyrics = document.getElementById('lyrics-text');
+  const $configBanner = document.getElementById('config-banner');
+
+  // ===========================================================
+  //  ID3v2 PARSER — extracts APIC (album art) and USLT (lyrics)
+  // ===========================================================
+
+  /**
+   * Fetches the MP3 file as an ArrayBuffer and parses ID3v2.3/2.4 tags.
+   * Returns: { cover: Blob|null, lyrics: string|null, title, artist, album }
+   */
+  async function parseID3(url) {
+    if (id3Cache[url]) return id3Cache[url];
+
+    const result = { cover: null, lyrics: null, title: null, artist: null, album: null };
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) return result;
+      const buf = await resp.arrayBuffer();
+      const dv = new DataView(buf);
+
+      // Check for "ID3" header
+      if (dv.getUint8(0) !== 0x49 || dv.getUint8(1) !== 0x44 || dv.getUint8(2) !== 0x33) {
+        id3Cache[url] = result;
+        return result;
+      }
+
+      const version = dv.getUint8(3); // 3 = ID3v2.3, 4 = ID3v2.4
+      // const revision = dv.getUint8(4);
+      const flags = dv.getUint8(5);
+      const hasExtHeader = (flags & 0x40) !== 0;
+
+      // Synchsafe size
+      const tagSize =
+        (dv.getUint8(6) << 21) |
+        (dv.getUint8(7) << 14) |
+        (dv.getUint8(8) << 7) |
+        dv.getUint8(9);
+
+      let offset = 10;
+
+      // Skip extended header if present
+      if (hasExtHeader) {
+        const extSize =
+          (dv.getUint8(10) << 21) |
+          (dv.getUint8(11) << 14) |
+          (dv.getUint8(12) << 7) |
+          dv.getUint8(13);
+        offset += 4 + extSize;
+      }
+
+      const tagEnd = 10 + tagSize;
+
+      // Read text from buffer with given encoding byte
+      function readText(data, encodingByte, start, length) {
+        const slice = new Uint8Array(data, start, length);
+        if (encodingByte === 0) {
+          // ISO-8859-1
+          return Array.from(slice).map(b => String.fromCharCode(b)).join('');
+        } else if (encodingByte === 1 || encodingByte === 2) {
+          // UTF-16 (with or without BOM)
+          let le = true;
+          let s = 0;
+          if (slice.length >= 2 && slice[0] === 0xFF && slice[1] === 0xFE) { le = true; s = 2; }
+          else if (slice.length >= 2 && slice[0] === 0xFE && slice[1] === 0xFF) { le = false; s = 2; }
+          let str = '';
+          for (let i = s; i + 1 < slice.length; i += 2) {
+            const code = le ? (slice[i] | (slice[i + 1] << 8)) : ((slice[i] << 8) | slice[i + 1]);
+            if (code === 0) break;
+            str += String.fromCharCode(code);
+          }
+          return str;
+        } else if (encodingByte === 3) {
+          // UTF-8
+          return new TextDecoder('utf-8').decode(slice);
+        }
+        return '';
+      }
+
+      // Find null terminator position for given encoding
+      function findNull(data, enc, start, end) {
+        const arr = new Uint8Array(data);
+        if (enc === 0 || enc === 3) {
+          for (let i = start; i < end; i++) {
+            if (arr[i] === 0) return i;
+          }
+          return end;
+        } else {
+          // UTF-16: look for double null
+          for (let i = start; i + 1 < end; i += 2) {
+            if (arr[i] === 0 && arr[i + 1] === 0) return i;
+          }
+          return end;
+        }
+      }
+
+      function nullTermLen(enc) { return (enc === 1 || enc === 2) ? 2 : 1; }
+
+      // Parse frames
+      while (offset + 10 <= tagEnd) {
+        const frameId = String.fromCharCode(
+          dv.getUint8(offset), dv.getUint8(offset + 1),
+          dv.getUint8(offset + 2), dv.getUint8(offset + 3)
+        );
+
+        if (frameId.charCodeAt(0) === 0) break; // padding
+
+        let frameSize;
+        if (version === 4) {
+          // v2.4 uses synchsafe integers for frame size
+          frameSize =
+            (dv.getUint8(offset + 4) << 21) |
+            (dv.getUint8(offset + 5) << 14) |
+            (dv.getUint8(offset + 6) << 7) |
+            dv.getUint8(offset + 7);
+        } else {
+          // v2.3 uses normal big-endian integer
+          frameSize = dv.getUint32(offset + 4);
+        }
+
+        // const frameFlags = (dv.getUint8(offset + 8) << 8) | dv.getUint8(offset + 9);
+        const frameDataStart = offset + 10;
+        const frameDataEnd = frameDataStart + frameSize;
+
+        // ---- APIC (Attached Picture) ----
+        if (frameId === 'APIC' && !result.cover) {
+          try {
+            const enc = dv.getUint8(frameDataStart);
+            // MIME type (always ISO-8859-1, null-terminated)
+            const mimeEnd = findNull(buf, 0, frameDataStart + 1, frameDataEnd);
+            const mime = readText(buf, 0, frameDataStart + 1, mimeEnd - (frameDataStart + 1));
+            // picture type byte
+            // const picType = dv.getUint8(mimeEnd + 1);
+            // description (null-terminated in frame encoding)
+            const descStart = mimeEnd + 2;
+            const descEnd = findNull(buf, enc, descStart, frameDataEnd);
+            // image data starts after description + null terminator
+            const imgStart = descEnd + nullTermLen(enc);
+            const imgData = new Uint8Array(buf, imgStart, frameDataEnd - imgStart);
+
+            const mimeType = mime.toLowerCase().includes('png') ? 'image/png' : 'image/jpeg';
+            result.cover = new Blob([imgData], { type: mimeType });
+          } catch (e) {
+            console.warn('Error parsing APIC frame:', e);
+          }
+        }
+
+        // ---- USLT (Unsynchronized Lyrics) ----
+        if (frameId === 'USLT' && !result.lyrics) {
+          try {
+            const enc = dv.getUint8(frameDataStart);
+            // 3-byte language code
+            // const lang = readText(buf, 0, frameDataStart + 1, 3);
+            // content descriptor (null-terminated)
+            const descStart = frameDataStart + 4;
+            const descEnd = findNull(buf, enc, descStart, frameDataEnd);
+            // lyrics text starts after descriptor + null
+            const lyricsStart = descEnd + nullTermLen(enc);
+            const lyricsLen = frameDataEnd - lyricsStart;
+            if (lyricsLen > 0) {
+              result.lyrics = readText(buf, enc, lyricsStart, lyricsLen).trim();
+            }
+          } catch (e) {
+            console.warn('Error parsing USLT frame:', e);
+          }
+        }
+
+        // ---- Text frames for metadata fallback ----
+        if (frameId === 'TIT2' && !result.title) {
+          const enc = dv.getUint8(frameDataStart);
+          result.title = readText(buf, enc, frameDataStart + 1, frameSize - 1).replace(/\0/g, '').trim();
+        }
+        if (frameId === 'TPE1' && !result.artist) {
+          const enc = dv.getUint8(frameDataStart);
+          result.artist = readText(buf, enc, frameDataStart + 1, frameSize - 1).replace(/\0/g, '').trim();
+        }
+        if (frameId === 'TALB' && !result.album) {
+          const enc = dv.getUint8(frameDataStart);
+          result.album = readText(buf, enc, frameDataStart + 1, frameSize - 1).replace(/\0/g, '').trim();
+        }
+
+        offset = frameDataEnd;
+      }
+    } catch (e) {
+      console.warn('ID3 parse failed for', url, e);
+    }
+
+    id3Cache[url] = result;
+    return result;
+  }
+
+  // ===========================================================
+  //  PLAYER LOGIC
+  // ===========================================================
+
+  async function init() {
+    try {
+      const res = await fetch('tracks.json');
+      if (!res.ok) throw new Error('No tracks.json found');
+      tracks = await res.json();
+      if (!tracks.length) throw new Error('Empty track list');
+      renderTrackList();
+    } catch (e) {
+      $trackList.innerHTML = '';
+      $configBanner.style.display = 'block';
+      console.warn('Could not load tracks.json:', e.message);
+    }
+  }
+
+  function renderTrackList() {
+    $trackList.innerHTML = '';
+    tracks.forEach((t, i) => {
+      const el = document.createElement('div');
+      el.className = 'track-item';
+      el.dataset.index = i;
+
+      el.innerHTML = `
+        <span class="track-num">${String(i + 1).padStart(2, '0')}</span>
+        <img class="track-thumb" id="thumb-${i}" alt="" style="display:none;">
+        <div class="track-info">
+          <div class="track-name">${t.title || t.file}</div>
+          <div class="track-artist">${t.artist || ''}</div>
+        </div>
+        <span class="track-duration" id="dur-${i}">—</span>
+      `;
+      el.addEventListener('click', () => loadTrack(i));
+      $trackList.appendChild(el);
+
+      // Pre-parse ID3 for thumbnails in background
+      parseID3(t.file).then(id3 => {
+        if (id3.cover) {
+          const thumbEl = document.getElementById('thumb-' + i);
+          if (thumbEl) {
+            thumbEl.src = URL.createObjectURL(id3.cover);
+            thumbEl.style.display = 'block';
+          }
+        }
+        // Backfill title/artist from ID3 if not in tracks.json
+        if (!t.title && id3.title) {
+          t.title = id3.title;
+          const nameEl = el.querySelector('.track-name');
+          if (nameEl) nameEl.textContent = id3.title;
+        }
+        if (!t.artist && id3.artist) {
+          t.artist = id3.artist;
+          const artEl = el.querySelector('.track-artist');
+          if (artEl) artEl.textContent = id3.artist;
+        }
+        if (!t.album && id3.album) t.album = id3.album;
+      });
+    });
+  }
+
+  // ---- Load & play a track ----
+  async function loadTrack(index) {
+    if (index < 0 || index >= tracks.length) return;
+    currentIndex = index;
+    const t = tracks[index];
+
+    // highlight
+    document.querySelectorAll('.track-item').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+
+    // audio
+    audio.src = t.file;
+    audio.load();
+    audio.volume = parseFloat($volume.value);
+
+    // Parse ID3 tags
+    const id3 = await parseID3(t.file);
+
+    // metadata — prefer tracks.json, fall back to ID3
+    $title.textContent = t.title || id3.title || t.file;
+    $artist.textContent = t.artist || id3.artist || 'Unknown Artist';
+    $album.textContent = t.album || id3.album || '';
+
+    // cover art from embedded ID3
+    if (id3.cover) {
+      $art.src = URL.createObjectURL(id3.cover);
+      $art.style.display = 'block';
+      $artPlaceholder.style.display = 'none';
+    } else {
+      $art.style.display = 'none';
+      $artPlaceholder.style.display = 'flex';
+    }
+
+    // lyrics: .txt override > ID3 embedded USLT
+    const basePath = t.file.replace(/\.[^.]+$/, '');
+    const lyricsSources = t.lyrics ? [t.lyrics] : [basePath + '.txt'];
+    let lyricsLoaded = false;
+
+    // Try .txt file first
+    for (const src of lyricsSources) {
+      try {
+        const resp = await fetch(src);
+        if (resp.ok) {
+          const text = await resp.text();
+          if (text.trim()) {
+            $lyrics.textContent = text.trim();
+            lyricsLoaded = true;
+            break;
+          }
+        }
+      } catch (_) {}
+    }
+
+    // Fall back to embedded ID3 lyrics
+    if (!lyricsLoaded && id3.lyrics) {
+      $lyrics.textContent = id3.lyrics;
+      lyricsLoaded = true;
+    }
+
+    if (!lyricsLoaded) {
+      $lyrics.innerHTML = '<span class="no-lyrics">No lyrics available for this track.</span>';
+    }
+
+    $nowPlaying.classList.add('visible');
+    playAudio();
+    $nowPlaying.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---- Playback controls ----
+  function playAudio() {
+    audio.play();
+    isPlaying = true;
+    $iconPlay.style.display = 'none';
+    $iconPause.style.display = 'block';
+  }
+
+  function pauseAudio() {
+    audio.pause();
+    isPlaying = false;
+    $iconPlay.style.display = 'block';
+    $iconPause.style.display = 'none';
+  }
+
+  $btnPlay.addEventListener('click', () => {
+    if (currentIndex < 0) return;
+    isPlaying ? pauseAudio() : playAudio();
+  });
+
+  $btnPrev.addEventListener('click', () => {
+    if (audio.currentTime > 3) {
+      audio.currentTime = 0;
+    } else {
+      loadTrack((currentIndex - 1 + tracks.length) % tracks.length);
+    }
+  });
+
+  $btnNext.addEventListener('click', () => {
+    loadTrack((currentIndex + 1) % tracks.length);
+  });
+
+  audio.addEventListener('ended', () => {
+    if (currentIndex < tracks.length - 1) {
+      loadTrack(currentIndex + 1);
+    } else {
+      pauseAudio();
+    }
+  });
+
+  // ---- Progress ----
+  function formatTime(s) {
+    if (isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ':' + String(sec).padStart(2, '0');
+  }
+
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    $progressFill.style.width = pct + '%';
+    $timeCurrent.textContent = formatTime(audio.currentTime);
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    $timeTotal.textContent = formatTime(audio.duration);
+    const durEl = document.getElementById('dur-' + currentIndex);
+    if (durEl) durEl.textContent = formatTime(audio.duration);
+  });
+
+  $progressBar.addEventListener('click', (e) => {
+    if (!audio.duration) return;
+    const rect = $progressBar.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = pct * audio.duration;
+  });
+
+  // ---- Volume ----
+  $volume.addEventListener('input', () => {
+    audio.volume = parseFloat($volume.value);
+  });
+
+  // ---- Keyboard shortcuts ----
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space') { e.preventDefault(); $btnPlay.click(); }
+    if (e.code === 'ArrowLeft') { audio.currentTime = Math.max(0, audio.currentTime - 5); }
+    if (e.code === 'ArrowRight') { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); }
+  });
+
+  // ---- Media Session API (OS media controls) ----
+  if ('mediaSession' in navigator) {
+    audio.addEventListener('play', () => {
+      const t = tracks[currentIndex];
+      const id3 = id3Cache[t.file] || {};
+      const meta = {
+        title: t.title || id3.title || '',
+        artist: t.artist || id3.artist || '',
+        album: t.album || id3.album || '',
+      };
+      if (id3.cover) {
+        meta.artwork = [{ src: URL.createObjectURL(id3.cover), type: 'image/jpeg' }];
+      }
+      navigator.mediaSession.metadata = new MediaMetadata(meta);
+    });
+    navigator.mediaSession.setActionHandler('play', playAudio);
+    navigator.mediaSession.setActionHandler('pause', pauseAudio);
+    navigator.mediaSession.setActionHandler('previoustrack', () => $btnPrev.click());
+    navigator.mediaSession.setActionHandler('nexttrack', () => $btnNext.click());
+  }
+
+  // ---- Init ----
+  init();
+</script>
+</body>
+</html>
