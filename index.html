@@ -1096,6 +1096,11 @@
     navigator.mediaSession.setActionHandler('nexttrack',     () => $btnNext.click());
   }
 
+  // Hide volume slider on iOS (volume is read-only, controlled by hardware only)
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    document.getElementById('volume-track').style.display = 'none';
+  }
+
   init();
 </script>
 </body>
