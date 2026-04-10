@@ -9,15 +9,21 @@
 </style>
 </head>
 <body>
-<video autoplay controls loop>
+<video autoplay loop muted playsinline id="v">
   <source src="https://raw.githubusercontent.com/onyx-i/onyx-i.github.io/main/lab/test.mp4" type="video/mp4">
 </video>
 <script>
-  const v = document.querySelector('video');
-  v.addEventListener('click', () => {
-    if (!document.fullscreenElement) v.requestFullscreen();
-  });
-  v.requestFullscreen().catch(() => {});
+  const v = document.getElementById('v');
+  function goFullscreen() {
+    if (!document.fullscreenElement) {
+      v.requestFullscreen().catch(() => {});
+    }
+  }
+  // Try on load
+  v.addEventListener('canplay', goFullscreen, { once: true });
+  // Fallback: try on first user interaction
+  document.addEventListener('click', goFullscreen, { once: true });
+  document.addEventListener('keydown', goFullscreen, { once: true });
 </script>
 </body>
 </html>
