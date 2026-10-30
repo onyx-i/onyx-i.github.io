@@ -1,0 +1,1428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071b2d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="A fast, accessible view of NOAA Climate Prediction Center temperature and precipitation outlooks.">
+  <title>NOAA Climate Outlook</title>
+  <link rel="preconnect" href="https://www.cpc.ncep.noaa.gov">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f5fbff;
+      --muted: #9db2c2;
+      --faint: #668197;
+      --line: rgba(181, 215, 238, .14);
+      --panel: rgba(10, 34, 52, .82);
+      --panel-solid: #0a253a;
+      --accent: #62d5ff;
+      --accent-2: #78f0c3;
+      --focus: #b7f0ff;
+      --radius: 22px;
+      --shadow: 0 24px 70px rgba(0, 9, 19, .32);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background:
+        radial-gradient(circle at 88% -8%, rgba(31, 149, 196, .28), transparent 33rem),
+        radial-gradient(circle at -6% 35%, rgba(22, 105, 145, .2), transparent 30rem),
+        linear-gradient(145deg, #061522 0%, #092238 54%, #061825 100%);
+      color: var(--ink);
+      font: 500 16px/1.5 "DM Sans", system-ui, sans-serif;
+    }
+
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    .shell { width: min(1480px, 100%); margin: auto; padding: 22px clamp(18px, 3vw, 46px) 38px; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(116, 220, 255, .34);
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(40, 159, 204, .25), rgba(13, 51, 75, .8));
+      box-shadow: inset 0 1px rgba(255,255,255,.12);
+    }
+    .brand-mark svg { width: 25px; }
+    .brand-copy { display: grid; line-height: 1.1; }
+    .brand-copy strong { font: 800 15px/1.1 Manrope, sans-serif; letter-spacing: .08em; }
+    .brand-copy span { margin-top: 4px; color: var(--muted); font-size: 12px; }
+
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(7, 27, 43, .68);
+      color: var(--ink);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .button:hover { border-color: rgba(98, 213, 255, .55); background: rgba(21, 65, 91, .72); transform: translateY(-1px); }
+    .button svg { width: 18px; height: 18px; }
+    .button.primary { border-color: rgba(98, 213, 255, .4); background: var(--accent); color: #052132; font-weight: 700; }
+    .button.primary:hover { background: #94e4ff; }
+    .button.compact { min-height: 38px; padding-inline: 12px; font-size: 14px; }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
+      align-items: end;
+      gap: clamp(28px, 5vw, 80px);
+      margin-bottom: 26px;
+    }
+    .eyebrow { margin: 0 0 10px; color: var(--accent-2); font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { max-width: 780px; margin: 0; font: 800 clamp(35px, 5.2vw, 72px)/.98 Manrope, sans-serif; letter-spacing: -.055em; }
+    .lede { max-width: 630px; margin: 19px 0 0; color: var(--muted); font-size: clamp(16px, 1.5vw, 19px); }
+
+    .period-wrap { justify-self: end; width: min(100%, 510px); }
+    .control-label { display: block; margin: 0 0 9px 3px; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .period-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(4, 22, 35, .7);
+    }
+    .period-tab {
+      min-height: 48px;
+      padding: 8px 10px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 700;
+      transition: .2s ease;
+    }
+    .period-tab:hover { color: var(--ink); background: rgba(255,255,255,.05); }
+    .period-tab[aria-selected="true"] { background: #e9f9ff; color: #07253a; box-shadow: 0 8px 25px rgba(0, 0, 0, .22); }
+
+    .status-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 0 2px 13px; color: var(--muted); font-size: 13px; }
+    .status { display: inline-flex; align-items: center; gap: 8px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 0 5px rgba(120,240,195,.08); }
+    #statusMessage[role="alert"] { color: #ffd8a3; }
+
+    .outlook-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .outlook-card {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 19px 15px; }
+    .metric { display: flex; align-items: center; gap: 11px; }
+    .metric-icon { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 12px; background: rgba(98,213,255,.1); color: var(--accent); }
+    .metric-icon.rain { color: var(--accent-2); background: rgba(120,240,195,.09); }
+    .metric-icon svg { width: 21px; height: 21px; }
+    .metric-copy { display: grid; }
+    .metric-copy strong { font: 700 17px/1.2 Manrope, sans-serif; }
+    .metric-copy span { margin-top: 3px; color: var(--faint); font-size: 12px; }
+
+    .map-link {
+      position: relative;
+      display: grid;
+      min-height: 420px;
+      place-items: center;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
+      background: #edf3f5;
+      cursor: zoom-in;
+    }
+    .map-link::after { content: "Open full-size map ↗"; position: absolute; right: 15px; bottom: 15px; padding: 8px 11px; border-radius: 10px; background: rgba(3,24,38,.88); color: white; font-size: 12px; opacity: 0; transform: translateY(5px); transition: .2s ease; }
+    .map-link:hover::after { opacity: 1; transform: translateY(0); }
+    .map-link img { display: block; width: 100%; height: 100%; max-height: 620px; object-fit: contain; transition: opacity .25s ease, transform .35s ease; }
+    .map-link:hover img { transform: scale(1.012); }
+    .map-link img.loading { opacity: 0; }
+
+    .skeleton { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(100deg, #e7eef0 20%, #f7fafb 40%, #e7eef0 60%); background-size: 250% 100%; animation: shimmer 1.4s infinite linear; color: #48606d; font-weight: 700; }
+    .skeleton[hidden] { display: none; }
+    @keyframes shimmer { to { background-position-x: -250%; } }
+
+    .error-box { position: absolute; inset: 0; display: none; place-items: center; padding: 28px; background: #f2f6f7; color: #243c49; text-align: center; }
+    .error-box.visible { display: grid; }
+    .error-box strong { display: block; margin-bottom: 7px; font-size: 18px; }
+
+    .details {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .info-panel { border: 1px solid var(--line); border-radius: 18px; background: rgba(7, 29, 46, .66); padding: 20px; }
+    .info-panel h2 { margin: 0 0 13px; font: 700 16px/1.2 Manrope, sans-serif; }
+    .legend-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .legend-item { color: var(--muted); font-size: 13px; }
+    .legend-item strong { display: block; margin-bottom: 4px; color: var(--ink); font-size: 14px; }
+    .swatch { display: inline-block; width: 9px; height: 9px; margin-right: 7px; border-radius: 50%; }
+    .swatch.warm { background: #ed855c; }.swatch.equal { background: #b6c4cc; }.swatch.cool { background: #4da7d9; }
+    .note { margin: 0; color: var(--muted); font-size: 14px; }
+    .note a { color: var(--accent); text-underline-offset: 3px; }
+
+    .motion-section { margin-top: clamp(54px, 8vw, 100px); }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 22px; }
+    .section-heading h2 { max-width: 760px; margin: 0; font: 800 clamp(29px, 4vw, 48px)/1.05 Manrope, sans-serif; letter-spacing: -.04em; }
+    .section-heading p:last-child { max-width: 520px; margin: 0; color: var(--muted); }
+    .motion-tabs { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+    .motion-tabs::-webkit-scrollbar { display: none; }
+    .motion-tab { flex: 0 0 auto; min-height: 43px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: rgba(7,29,46,.66); color: var(--muted); cursor: pointer; font-weight: 700; }
+    .motion-tab[aria-selected="true"] { border-color: rgba(98,213,255,.42); background: var(--accent); color: #062235; }
+    .motion-player { overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: #06131d; box-shadow: var(--shadow); }
+    .explorer-controls { display: grid; grid-template-columns: 1.1fr 1.15fr 1.15fr .9fr; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); background: rgba(10,34,52,.86); }
+    .select-control { display: grid; gap: 6px; min-width: 0; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    .select-control select { width: 100%; min-height: 43px; padding: 0 36px 0 12px; border: 1px solid var(--line); border-radius: 11px; background: #071c2c; color: var(--ink); font: 600 14px "DM Sans", sans-serif; text-transform: none; letter-spacing: normal; cursor: pointer; }
+    .select-control select:disabled { cursor: not-allowed; opacity: .48; }
+    .feed-facts { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 18px 15px; border-bottom: 1px solid var(--line); background: rgba(10,34,52,.86); }
+    .feed-fact { padding: 6px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 11px; }
+    .feed-fact strong { color: var(--ink); font-weight: 700; }
+    .solar-tools { display: flex; align-items: center; gap: 10px; padding: 0 18px 15px; border-bottom: 1px solid var(--line); background: rgba(10,34,52,.86); color: var(--muted); font-size: 12px; }
+    .solar-tools .button { min-height: 36px; flex: 0 0 auto; }
+    .solar-tools a { margin-left: auto; color: var(--accent); text-underline-offset: 3px; white-space: nowrap; }
+    .motion-stage { position: relative; display: grid; min-height: clamp(340px, 58vw, 780px); place-items: center; overflow: hidden; background: #02090e; touch-action: pan-y; }
+    .motion-stage.is-zoomed { cursor: grab; touch-action: none; }
+    .motion-stage.is-dragging { cursor: grabbing; }
+    .motion-stage img { display: block; width: 100%; height: 100%; max-height: 780px; object-fit: contain; transform-origin: 50% 50%; transition: transform .16s ease-out; user-select: none; -webkit-user-drag: none; will-change: transform; }
+    .motion-stage.is-dragging img { transition: none; }
+    .motion-loading { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(110deg, #06131d, #0d2b3c, #06131d); color: var(--muted); z-index: 2; }
+    .motion-loading[hidden] { display: none; }
+    .frame-time { position: absolute; top: 16px; left: 16px; display: grid; gap: 2px; padding: 9px 12px; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; background: rgba(1,12,19,.82); box-shadow: 0 8px 25px rgba(0,0,0,.28); backdrop-filter: blur(10px); }
+    .frame-time strong { font: 700 14px/1.2 Manrope, sans-serif; }
+    .frame-time span { color: #adc0cb; font-size: 11px; }
+    .frame-count { position: absolute; top: 16px; right: 16px; padding: 8px 11px; border-radius: 999px; background: rgba(1,12,19,.82); color: #d7e7ee; font-size: 12px; }
+    .zoom-controls { position: absolute; right: 16px; bottom: 16px; z-index: 4; display: flex; align-items: center; gap: 4px; padding: 4px; border: 1px solid rgba(255,255,255,.14); border-radius: 13px; background: rgba(1,12,19,.86); box-shadow: 0 8px 25px rgba(0,0,0,.3); backdrop-filter: blur(10px); }
+    .zoom-button { display: grid; min-width: 38px; height: 38px; place-items: center; padding: 0 9px; border: 0; border-radius: 9px; background: transparent; color: var(--ink); cursor: pointer; font: 700 18px/1 Manrope, sans-serif; }
+    .zoom-button:hover { background: rgba(98,213,255,.14); }
+    .zoom-button.reset { min-width: 62px; color: var(--accent); font: 700 12px/1 "DM Sans", sans-serif; }
+    .zoom-hint { position: absolute; bottom: 17px; left: 16px; z-index: 3; padding: 7px 10px; border-radius: 9px; background: rgba(1,12,19,.72); color: #a9bbc6; font-size: 11px; pointer-events: none; backdrop-filter: blur(8px); }
+    .player-controls { display: grid; grid-template-columns: auto minmax(220px, 1fr) auto; align-items: center; gap: 20px; padding: 16px 18px; border-top: 1px solid var(--line); }
+    .transport { display: flex; align-items: center; gap: 7px; }
+    .transport-button { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.04); color: var(--ink); cursor: pointer; }
+    .transport-button:hover { border-color: rgba(98,213,255,.5); background: rgba(98,213,255,.1); }
+    .transport-button.play { width: 48px; background: var(--accent); color: #052132; }
+    .transport-button svg { width: 18px; height: 18px; fill: currentColor; }
+    .timeline { min-width: 0; width: 100%; overflow: hidden; padding: 3px 0 7px; }
+    .timeline-track { position: relative; width: 100%; min-width: 0; padding-bottom: 56px; }
+    .timeline-track input { display: block; margin: 0; }
+    .timeline-ticks { position: absolute; top: 22px; left: 7px; right: 7px; height: 28px; pointer-events: none; }
+    .timeline-tick { position: absolute; top: 0; width: 1px; height: 6px; background: rgba(157,178,194,.42); }
+    .timeline-tick span { position: absolute; top: 9px; left: 50%; color: var(--faint); font-size: 9px; line-height: 1; white-space: nowrap; transform: translateX(-50%); }
+    .timeline-tick.major { width: 2px; height: 12px; background: var(--accent); }
+    .timeline-tick.major span { top: 15px; color: var(--ink); font-size: 10px; font-weight: 700; }
+    .timeline-tick.first span { left: 0; transform: none; }
+    .timeline-tick.last span { right: 0; left: auto; transform: none; }
+    .solar-markers { position: absolute; top: 0; right: 7px; bottom: 0; left: 7px; pointer-events: none; z-index: 2; }
+    .solar-marker { position: absolute; top: -2px; width: 2px; height: 21px; border-radius: 2px; }
+    .solar-marker.sunrise { background: #ffd166; box-shadow: 0 0 8px rgba(255,209,102,.55); }
+    .solar-marker.sunset { background: #c39cff; box-shadow: 0 0 8px rgba(195,156,255,.5); }
+    .solar-marker span { position: absolute; top: 34px; left: 50%; padding: 2px 4px; border-radius: 4px; background: rgba(6,19,29,.86); font-size: 9px; font-style: normal; line-height: 1; white-space: nowrap; transform: translateX(-50%); }
+    .solar-marker.sunrise span { color: #ffd166; }
+    .solar-marker.sunset span { color: #d8bdff; }
+    .solar-marker.first span { left: 0; transform: none; }
+    .solar-marker.last span { right: 0; left: auto; transform: none; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    .speed-control { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .speed-control input { width: 125px; }
+    #speedValue { min-width: 36px; color: var(--ink); }
+    .motion-meta { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 18px 16px; color: var(--muted); font-size: 13px; }
+    .motion-meta p { margin: 0; }
+    .motion-meta a { flex: 0 0 auto; color: var(--accent); text-underline-offset: 3px; }
+
+    .mobile-metric-tabs { display: none; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 900px) {
+      .shell { padding-top: 16px; }
+      .topbar { margin-bottom: 28px; }
+      .intro { grid-template-columns: 1fr; align-items: start; gap: 25px; }
+      .period-wrap { justify-self: stretch; width: 100%; }
+      .map-link { min-height: 330px; }
+      .details { grid-template-columns: 1fr; }
+      .section-heading { display: grid; }
+      .explorer-controls { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 680px) {
+      .shell { padding-inline: 14px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+      .brand-copy span, .button .label, .desktop-only { display: none; }
+      .topbar { gap: 12px; margin-bottom: 28px; }
+      .top-actions { gap: 7px; }
+      .button { width: 44px; padding: 0; }
+      .button.primary { width: auto; padding-inline: 13px; }
+      h1 { font-size: clamp(34px, 12vw, 49px); }
+      .lede { margin-top: 14px; }
+      .period-tab { min-height: 45px; font-size: 13px; }
+      .status-row { align-items: flex-start; margin-top: 3px; }
+      .outlook-grid { grid-template-columns: 1fr; }
+      .outlook-card { display: none; }
+      .outlook-card.mobile-active { display: block; }
+      .mobile-metric-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; padding: 5px; border: 1px solid var(--line); border-radius: 14px; background: rgba(4,22,35,.66); }
+      .metric-tab { min-height: 42px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 700; cursor: pointer; }
+      .metric-tab[aria-selected="true"] { background: rgba(98,213,255,.14); color: var(--ink); }
+      .map-link { min-height: min(69vh, 500px); }
+      .map-link::after { opacity: 1; transform: none; }
+      .details { margin-top: 12px; }
+      .legend-list { grid-template-columns: 1fr; gap: 11px; }
+      .motion-section { margin-top: 58px; }
+      .motion-stage { min-height: 58vw; }
+      .zoom-hint { display: none; }
+      .zoom-controls { right: 10px; bottom: 10px; }
+      .player-controls { grid-template-columns: 1fr; gap: 12px; }
+      .transport { justify-content: center; }
+      .speed-control { justify-content: center; }
+      .motion-meta { align-items: flex-start; }
+      .explorer-controls { grid-template-columns: 1fr; padding: 14px; }
+      .feed-facts { padding-inline: 14px; }
+      .solar-tools { flex-wrap: wrap; padding-inline: 14px; }
+      .solar-tools a { margin-left: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="https://www.cpc.ncep.noaa.gov/" target="_blank" rel="noopener" aria-label="Visit NOAA Climate Prediction Center">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M5 20.5c5.2-5.8 10.5-8.7 22-9.5-4.2 2.6-6.7 5.4-8.2 8.5-3.6-2.4-7.7-2.1-13.8 1Z" fill="currentColor"/><path d="M5 23.5c6.8-2.1 12.9-1.6 21 2.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span class="brand-copy"><strong>NOAA</strong><span>Climate Prediction Center</span></span>
+      </a>
+      <div class="top-actions">
+        <button class="button" id="refreshButton" type="button" title="Refresh outlook maps">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 1-2-5"/></svg><span class="label">Refresh</span>
+        </button>
+        <a class="button primary" id="locationButton" href="https://www.weather.gov/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Local forecast</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="intro" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">U.S. climate outlook</p>
+        <h1 id="pageTitle">See what the next few weeks may bring.</h1>
+        <p class="lede">Compare NOAA’s temperature and precipitation probabilities side by side—without digging through multiple forecast pages.</p>
+      </div>
+      <div class="period-wrap">
+        <span class="control-label">Forecast range</span>
+        <div class="period-tabs" role="tablist" aria-label="Forecast range">
+          <button class="period-tab" role="tab" data-period="610" aria-selected="true">6–10 days</button>
+          <button class="period-tab" role="tab" data-period="814" aria-selected="false">8–14 days</button>
+          <button class="period-tab" role="tab" data-period="30" aria-selected="false">30 days</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="status-row">
+      <span class="status" id="statusMessage"><span class="status-dot" aria-hidden="true"></span><span>Showing the latest maps from NOAA CPC</span></span>
+      <span id="updatedTime" class="desktop-only">Loaded just now</span>
+    </div>
+
+    <div class="mobile-metric-tabs" role="tablist" aria-label="Outlook type">
+      <button class="metric-tab" role="tab" data-metric="temperature" aria-selected="true">Temperature</button>
+      <button class="metric-tab" role="tab" data-metric="precipitation" aria-selected="false">Precipitation</button>
+    </div>
+
+    <section class="outlook-grid" aria-live="polite" aria-label="6–10 day outlook maps">
+      <article class="outlook-card mobile-active" data-card="temperature">
+        <div class="card-head">
+          <div class="metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.8V5a4 4 0 0 0-8 0v9.8a6 6 0 1 0 8 0Z"/><path d="M10 9v8"/></svg></span><span class="metric-copy"><strong>Temperature</strong><span>Probability above or below normal</span></span></div>
+          <a class="button compact map-source" href="#" target="_blank" rel="noopener">Source ↗</a>
+        </div>
+        <a class="map-link" data-map-link href="#" target="_blank" rel="noopener">
+          <span class="skeleton">Loading NOAA map…</span>
+          <img class="loading" data-map="temperature" alt="NOAA 6–10 day temperature probability outlook">
+          <span class="error-box"><span><strong>Map unavailable</strong>Open the NOAA source to view the latest outlook.</span></span>
+        </a>
+      </article>
+
+      <article class="outlook-card" data-card="precipitation">
+        <div class="card-head">
+          <div class="metric"><span class="metric-icon rain" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17a5 5 0 1 1 1.5-9.8A6 6 0 0 1 20 10a4 4 0 0 1-1 7"/><path d="m9 16-1 4m5-4-1 4m5-4-1 4"/></svg></span><span class="metric-copy"><strong>Precipitation</strong><span>Probability above or below normal</span></span></div>
+          <a class="button compact map-source" href="#" target="_blank" rel="noopener">Source ↗</a>
+        </div>
+        <a class="map-link" data-map-link href="#" target="_blank" rel="noopener">
+          <span class="skeleton">Loading NOAA map…</span>
+          <img class="loading" data-map="precipitation" alt="NOAA 6–10 day precipitation probability outlook">
+          <span class="error-box"><span><strong>Map unavailable</strong>Open the NOAA source to view the latest outlook.</span></span>
+        </a>
+      </article>
+    </section>
+
+    <section class="details" aria-label="How to read the outlook">
+      <div class="info-panel">
+        <h2>Reading the maps</h2>
+        <div class="legend-list">
+          <div class="legend-item"><strong><span class="swatch warm"></span>Temperature: orange/red</strong>Odds favor warmer-than-normal temperatures. Blue favors cooler than normal.</div>
+          <div class="legend-item"><strong><span class="swatch cool"></span>Precipitation: green/brown</strong>Green favors wetter-than-normal conditions. Brown favors drier than normal.</div>
+          <div class="legend-item"><strong><span class="swatch equal"></span>EC / unshaded</strong>Equal chances: no category—above, near, or below normal—is favored.</div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h2>Good to know</h2>
+        <p class="note">These are probability outlooks, not exact temperature or rainfall totals. For warnings and day-to-day weather, use your <a id="inlineLocation" href="https://www.weather.gov/" target="_blank" rel="noopener">local NWS forecast</a>.</p>
+      </div>
+    </section>
+
+    <section class="motion-section" aria-labelledby="motionTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">NOAA imagery lab</p><h2 id="motionTitle">Watch weather evolve, frame by frame.</h2></div>
+        <p>Play recent satellite, precipitation-radar, satellite-derived wind, and gridded temperature imagery. Every timestamp is converted to your device’s local time.</p>
+      </div>
+      <div class="motion-tabs" role="tablist" aria-label="NOAA imagery product">
+        <button class="motion-tab" role="tab" data-product="satellite" aria-selected="true">Satellite</button>
+        <button class="motion-tab" role="tab" data-product="radar" aria-selected="false">Precipitation radar</button>
+        <button class="motion-tab" role="tab" data-product="winds" aria-selected="false">Winds</button>
+        <button class="motion-tab" role="tab" data-product="temperature" aria-selected="false">Temperature</button>
+      </div>
+      <div class="motion-player">
+        <div class="explorer-controls" id="explorerControls">
+          <label class="select-control">Satellite<select id="satelliteSelect"><option value="G18">GOES-18 · West</option><option value="G19">GOES-19 · East</option></select></label>
+          <label class="select-control">Coverage view<select id="viewSelect"></select></label>
+          <label class="select-control">Imagery product<select id="imagerySelect"></select></label>
+          <label class="select-control">Loop length<select id="loopLengthSelect"></select></label>
+        </div>
+        <div class="feed-facts" id="feedFacts" aria-live="polite">
+          <span class="feed-fact"><strong>Loading feed details…</strong></span>
+        </div>
+        <div class="solar-tools">
+          <button class="button compact" id="solarLocationButton" type="button">☀ Add sunrise + sunset</button>
+          <span id="solarStatus">Location is used only in this browser to calculate solar times.</span>
+          <a href="https://gml.noaa.gov/grad/solcalc/calcdetails.html" target="_blank" rel="noopener">NOAA method ↗</a>
+        </div>
+        <div class="motion-stage" id="motionStage" tabindex="0" aria-label="Interactive NOAA imagery. Use the controls, mouse wheel, or gestures to zoom and pan.">
+          <div class="motion-loading" id="motionLoading">Loading the latest NOAA frames…</div>
+          <img id="motionImage" alt="Latest NOAA satellite loop frame">
+          <time class="frame-time" id="frameTime"><strong>Loading…</strong><span>Your local time</span></time>
+          <span class="frame-count" id="frameCount">— / —</span>
+          <span class="zoom-hint">Scroll to zoom · drag to pan · double-click to zoom</span>
+          <div class="zoom-controls" role="group" aria-label="Map zoom controls">
+            <button class="zoom-button" id="zoomOut" type="button" aria-label="Zoom out">−</button>
+            <button class="zoom-button reset" id="zoomReset" type="button" aria-label="Reset zoom"><span id="zoomValue">100%</span></button>
+            <button class="zoom-button" id="zoomIn" type="button" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="player-controls">
+          <div class="transport">
+            <button class="transport-button" id="previousFrame" type="button" aria-label="Previous frame"><svg viewBox="0 0 24 24"><path d="M7 5h2v14H7zm3 7 9 7V5z"/></svg></button>
+            <button class="transport-button play" id="playPause" type="button" aria-label="Pause loop"><svg id="playIcon" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg></button>
+            <button class="transport-button" id="nextFrame" type="button" aria-label="Next frame"><svg viewBox="0 0 24 24"><path d="M15 5h2v14h-2zm-10 0 9 7-9 7z"/></svg></button>
+          </div>
+          <div class="timeline"><div class="timeline-track" id="timelineTrack"><label><span class="sr-only">Loop frame</span><input id="frameSlider" type="range" min="0" max="0" value="0" step="1" list="frameTickList"></label><datalist id="frameTickList"></datalist><div class="timeline-ticks" id="timelineTicks" aria-hidden="true"></div><div class="solar-markers" id="solarMarkers" aria-hidden="true"></div></div></div>
+          <label class="speed-control">Speed <input id="speedSlider" type="range" min="0" max="8" value="2" step="1" list="speedTickList"><datalist id="speedTickList"><option value="0"></option><option value="1"></option><option value="2"></option><option value="3"></option><option value="4"></option><option value="5"></option><option value="6"></option><option value="7"></option><option value="8"></option></datalist><span id="speedValue">1×</span></label>
+        </div>
+        <div class="motion-meta"><p id="motionDescription">GOES-19 GeoColor shows visible cloud detail by day and multispectral infrared imagery at night.</p><a id="motionSource" href="https://www.star.nesdis.noaa.gov/goes/conus.php?sat=G19" target="_blank" rel="noopener">Open NOAA source ↗</a></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const outlooks = {
+      610: {
+        label: '6–10 day',
+        temperature: 'https://www.cpc.ncep.noaa.gov/products/predictions/610day/610temp.new.gif',
+        precipitation: 'https://www.cpc.ncep.noaa.gov/products/predictions/610day/610prcp.new.gif'
+      },
+      814: {
+        label: '8–14 day',
+        temperature: 'https://www.cpc.ncep.noaa.gov/products/predictions/814day/814temp.new.gif',
+        precipitation: 'https://www.cpc.ncep.noaa.gov/products/predictions/814day/814prcp.new.gif'
+      },
+      30: {
+        label: '30 day',
+        temperature: 'https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_temp.gif',
+        precipitation: 'https://www.cpc.ncep.noaa.gov/products/predictions/30day/off15_prcp.gif'
+      }
+    };
+
+    const loopFrameOptions = [12, 24, 36, 48, 60, 72, 84, 96, 120, 150, 180, 240];
+    const imageryProducts = {
+      GEOCOLOR: { label: 'GeoColor · day / night', description: 'True-color-like clouds by day and multispectral infrared imagery at night.' },
+      '13': { label: 'Clean infrared · Band 13', description: 'Longwave infrared cloud-top imagery that works equally well day and night.' },
+      '08': { label: 'Upper-level water vapor', description: 'Band 8 highlights moisture and motion in the upper atmosphere.' },
+      '09': { label: 'Mid-level water vapor', description: 'Band 9 highlights moisture patterns in the middle atmosphere.' },
+      DayNightCloudMicroCombo: { label: 'Day/night cloud microphysics', description: 'A day/night RGB for cloud phase, fog, and low-cloud detail.' },
+      AirMass: { label: 'Air mass RGB', description: 'Infrared and water-vapor channels combined to distinguish air masses.' },
+      Sandwich: { label: 'Sandwich RGB', description: 'Visible and infrared detail combined to emphasize cloud structure.' },
+      FireTemperature: { label: 'Fire temperature RGB', description: 'A multispectral view designed to highlight active fires and hot spots.' },
+      Dust: { label: 'Dust RGB', description: 'An infrared composite designed to distinguish airborne dust.' },
+      EXTENT3: { label: 'Lightning + GeoColor', description: 'Geostationary Lightning Mapper flash extent over GeoColor imagery.' }
+    };
+    const temperatureProducts = {
+      T: {
+        label: 'Air temperature · °F',
+        element: 't',
+        description: 'NOAA’s gridded forecast of expected air temperature in degrees Fahrenheit for each valid hour.'
+      },
+      ApparentT: {
+        label: 'Feels-like temperature · °F',
+        element: 'apparentt',
+        description: 'NOAA’s apparent-temperature forecast, combining heat index and wind chill when conditions warrant.'
+      }
+    };
+    const temperatureFrameOptions = [12, 24, 36];
+    const satelliteViews = {
+      G18: [
+        { id: 'wus', label: 'U.S. Pacific Coast', type: 'sector', sector: 'wus', path: 'SECTOR/wus', size: '1000x1000', cadence: 10 },
+        { id: 'pacus', label: 'Pacific U.S. · PACUS', type: 'conus', path: 'CONUS', size: '1250x750', cadence: 5 },
+        { id: 'pnw', label: 'Pacific Northwest', type: 'sector', sector: 'pnw', path: 'SECTOR/pnw', size: '1200x1200', cadence: 5 },
+        { id: 'psw', label: 'Pacific Southwest', type: 'sector', sector: 'psw', path: 'SECTOR/psw', size: '1200x1200', cadence: 5 },
+        { id: 'np', label: 'Northern Pacific', type: 'sector', sector: 'np', path: 'SECTOR/np', size: '1800x1080', cadence: 10 },
+        { id: 'ak', label: 'Alaska', type: 'sector', sector: 'ak', path: 'SECTOR/ak', size: '1000x1000', cadence: 10 },
+        { id: 'cak', label: 'Central Alaska', type: 'sector', sector: 'cak', path: 'SECTOR/cak', size: '1200x1200', cadence: 10 },
+        { id: 'sea', label: 'Southeastern Alaska', type: 'sector', sector: 'sea', path: 'SECTOR/sea', size: '1200x1200', cadence: 10 },
+        { id: 'hi', label: 'Hawaii', type: 'sector', sector: 'hi', path: 'SECTOR/hi', size: '1200x1200', cadence: 10 },
+        { id: 'eep', label: 'Eastern East Pacific', type: 'sector', sector: 'eep', path: 'SECTOR/eep', size: '1800x1080', cadence: 10 },
+        { id: 'tpw', label: 'Tropical Pacific', type: 'sector', sector: 'tpw', path: 'SECTOR/tpw', size: '1800x1080', cadence: 10 },
+        { id: 'tsp', label: 'South Pacific', type: 'sector', sector: 'tsp', path: 'SECTOR/tsp', size: '1800x1080', cadence: 10 },
+        { id: 'gwas', label: 'GOES-West · All States', type: 'sector', sector: 'gwas', path: 'SECTOR/gwas', size: '1800x1080', cadence: 10 },
+        { id: 'full', label: 'Full disk · Pacific', type: 'full', path: 'FD', size: '1808x1808', cadence: 10 }
+      ],
+      G19: [
+        { id: 'conus', label: 'Continental U.S. · East', type: 'conus', path: 'CONUS', size: '1250x750', cadence: 5 },
+        { id: 'eus', label: 'U.S. Atlantic Coast', type: 'sector', sector: 'eus', path: 'SECTOR/eus', size: '1000x1000', cadence: 10 },
+        { id: 'ne', label: 'Northeast', type: 'sector', sector: 'ne', path: 'SECTOR/ne', size: '1200x1200', cadence: 5 },
+        { id: 'se', label: 'Southeast', type: 'sector', sector: 'se', path: 'SECTOR/se', size: '1200x1200', cadence: 5 },
+        { id: 'can', label: 'Canada / Northern U.S.', type: 'sector', sector: 'can', path: 'SECTOR/can', size: '2250x1125', cadence: 10 },
+        { id: 'cgl', label: 'Great Lakes', type: 'sector', sector: 'cgl', path: 'SECTOR/cgl', size: '1200x1200', cadence: 5 },
+        { id: 'smv', label: 'Southern Mississippi Valley', type: 'sector', sector: 'smv', path: 'SECTOR/smv', size: '1200x1200', cadence: 5 },
+        { id: 'umv', label: 'Upper Mississippi Valley', type: 'sector', sector: 'umv', path: 'SECTOR/umv', size: '1200x1200', cadence: 5 },
+        { id: 'sp', label: 'Southern Plains', type: 'sector', sector: 'sp', path: 'SECTOR/sp', size: '1200x1200', cadence: 5 },
+        { id: 'sr', label: 'Southern Rockies', type: 'sector', sector: 'sr', path: 'SECTOR/sr', size: '1200x1200', cadence: 5 },
+        { id: 'nr', label: 'Northern Rockies', type: 'sector', sector: 'nr', path: 'SECTOR/nr', size: '1200x1200', cadence: 5 },
+        { id: 'pnw', label: 'Pacific Northwest', type: 'sector', sector: 'pnw', path: 'SECTOR/pnw', size: '1200x1200', cadence: 5 },
+        { id: 'psw', label: 'Pacific Southwest', type: 'sector', sector: 'psw', path: 'SECTOR/psw', size: '1200x1200', cadence: 5 },
+        { id: 'car', label: 'Caribbean', type: 'sector', sector: 'car', path: 'SECTOR/car', size: '1000x1000', cadence: 10 },
+        { id: 'ga', label: 'Gulf of America', type: 'sector', sector: 'ga', path: 'SECTOR/ga', size: '1000x1000', cadence: 10 },
+        { id: 'pr', label: 'Puerto Rico', type: 'sector', sector: 'pr', path: 'SECTOR/pr', size: '1200x1200', cadence: 10 },
+        { id: 'mex', label: 'Mexico', type: 'sector', sector: 'mex', path: 'SECTOR/mex', size: '1000x1000', cadence: 10 },
+        { id: 'cam', label: 'Central America', type: 'sector', sector: 'cam', path: 'SECTOR/cam', size: '1000x1000', cadence: 10 },
+        { id: 'eep', label: 'Eastern East Pacific', type: 'sector', sector: 'eep', path: 'SECTOR/eep', size: '1800x1080', cadence: 10 },
+        { id: 'taw', label: 'Tropical Atlantic', type: 'sector', sector: 'taw', path: 'SECTOR/taw', size: '1800x1080', cadence: 10 },
+        { id: 'na', label: 'Northern Atlantic', type: 'sector', sector: 'na', path: 'SECTOR/na', size: '1800x1080', cadence: 10 },
+        { id: 'nsa', label: 'Northern South America', type: 'sector', sector: 'nsa', path: 'SECTOR/nsa', size: '1800x1080', cadence: 10 },
+        { id: 'ssa', label: 'Southern South America', type: 'sector', sector: 'ssa', path: 'SECTOR/ssa', size: '1800x1080', cadence: 10 },
+        { id: 'full', label: 'Full disk · Atlantic', type: 'full', path: 'FD', size: '1808x1808', cadence: 10 }
+      ]
+    };
+
+    const periodTabs = [...document.querySelectorAll('.period-tab')];
+    const metricTabs = [...document.querySelectorAll('.metric-tab')];
+    const mapImages = [...document.querySelectorAll('[data-map]')];
+    const statusMessage = document.querySelector('#statusMessage');
+    const updatedTime = document.querySelector('#updatedTime');
+    let activePeriod = new URLSearchParams(location.search).get('range');
+    if (!outlooks[activePeriod]) activePeriod = '610';
+
+    function setStatus(message, isError = false) {
+      statusMessage.innerHTML = `${isError ? '' : '<span class="status-dot" aria-hidden="true"></span>'}<span>${message}</span>`;
+      isError ? statusMessage.setAttribute('role', 'alert') : statusMessage.removeAttribute('role');
+    }
+
+    function loadMap(img, url, label, cacheBust = false) {
+      const card = img.closest('.outlook-card');
+      const skeleton = card.querySelector('.skeleton');
+      const error = card.querySelector('.error-box');
+      const finalUrl = cacheBust ? `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}` : url;
+      img.classList.add('loading');
+      skeleton.hidden = false;
+      error.classList.remove('visible');
+      img.onload = () => { img.classList.remove('loading'); skeleton.hidden = true; };
+      img.onerror = () => { skeleton.hidden = true; error.classList.add('visible'); setStatus('One or more NOAA maps could not be loaded.', true); };
+      img.alt = `NOAA ${label} ${img.dataset.map} probability outlook`;
+      img.src = finalUrl;
+      card.querySelector('[data-map-link]').href = url;
+      card.querySelector('.map-source').href = url;
+    }
+
+    function selectPeriod(period, options = {}) {
+      activePeriod = String(period);
+      const outlook = outlooks[activePeriod];
+      periodTabs.forEach(tab => {
+        const selected = tab.dataset.period === activePeriod;
+        tab.setAttribute('aria-selected', selected);
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      mapImages.forEach(img => loadMap(img, outlook[img.dataset.map], outlook.label, options.refresh));
+      document.querySelector('.outlook-grid').setAttribute('aria-label', `${outlook.label} outlook maps`);
+      if (!options.initial) history.replaceState(null, '', `${location.pathname}?range=${activePeriod}${location.hash}`);
+      updatedTime.textContent = `Loaded ${new Intl.DateTimeFormat([], {hour: 'numeric', minute: '2-digit'}).format(new Date())}`;
+      setStatus(options.refresh ? 'Maps refreshed from NOAA CPC' : `Showing the latest ${outlook.label} maps from NOAA CPC`);
+    }
+
+    function selectMetric(metric) {
+      metricTabs.forEach(tab => {
+        const selected = tab.dataset.metric === metric;
+        tab.setAttribute('aria-selected', selected);
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      document.querySelectorAll('[data-card]').forEach(card => card.classList.toggle('mobile-active', card.dataset.card === metric));
+    }
+
+    periodTabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectPeriod(tab.dataset.period));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        event.preventDefault();
+        const next = (index + (event.key === 'ArrowRight' ? 1 : -1) + periodTabs.length) % periodTabs.length;
+        periodTabs[next].focus();
+        selectPeriod(periodTabs[next].dataset.period);
+      });
+    });
+    metricTabs.forEach(tab => tab.addEventListener('click', () => selectMetric(tab.dataset.metric)));
+    document.querySelector('#refreshButton').addEventListener('click', () => selectPeriod(activePeriod, {refresh: true}));
+
+    function requestLocalForecast(event) {
+      if (!navigator.geolocation) return;
+      event.preventDefault();
+      const button = document.querySelector('#locationButton');
+      const original = button.innerHTML;
+      button.setAttribute('aria-busy', 'true');
+      button.lastElementChild.textContent = 'Locating…';
+      setStatus('Finding your location…');
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+        location.href = `https://forecast.weather.gov/MapClick.php?lat=${latitude.toFixed(4)}&lon=${longitude.toFixed(4)}`;
+      }, () => {
+        button.innerHTML = original;
+        button.removeAttribute('aria-busy');
+        setStatus('Location was unavailable. Open weather.gov to search by city or ZIP.', true);
+      }, { timeout: 10000, maximumAge: 300000 });
+    }
+    document.querySelector('#locationButton').addEventListener('click', requestLocalForecast);
+
+    const motionTabs = [...document.querySelectorAll('.motion-tab')];
+    const motionStage = document.querySelector('#motionStage');
+    const motionImage = document.querySelector('#motionImage');
+    const motionLoading = document.querySelector('#motionLoading');
+    const frameTime = document.querySelector('#frameTime');
+    const frameCount = document.querySelector('#frameCount');
+    const frameSlider = document.querySelector('#frameSlider');
+    const frameTickList = document.querySelector('#frameTickList');
+    const timeline = document.querySelector('.timeline');
+    const timelineTrack = document.querySelector('#timelineTrack');
+    const timelineTicks = document.querySelector('#timelineTicks');
+    const solarMarkers = document.querySelector('#solarMarkers');
+    const solarLocationButton = document.querySelector('#solarLocationButton');
+    const solarStatus = document.querySelector('#solarStatus');
+    const speedSlider = document.querySelector('#speedSlider');
+    const speedValue = document.querySelector('#speedValue');
+    const playPause = document.querySelector('#playPause');
+    const playIcon = document.querySelector('#playIcon');
+    const motionDescription = document.querySelector('#motionDescription');
+    const motionSource = document.querySelector('#motionSource');
+    const zoomOutButton = document.querySelector('#zoomOut');
+    const zoomResetButton = document.querySelector('#zoomReset');
+    const zoomInButton = document.querySelector('#zoomIn');
+    const zoomValue = document.querySelector('#zoomValue');
+    const satelliteSelect = document.querySelector('#satelliteSelect');
+    const viewSelect = document.querySelector('#viewSelect');
+    const imagerySelect = document.querySelector('#imagerySelect');
+    const loopLengthSelect = document.querySelector('#loopLengthSelect');
+    const feedFacts = document.querySelector('#feedFacts');
+    const feedCache = new Map();
+    const imageCache = new Map();
+    const viewStateCache = new Map();
+    const activePointers = new Map();
+    const speedPresets = [0.25, 0.5, 1, 2, 4, 8, 16, 32, 64];
+    const viewPreferences = { G18: 'wus', G19: 'conus' };
+    let motionFrames = [];
+    let motionFrameIndex = 0;
+    let motionTimer = null;
+    let motionPlaying = true;
+    let motionSpeed = 1;
+    let motionLoadId = 0;
+    let activeMotionProduct = 'satellite';
+    let activeFeedKey = '';
+    let measuredCadence = null;
+    let lastSatelliteImagery = 'GEOCOLOR';
+    let lastTemperatureImagery = 'T';
+    let solarLocation = null;
+    let zoomState = { scale: 1, x: 0, y: 0 };
+    let zoomGesture = null;
+
+    try {
+      const savedSolarLocation = JSON.parse(localStorage.getItem('noaaSolarLocation'));
+      if (Number.isFinite(savedSolarLocation?.latitude) && Number.isFinite(savedSolarLocation?.longitude)) solarLocation = savedSolarLocation;
+    } catch (error) {
+      solarLocation = null;
+    }
+
+    function parseNoaaTimestamp(code) {
+      const year = Number(code.slice(0, 4));
+      const day = Number(code.slice(4, 7));
+      const hour = Number(code.slice(7, 9));
+      const minute = Number(code.slice(9, 11));
+      return new Date(Date.UTC(year, 0, day, hour, minute));
+    }
+
+    function formatLocalTime(date, approximate = false) {
+      const formatted = new Intl.DateTimeFormat(undefined, {
+        weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric',
+        minute: '2-digit', timeZoneName: 'short', hour12: true
+      }).format(date);
+      return `${approximate ? 'About ' : ''}${formatted}`;
+    }
+
+    function formatTickTime(date) {
+      return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', hour12: true }).format(date);
+    }
+
+    function formatTickDay(date) {
+      return new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).format(date);
+    }
+
+    function localDayKey(date) {
+      return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+    }
+
+    function julianCentury(julianDay) {
+      return (julianDay - 2451545) / 36525;
+    }
+
+    function normalizeDegrees(value) {
+      return ((value % 360) + 360) % 360;
+    }
+
+    function solarEquationValues(century) {
+      const toRadians = degrees => degrees * Math.PI / 180;
+      const meanLongitude = normalizeDegrees(280.46646 + century * (36000.76983 + century * 0.0003032));
+      const meanAnomaly = 357.52911 + century * (35999.05029 - 0.0001537 * century);
+      const eccentricity = 0.016708634 - century * (0.000042037 + 0.0000001267 * century);
+      const center = Math.sin(toRadians(meanAnomaly)) * (1.914602 - century * (0.004817 + 0.000014 * century))
+        + Math.sin(toRadians(2 * meanAnomaly)) * (0.019993 - 0.000101 * century)
+        + Math.sin(toRadians(3 * meanAnomaly)) * 0.000289;
+      const trueLongitude = meanLongitude + center;
+      const omega = 125.04 - 1934.136 * century;
+      const apparentLongitude = trueLongitude - 0.00569 - 0.00478 * Math.sin(toRadians(omega));
+      const meanObliquity = 23 + (26 + (21.448 - century * (46.815 + century * (0.00059 - century * 0.001813))) / 60) / 60;
+      const obliquity = meanObliquity + 0.00256 * Math.cos(toRadians(omega));
+      const declination = Math.asin(Math.sin(toRadians(obliquity)) * Math.sin(toRadians(apparentLongitude)));
+      const y = Math.tan(toRadians(obliquity / 2)) ** 2;
+      const equationOfTime = 4 * 180 / Math.PI * (
+        y * Math.sin(2 * toRadians(meanLongitude))
+        - 2 * eccentricity * Math.sin(toRadians(meanAnomaly))
+        + 4 * eccentricity * y * Math.sin(toRadians(meanAnomaly)) * Math.cos(2 * toRadians(meanLongitude))
+        - 0.5 * y * y * Math.sin(4 * toRadians(meanLongitude))
+        - 1.25 * eccentricity * eccentricity * Math.sin(2 * toRadians(meanAnomaly))
+      );
+      return { declination, equationOfTime };
+    }
+
+    function solarEventMinutesUTC(julianDay, latitude, longitude, sunrise) {
+      const calculate = century => {
+        const { declination, equationOfTime } = solarEquationValues(century);
+        const latitudeRadians = latitude * Math.PI / 180;
+        const cosHourAngle = Math.cos(90.833 * Math.PI / 180) / (Math.cos(latitudeRadians) * Math.cos(declination))
+          - Math.tan(latitudeRadians) * Math.tan(declination);
+        if (cosHourAngle < -1 || cosHourAngle > 1) return null;
+        const hourAngle = Math.acos(cosHourAngle) * 180 / Math.PI * (sunrise ? 1 : -1);
+        return 720 - 4 * (longitude + hourAngle) - equationOfTime;
+      };
+      const firstPass = calculate(julianCentury(julianDay));
+      return firstPass == null ? null : calculate(julianCentury(julianDay + firstPass / 1440));
+    }
+
+    function solarEventsForLocalDate(date, latitude, longitude) {
+      const utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+      const julianDay = utcMidnight / 86400000 + 2440587.5;
+      const sunriseMinutes = solarEventMinutesUTC(julianDay, latitude, longitude, true);
+      const sunsetMinutes = solarEventMinutesUTC(julianDay, latitude, longitude, false);
+      return [
+        sunriseMinutes == null ? null : { type: 'sunrise', time: new Date(utcMidnight + sunriseMinutes * 60000) },
+        sunsetMinutes == null ? null : { type: 'sunset', time: new Date(utcMidnight + sunsetMinutes * 60000) }
+      ].filter(Boolean);
+    }
+
+    function renderSolarMarkers() {
+      solarMarkers.innerHTML = '';
+      if (!solarLocation || motionFrames.length < 2) return;
+      const firstTime = motionFrames[0].time;
+      const lastTime = motionFrames[motionFrames.length - 1].time;
+      const duration = lastTime - firstTime;
+      if (duration <= 0) return;
+
+      const firstDay = new Date(firstTime);
+      firstDay.setHours(0, 0, 0, 0);
+      const lastDay = new Date(lastTime);
+      lastDay.setHours(0, 0, 0, 0);
+      const events = [];
+      for (const day = new Date(firstDay); day <= lastDay; day.setDate(day.getDate() + 1)) {
+        solarEventsForLocalDate(day, solarLocation.latitude, solarLocation.longitude).forEach(event => {
+          if (event.time >= firstTime && event.time <= lastTime) events.push(event);
+        });
+      }
+
+      const availableWidth = Math.max(280, timeline.clientWidth || 600);
+      const maxLabels = Math.max(2, Math.floor(availableWidth / 105));
+      const labelStride = Math.max(1, Math.ceil(events.length / maxLabels));
+      solarMarkers.innerHTML = events.map((event, index) => {
+        const left = ((event.time - firstTime) / duration) * 100;
+        const edgeClass = left < 6 ? 'first' : left > 94 ? 'last' : '';
+        const showLabel = events.length <= maxLabels || index % labelStride === 0;
+        const eventName = event.type === 'sunrise' ? 'Sunrise' : 'Sunset';
+        const symbol = event.type === 'sunrise' ? '↑' : '↓';
+        const time = formatTickTime(event.time);
+        return `<i class="solar-marker ${event.type} ${edgeClass}" style="left:${left}%" title="${eventName} · ${formatLocalTime(event.time)}">${showLabel ? `<span>${symbol} ${time}</span>` : ''}</i>`;
+      }).join('');
+    }
+
+    function formatDuration(minutes) {
+      if (minutes < 60) return `${Math.round(minutes)} min`;
+      if (minutes >= 1440) {
+        const roundedHours = Math.round(minutes / 60);
+        const days = Math.floor(roundedHours / 24);
+        const remainingHours = roundedHours % 24;
+        return `${days} day${days === 1 ? '' : 's'}${remainingHours ? ` ${remainingHours} hr` : ''}`;
+      }
+      const hours = minutes / 60;
+      return `${Number.isInteger(hours) ? hours : hours.toFixed(1)} hr`;
+    }
+
+    function clamp(value, minimum, maximum) {
+      return Math.min(maximum, Math.max(minimum, value));
+    }
+
+    function applyZoomState({ persist = true } = {}) {
+      const maxX = Math.max(0, (zoomState.scale - 1) * motionStage.clientWidth / 2);
+      const maxY = Math.max(0, (zoomState.scale - 1) * motionStage.clientHeight / 2);
+      zoomState.x = clamp(zoomState.x, -maxX, maxX);
+      zoomState.y = clamp(zoomState.y, -maxY, maxY);
+      if (zoomState.scale === 1) { zoomState.x = 0; zoomState.y = 0; }
+      motionImage.style.transform = `translate3d(${zoomState.x}px, ${zoomState.y}px, 0) scale(${zoomState.scale})`;
+      motionStage.classList.toggle('is-zoomed', zoomState.scale > 1.001);
+      zoomValue.textContent = `${Math.round(zoomState.scale * 100)}%`;
+      zoomOutButton.disabled = zoomState.scale <= 1;
+      zoomInButton.disabled = zoomState.scale >= 16;
+      if (persist && activeFeedKey) viewStateCache.set(activeFeedKey, { ...zoomState });
+    }
+
+    function restoreZoomState(feedKey) {
+      zoomState = viewStateCache.has(feedKey) ? { ...viewStateCache.get(feedKey) } : { scale: 1, x: 0, y: 0 };
+      applyZoomState({ persist: false });
+    }
+
+    function zoomAt(nextScale, clientX = null, clientY = null) {
+      const oldScale = zoomState.scale;
+      const scale = clamp(nextScale, 1, 16);
+      if (Math.abs(scale - oldScale) < 0.001) return;
+      const rect = motionStage.getBoundingClientRect();
+      const anchorX = clientX == null ? 0 : clientX - rect.left - rect.width / 2;
+      const anchorY = clientY == null ? 0 : clientY - rect.top - rect.height / 2;
+      const ratio = scale / oldScale;
+      zoomState.x = anchorX - (anchorX - zoomState.x) * ratio;
+      zoomState.y = anchorY - (anchorY - zoomState.y) * ratio;
+      zoomState.scale = scale;
+      applyZoomState();
+    }
+
+    function resetZoom() {
+      zoomState = { scale: 1, x: 0, y: 0 };
+      applyZoomState();
+    }
+
+    function pointerMidpoint(points) {
+      return { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+    }
+
+    function pointerDistance(points) {
+      return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+    }
+
+    function beginPointerGesture() {
+      const points = [...activePointers.values()];
+      if (points.length >= 2) {
+        zoomGesture = {
+          type: 'pinch',
+          startPoints: points.slice(0, 2),
+          startDistance: Math.max(1, pointerDistance(points.slice(0, 2))),
+          startMidpoint: pointerMidpoint(points.slice(0, 2)),
+          startState: { ...zoomState }
+        };
+      } else if (points.length === 1 && zoomState.scale > 1) {
+        zoomGesture = { type: 'drag', startPoint: points[0], startState: { ...zoomState } };
+      } else {
+        zoomGesture = null;
+      }
+    }
+
+    function selectedView() {
+      return satelliteViews[satelliteSelect.value].find(view => view.id === viewSelect.value) || satelliteViews[satelliteSelect.value][0];
+    }
+
+    function temperatureCycleBase() {
+      const now = new Date();
+      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours() >= 12 ? 12 : 0));
+    }
+
+    function temperatureSpanMinutes(frameCount) {
+      if (frameCount <= 1) return 0;
+      if (frameCount <= 20) return (frameCount - 1) * 180;
+      return 3600 + (frameCount - 21) * 360;
+    }
+
+    function currentFeedSpec() {
+      if (activeMotionProduct === 'radar') {
+        return { key: 'radar|CONUS', mode: 'radar', label: 'NWS precipitation radar', cadence: 2, length: 10, source: 'https://radar.weather.gov/ridge/standard/' };
+      }
+      if (activeMotionProduct === 'temperature') {
+        const productKey = temperatureProducts[imagerySelect.value] ? imagerySelect.value : 'T';
+        const product = temperatureProducts[productKey];
+        return {
+          key: `temperature|CONUS|${productKey}`,
+          mode: 'temperature',
+          productKey,
+          product,
+          forecast: true,
+          cadence: 180,
+          cadenceLabel: '3 hr near term · 6 hr later',
+          length: Number(loopLengthSelect.value || 24),
+          source: 'https://graphical.weather.gov/sectors/conusLoop.php'
+        };
+      }
+      const view = selectedView();
+      const band = activeMotionProduct === 'winds' ? 'DMW' : imagerySelect.value;
+      const cadence = band === 'DMW' ? (view.type === 'full' ? 60 : 15) : view.cadence;
+      return {
+        key: `${activeMotionProduct}|${satelliteSelect.value}|${view.id}|${band}`,
+        mode: activeMotionProduct,
+        satellite: satelliteSelect.value,
+        view,
+        band,
+        cadence,
+        length: Number(loopLengthSelect.value || 24)
+      };
+    }
+
+    function pageUrlFor(spec) {
+      const base = 'https://www.star.nesdis.noaa.gov/goes/';
+      if (spec.view.type === 'conus') return `${base}conus_band.php?band=${spec.band}&length=${spec.length}&sat=${spec.satellite}`;
+      if (spec.view.type === 'full') return `${base}fulldisk_band.php?band=${spec.band}&length=${spec.length}&sat=${spec.satellite}`;
+      return `${base}sector_band.php?band=${spec.band}&length=${spec.length}&sat=${spec.satellite}&sector=${spec.view.sector}`;
+    }
+
+    function updateViewOptions() {
+      const allViews = satelliteViews[satelliteSelect.value];
+      const availableViews = activeMotionProduct === 'winds' ? allViews.filter(view => view.type === 'conus' || view.type === 'full') : allViews;
+      const preferred = viewPreferences[satelliteSelect.value];
+      viewSelect.innerHTML = availableViews.map(view => `<option value="${view.id}">${view.label}</option>`).join('');
+      viewSelect.value = availableViews.some(view => view.id === preferred) ? preferred : availableViews[0].id;
+    }
+
+    function updateLoopOptions(cadence = currentFeedSpec().cadence) {
+      const previous = Number(loopLengthSelect.value || 24);
+      if (activeMotionProduct === 'radar') {
+        loopLengthSelect.innerHTML = '<option value="10">10 frames · about 20 min</option>';
+        loopLengthSelect.disabled = true;
+        return;
+      }
+      if (activeMotionProduct === 'temperature') {
+        loopLengthSelect.disabled = false;
+        loopLengthSelect.innerHTML = temperatureFrameOptions.map(count => `<option value="${count}">${count} frames · ${formatDuration(temperatureSpanMinutes(count))}</option>`).join('');
+        loopLengthSelect.value = temperatureFrameOptions.includes(previous) ? previous : 24;
+        return;
+      }
+      loopLengthSelect.disabled = false;
+      loopLengthSelect.innerHTML = loopFrameOptions.map(count => `<option value="${count}">${count} frames · ${formatDuration(count * cadence)}</option>`).join('');
+      loopLengthSelect.value = loopFrameOptions.includes(previous) ? previous : 24;
+    }
+
+    function configureExplorerControls() {
+      const isRadar = activeMotionProduct === 'radar';
+      const isWinds = activeMotionProduct === 'winds';
+      const isTemperature = activeMotionProduct === 'temperature';
+      const desiredMenu = isTemperature ? 'temperature' : 'satellite';
+      if (imagerySelect.dataset.menu !== desiredMenu) {
+        if (imagerySelect.dataset.menu === 'temperature') lastTemperatureImagery = imagerySelect.value;
+        else if (imagerySelect.dataset.menu === 'satellite' && imageryProducts[imagerySelect.value]) lastSatelliteImagery = imagerySelect.value;
+        const products = isTemperature ? temperatureProducts : imageryProducts;
+        imagerySelect.innerHTML = Object.entries(products).map(([value, product]) => `<option value="${value}">${product.label}</option>`).join('');
+        imagerySelect.dataset.menu = desiredMenu;
+        imagerySelect.value = isTemperature ? lastTemperatureImagery : lastSatelliteImagery;
+      }
+      if (activeMotionProduct === 'satellite' && imageryProducts[lastSatelliteImagery]) imagerySelect.value = lastSatelliteImagery;
+      const allowedViewIds = satelliteViews[satelliteSelect.value]
+        .filter(view => !isWinds || view.type === 'conus' || view.type === 'full')
+        .map(view => view.id);
+      if (!isRadar && !isTemperature && (!allowedViewIds.includes(viewSelect.value) || viewSelect.options.length !== allowedViewIds.length)) updateViewOptions();
+      satelliteSelect.disabled = isRadar || isTemperature;
+      viewSelect.disabled = isRadar || isTemperature;
+      imagerySelect.disabled = isRadar || isWinds;
+      if (isWinds) imagerySelect.value = 'GEOCOLOR';
+      updateLoopOptions();
+    }
+
+    function setMotionLoading(message, visible = true) {
+      motionLoading.textContent = message;
+      motionLoading.hidden = !visible;
+    }
+
+    function getRadarFrames() {
+      const twoMinutes = 120000;
+      const minute = new Date().getUTCMinutes();
+      const minutesToLatest = minute % 2 === 0 ? 1 : 2;
+      const latest = new Date(Date.now() - minutesToLatest * 60000);
+      const version = Math.floor(Date.now() / twoMinutes);
+      latest.setUTCSeconds(0, 0);
+      return Array.from({ length: 10 }, (_, chronologicalIndex) => {
+        const fileIndex = 9 - chronologicalIndex;
+        return {
+          url: `https://radar.weather.gov/ridge/standard/CONUS-LARGE_${fileIndex}.gif?v=${version}`,
+          time: new Date(latest.getTime() - fileIndex * twoMinutes),
+          approximate: true
+        };
+      });
+    }
+
+    function getTemperatureFrames(spec) {
+      const cycleBase = temperatureCycleBase();
+      const ranks = [
+        ...Array.from({ length: 20 }, (_, index) => index + 1),
+        ...Array.from({ length: 16 }, (_, index) => 21 + index * 2)
+      ];
+      const revision = Math.floor((Date.now() - 1800000) / 3600000);
+      const frames = ranks.map((rank, index) => {
+        const offsetMinutes = index < 20 ? index * 180 : 3600 + (index - 20) * 360;
+        return {
+          url: `https://graphical.weather.gov/GraphicalNDFD.php?width=1080&sector=CONUS&element=${spec.product.element}&n=${rank}&v=${revision}`,
+          time: new Date(cycleBase.getTime() + offsetMinutes * 60000),
+          forecast: true
+        };
+      });
+      return { frames, page: spec.source };
+    }
+
+    async function getStarFrames(spec) {
+      const page = pageUrlFor(spec);
+      const response = await fetch(page, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`NOAA returned ${response.status}`);
+      const html = await response.text();
+      const satelliteDirectory = `GOES${spec.satellite.slice(1)}`;
+      const escapedPath = spec.view.path.replace('/', '\\/');
+      const pattern = new RegExp(`https://cdn\\.star\\.nesdis\\.noaa\\.gov/${satelliteDirectory}/ABI/${escapedPath}/${spec.band}/(\\d{11})_[^"\\s]+-${spec.band}-${spec.view.size}\\.jpg`, 'g');
+      const unique = new Map();
+      for (const match of html.matchAll(pattern)) unique.set(match[0], { url: match[0], time: parseNoaaTimestamp(match[1]) });
+      const frames = [...unique.values()].sort((a, b) => a.time - b.time);
+      if (!frames.length) throw new Error('NOAA listed no matching frames');
+      return { frames, page };
+    }
+
+    function calculateCadence(frames, fallback) {
+      const differences = [];
+      for (let index = 1; index < frames.length; index += 1) differences.push((frames[index].time - frames[index - 1].time) / 60000);
+      if (!differences.length) return fallback;
+      differences.sort((a, b) => a - b);
+      return Math.round(differences[Math.floor(differences.length / 2)] * 10) / 10;
+    }
+
+    function ensureImageCached(url) {
+      if (imageCache.has(url)) return imageCache.get(url);
+      const image = new Image();
+      image.decoding = 'async';
+      image.src = url;
+      imageCache.set(url, image);
+      return image;
+    }
+
+    function prefetchNearbyFrames() {
+      if (!motionFrames.length) return;
+      const lookAhead = motionSpeed >= 32
+        ? motionFrames.length
+        : Math.min(motionFrames.length, Math.max(6, Math.ceil(Math.sqrt(motionSpeed) * 6)));
+      for (let offset = 0; offset < lookAhead; offset += 1) ensureImageCached(motionFrames[(motionFrameIndex + offset) % motionFrames.length].url);
+    }
+
+    function renderTimeline() {
+      frameSlider.max = Math.max(0, motionFrames.length - 1);
+      frameTickList.innerHTML = '';
+      timelineTrack.style.minWidth = '0';
+      if (!motionFrames.length) { timelineTicks.innerHTML = ''; solarMarkers.innerHTML = ''; return; }
+
+      const width = Math.max(280, timeline.clientWidth || 600);
+      const frameTotal = motionFrames.length;
+      const maxMinorTicks = Math.max(10, Math.floor(width / 18));
+      const maxTimeLabels = Math.max(3, Math.floor(width / 74));
+      const tickStride = Math.max(1, Math.ceil(frameTotal / maxMinorTicks));
+      const labelStride = frameTotal <= 12 ? 1 : Math.max(1, Math.ceil(frameTotal / maxTimeLabels));
+      const dayIndexes = new Set();
+
+      motionFrames.forEach((frame, index) => {
+        if (index === 0 || localDayKey(frame.time) !== localDayKey(motionFrames[index - 1].time)) dayIndexes.add(index);
+      });
+
+      const dayPositions = [...dayIndexes].map(index => frameTotal === 1 ? 50 : (index / (frameTotal - 1)) * 100);
+      const majorClearance = Math.min(9, 6200 / width);
+      const marks = [];
+      const nativeTicks = [];
+      motionFrames.forEach((frame, index) => {
+        const left = frameTotal === 1 ? 50 : (index / (frameTotal - 1)) * 100;
+        const isFirst = index === 0;
+        const isLast = index === frameTotal - 1;
+        const isDay = dayIndexes.has(index);
+        const showTick = frameTotal <= 12 || isDay || isLast || index % tickStride === 0;
+        if (!showTick) return;
+        nativeTicks.push(`<option value="${index}"></option>`);
+
+        const nearDay = !isDay && dayPositions.some(position => Math.abs(position - left) < majorClearance);
+        const showTimeLabel = frameTotal <= 12 || isLast || (!nearDay && index % labelStride === 0);
+        const label = isDay ? formatTickDay(frame.time) : showTimeLabel ? formatTickTime(frame.time) : '';
+        const classes = ['timeline-tick', isDay ? 'major' : '', isFirst ? 'first' : '', isLast ? 'last' : ''].filter(Boolean).join(' ');
+        marks.push(`<i class="${classes}" style="left:${left}%" title="${formatLocalTime(frame.time, frame.approximate)}">${label ? `<span>${label}</span>` : ''}</i>`);
+      });
+      timelineTicks.innerHTML = marks.join('');
+      frameTickList.innerHTML = nativeTicks.join('');
+      renderSolarMarkers();
+    }
+
+    function updateSolarLocationState() {
+      if (!solarLocation) {
+        solarLocationButton.textContent = '☀ Add sunrise + sunset';
+        solarStatus.textContent = 'Location is used only in this browser to calculate solar times.';
+        return;
+      }
+      solarLocationButton.textContent = '☀ Update solar location';
+      solarStatus.textContent = `Solar ticks near ${solarLocation.latitude.toFixed(2)}°, ${solarLocation.longitude.toFixed(2)}° · calculated locally`;
+    }
+
+    function requestSolarLocation() {
+      if (!navigator.geolocation) {
+        solarStatus.textContent = 'This browser does not provide location access.';
+        return;
+      }
+      solarLocationButton.disabled = true;
+      solarLocationButton.textContent = 'Finding location…';
+      solarStatus.textContent = 'Waiting for location permission…';
+      navigator.geolocation.getCurrentPosition(position => {
+        solarLocation = {
+          latitude: Math.round(position.coords.latitude * 10000) / 10000,
+          longitude: Math.round(position.coords.longitude * 10000) / 10000
+        };
+        try { localStorage.setItem('noaaSolarLocation', JSON.stringify(solarLocation)); } catch (error) { /* Location still works for this session. */ }
+        solarLocationButton.disabled = false;
+        updateSolarLocationState();
+        renderTimeline();
+      }, error => {
+        solarLocationButton.disabled = false;
+        updateSolarLocationState();
+        solarStatus.textContent = error.code === 1
+          ? 'Location permission was denied. Enable it to add solar ticks.'
+          : 'Location was unavailable. Try again in a moment.';
+      }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 3600000 });
+    }
+
+    function renderMotionFrame() {
+      if (!motionFrames.length) return;
+      const frame = motionFrames[motionFrameIndex];
+      const cachedImage = ensureImageCached(frame.url);
+      if (cachedImage.complete && cachedImage.naturalWidth) setMotionLoading('', false);
+      else setMotionLoading('Loading selected frame…');
+      motionImage.src = frame.url;
+      const spec = currentFeedSpec();
+      const feedLabel = spec.mode === 'radar' ? 'precipitation radar' : spec.mode === 'winds' ? 'derived motion winds' : spec.mode === 'temperature' ? spec.product.label : imageryProducts[spec.band].label;
+      motionImage.alt = `NOAA ${feedLabel} frame at ${formatLocalTime(frame.time, frame.approximate)}`;
+      frameTime.dateTime = frame.time.toISOString();
+      frameTime.innerHTML = `<strong>${formatLocalTime(frame.time, frame.approximate)}</strong><span>${frame.forecast ? 'Forecast valid · ' : ''}your local time${frame.approximate ? ' · radar time estimated' : ''}</span>`;
+      frameCount.textContent = `${motionFrameIndex + 1} / ${motionFrames.length}`;
+      frameSlider.value = motionFrameIndex;
+      prefetchNearbyFrames();
+    }
+
+    function updateFeedFacts(spec, cacheLabel = 'Live') {
+      const cadence = measuredCadence || spec.cadence;
+      const span = motionFrames.length > 1 ? (motionFrames[motionFrames.length - 1].time - motionFrames[0].time) / 60000 : 0;
+      const product = spec.mode === 'radar' ? 'Composite reflectivity' : spec.mode === 'winds' ? 'Derived motion winds' : spec.mode === 'temperature' ? spec.product.label : imageryProducts[spec.band].label;
+      const satellite = spec.mode === 'radar' ? 'NWS radar mosaic' : spec.mode === 'temperature' ? 'National Digital Forecast Database' : `${spec.satellite === 'G18' ? 'GOES-18 West' : 'GOES-19 East'}`;
+      const view = spec.mode === 'radar' || spec.mode === 'temperature' ? 'Contiguous U.S.' : spec.view.label;
+      feedFacts.innerHTML = [
+        `<span class="feed-fact"><strong>${satellite}</strong></span>`,
+        `<span class="feed-fact">View <strong>${view}</strong></span>`,
+        `<span class="feed-fact">Product <strong>${product}</strong></span>`,
+        `<span class="feed-fact">Cadence <strong>${spec.cadenceLabel || formatDuration(cadence)}</strong></span>`,
+        `<span class="feed-fact">Loaded <strong>${motionFrames.length} frames · ${formatDuration(span)}</strong></span>`,
+        `<span class="feed-fact">Image cache <strong>${imageCache.size} frames · ${cacheLabel}</strong></span>`
+      ].join('');
+    }
+
+    function applyFrames(spec, frames, cacheLabel, preserveUrl = null) {
+      motionFrames = spec.forecast ? frames.slice(0, spec.length) : frames.slice(-spec.length);
+      measuredCadence = calculateCadence(motionFrames, spec.cadence);
+      const preservedIndex = preserveUrl ? motionFrames.findIndex(frame => frame.url === preserveUrl) : -1;
+      const firstCurrentForecast = spec.forecast ? motionFrames.findIndex(frame => frame.time >= Date.now()) : -1;
+      motionFrameIndex = preservedIndex >= 0 ? preservedIndex : firstCurrentForecast >= 0 ? firstCurrentForecast : motionFrames.length - 1;
+      renderTimeline();
+      renderMotionFrame();
+      updateLoopOptions(measuredCadence);
+      loopLengthSelect.value = String(spec.length);
+      updateFeedFacts(spec, cacheLabel);
+      startMotionTimer();
+    }
+
+    function describeFeed(spec) {
+      if (spec.mode === 'radar') {
+        motionDescription.textContent = 'The NWS CONUS radar mosaic shows recent precipitation echoes. Its ten rolling filenames are refreshed about every two minutes.';
+        motionSource.href = spec.source;
+        return;
+      }
+      if (spec.mode === 'temperature') {
+        motionDescription.textContent = `Contiguous U.S. · ${spec.product.description} The loop advances every three hours near term, then every six hours later in the forecast.`;
+        motionSource.href = spec.source;
+        return;
+      }
+      const product = spec.mode === 'winds' ? { description: 'Satellite-derived winds estimate atmospheric motion by tracking features between images.' } : imageryProducts[spec.band];
+      motionDescription.textContent = `${spec.view.label} · ${product.description}`;
+      motionSource.href = pageUrlFor(spec);
+    }
+
+    async function activateFeed({ force = false } = {}) {
+      const loadId = ++motionLoadId;
+      const spec = currentFeedSpec();
+      const desired = spec.length;
+      const cached = feedCache.get(spec.key);
+      const preserveUrl = activeFeedKey === spec.key && motionFrames[motionFrameIndex] ? motionFrames[motionFrameIndex].url : null;
+      const feedChanged = activeFeedKey !== spec.key;
+      activeFeedKey = spec.key;
+      if (feedChanged) restoreZoomState(spec.key);
+      measuredCadence = null;
+      describeFeed(spec);
+      clearInterval(motionTimer);
+
+      if (cached?.frames?.length) {
+        applyFrames(spec, cached.frames, 'Reused', preserveUrl);
+      } else {
+        motionFrames = [];
+        setMotionLoading('Loading the latest NOAA frame index…');
+        feedFacts.innerHTML = '<span class="feed-fact"><strong>Checking NOAA for available frames…</strong></span>';
+      }
+
+      const freshnessWindow = spec.mode === 'radar' ? 110000 : spec.mode === 'temperature' ? 900000 : Math.max(120000, spec.cadence * 30000);
+      if (!force && cached && Date.now() - cached.fetchedAt < freshnessWindow && cached.maxRequested >= desired) return;
+
+      try {
+        const result = spec.mode === 'radar'
+          ? { frames: getRadarFrames(), page: spec.source }
+          : spec.mode === 'temperature'
+            ? getTemperatureFrames(spec)
+            : await getStarFrames(spec);
+        if (loadId !== motionLoadId) return;
+        const merged = new Map((spec.forecast ? [] : cached?.frames || []).map(frame => [frame.url, frame]));
+        result.frames.forEach(frame => merged.set(frame.url, frame));
+        const allFrames = [...merged.values()].sort((a, b) => a.time - b.time);
+        feedCache.set(spec.key, { frames: allFrames, fetchedAt: Date.now(), maxRequested: Math.max(desired, result.frames.length, cached?.maxRequested || 0) });
+        motionSource.href = result.page;
+        applyFrames(spec, allFrames, cached ? 'Updated · past frames reused' : 'New', preserveUrl);
+      } catch (error) {
+        if (loadId !== motionLoadId) return;
+        if (cached?.frames?.length) {
+          updateFeedFacts(spec, 'Offline cache');
+          return;
+        }
+        setMotionLoading('NOAA did not return frames for this combination. Try another view or imagery product.');
+        feedFacts.innerHTML = `<span class="feed-fact"><strong>Feed unavailable</strong> · ${error.message}</span>`;
+      }
+    }
+
+    function updatePlayButton() {
+      playPause.setAttribute('aria-label', motionPlaying ? 'Pause loop' : 'Play loop');
+      playIcon.innerHTML = motionPlaying ? '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>' : '<path d="m7 4 13 8-13 8z"/>';
+    }
+
+    function startMotionTimer() {
+      clearInterval(motionTimer);
+      if (!motionPlaying || motionFrames.length < 2) return;
+      motionTimer = setInterval(() => {
+        motionFrameIndex = (motionFrameIndex + 1) % motionFrames.length;
+        renderMotionFrame();
+      }, Math.max(16, 800 / motionSpeed));
+    }
+
+    imagerySelect.innerHTML = Object.entries(imageryProducts).map(([value, product]) => `<option value="${value}">${product.label}</option>`).join('');
+    imagerySelect.dataset.menu = 'satellite';
+    const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    const prefersWest = /(Los_Angeles|Vancouver|Tijuana|Anchorage|Honolulu|Pacific)/i.test(localZone);
+    satelliteSelect.value = prefersWest ? 'G18' : 'G19';
+    updateViewOptions();
+    imagerySelect.value = 'GEOCOLOR';
+    loopLengthSelect.innerHTML = '<option value="24">24 frames</option>';
+    loopLengthSelect.value = '24';
+    configureExplorerControls();
+
+    motionImage.addEventListener('error', () => setMotionLoading('This NOAA image could not be loaded. Try another product or open the NOAA source.'));
+    motionImage.addEventListener('load', () => setMotionLoading('', false));
+    motionTabs.forEach(tab => tab.addEventListener('click', () => {
+      if (activeMotionProduct === 'satellite' && imageryProducts[imagerySelect.value]) lastSatelliteImagery = imagerySelect.value;
+      if (activeMotionProduct === 'temperature' && temperatureProducts[imagerySelect.value]) lastTemperatureImagery = imagerySelect.value;
+      activeMotionProduct = tab.dataset.product;
+      motionTabs.forEach(item => {
+        const selected = item === tab;
+        item.setAttribute('aria-selected', selected);
+        item.tabIndex = selected ? 0 : -1;
+      });
+      configureExplorerControls();
+      activateFeed();
+    }));
+    satelliteSelect.addEventListener('change', () => { updateViewOptions(); configureExplorerControls(); activateFeed(); });
+    viewSelect.addEventListener('change', () => { viewPreferences[satelliteSelect.value] = viewSelect.value; configureExplorerControls(); activateFeed(); });
+    imagerySelect.addEventListener('change', () => {
+      if (activeMotionProduct === 'temperature') lastTemperatureImagery = imagerySelect.value;
+      else if (activeMotionProduct === 'satellite') lastSatelliteImagery = imagerySelect.value;
+      configureExplorerControls();
+      activateFeed();
+    });
+    loopLengthSelect.addEventListener('change', () => activateFeed());
+    document.querySelector('#previousFrame').addEventListener('click', () => {
+      if (!motionFrames.length) return;
+      motionFrameIndex = (motionFrameIndex - 1 + motionFrames.length) % motionFrames.length;
+      renderMotionFrame(); startMotionTimer();
+    });
+    document.querySelector('#nextFrame').addEventListener('click', () => {
+      if (!motionFrames.length) return;
+      motionFrameIndex = (motionFrameIndex + 1) % motionFrames.length;
+      renderMotionFrame(); startMotionTimer();
+    });
+    playPause.addEventListener('click', () => { motionPlaying = !motionPlaying; updatePlayButton(); startMotionTimer(); });
+    frameSlider.addEventListener('input', () => { motionFrameIndex = Number(frameSlider.value); renderMotionFrame(); startMotionTimer(); });
+    speedSlider.addEventListener('input', () => {
+      motionSpeed = speedPresets[Number(speedSlider.value)];
+      speedValue.textContent = `${motionSpeed}×`;
+      prefetchNearbyFrames();
+      startMotionTimer();
+    });
+    solarLocationButton.addEventListener('click', requestSolarLocation);
+    zoomInButton.addEventListener('click', () => zoomAt(zoomState.scale * 1.45));
+    zoomOutButton.addEventListener('click', () => zoomAt(zoomState.scale / 1.45));
+    zoomResetButton.addEventListener('click', resetZoom);
+    motionImage.addEventListener('dragstart', event => event.preventDefault());
+    motionStage.addEventListener('wheel', event => {
+      event.preventDefault();
+      const factor = Math.exp(-event.deltaY * 0.0018);
+      zoomAt(zoomState.scale * factor, event.clientX, event.clientY);
+    }, { passive: false });
+    motionStage.addEventListener('dblclick', event => {
+      if (event.target.closest('.zoom-controls')) return;
+      event.preventDefault();
+      zoomAt(zoomState.scale * 2, event.clientX, event.clientY);
+    });
+    motionStage.addEventListener('pointerdown', event => {
+      if (event.target.closest('.zoom-controls')) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      try { motionStage.setPointerCapture(event.pointerId); } catch (error) { /* Pointer capture is an enhancement. */ }
+      beginPointerGesture();
+      if (zoomGesture) motionStage.classList.add('is-dragging');
+    });
+    motionStage.addEventListener('pointermove', event => {
+      if (!activePointers.has(event.pointerId)) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (!zoomGesture) { beginPointerGesture(); if (!zoomGesture) return; }
+
+      if (zoomGesture.type === 'drag') {
+        const point = activePointers.get(event.pointerId);
+        zoomState.x = zoomGesture.startState.x + point.x - zoomGesture.startPoint.x;
+        zoomState.y = zoomGesture.startState.y + point.y - zoomGesture.startPoint.y;
+        applyZoomState();
+      } else if (zoomGesture.type === 'pinch' && activePointers.size >= 2) {
+        const points = [...activePointers.values()].slice(0, 2);
+        const midpoint = pointerMidpoint(points);
+        const scale = clamp(zoomGesture.startState.scale * pointerDistance(points) / zoomGesture.startDistance, 1, 16);
+        const ratio = scale / zoomGesture.startState.scale;
+        const rect = motionStage.getBoundingClientRect();
+        const startX = zoomGesture.startMidpoint.x - rect.left - rect.width / 2;
+        const startY = zoomGesture.startMidpoint.y - rect.top - rect.height / 2;
+        const currentX = midpoint.x - rect.left - rect.width / 2;
+        const currentY = midpoint.y - rect.top - rect.height / 2;
+        zoomState.x = currentX - (startX - zoomGesture.startState.x) * ratio;
+        zoomState.y = currentY - (startY - zoomGesture.startState.y) * ratio;
+        zoomState.scale = scale;
+        applyZoomState();
+      }
+      motionStage.classList.add('is-dragging');
+    });
+    const endPointerGesture = event => {
+      activePointers.delete(event.pointerId);
+      try { motionStage.releasePointerCapture(event.pointerId); } catch (error) { /* The pointer may already be released. */ }
+      if (activePointers.size) beginPointerGesture();
+      else { zoomGesture = null; motionStage.classList.remove('is-dragging'); }
+    };
+    motionStage.addEventListener('pointerup', endPointerGesture);
+    motionStage.addEventListener('pointercancel', endPointerGesture);
+    motionStage.addEventListener('keydown', event => {
+      if (['+', '='].includes(event.key)) { event.preventDefault(); zoomAt(zoomState.scale * 1.45); }
+      else if (event.key === '-') { event.preventDefault(); zoomAt(zoomState.scale / 1.45); }
+      else if (event.key === '0') { event.preventDefault(); resetZoom(); }
+      else if (zoomState.scale > 1 && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+        event.preventDefault();
+        const step = event.shiftKey ? 90 : 35;
+        if (event.key === 'ArrowLeft') zoomState.x -= step;
+        if (event.key === 'ArrowRight') zoomState.x += step;
+        if (event.key === 'ArrowUp') zoomState.y -= step;
+        if (event.key === 'ArrowDown') zoomState.y += step;
+        applyZoomState();
+      }
+    });
+
+    let timelineResizeFrame = null;
+    const handleTimelineResize = () => {
+      cancelAnimationFrame(timelineResizeFrame);
+      timelineResizeFrame = requestAnimationFrame(renderTimeline);
+    };
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(handleTimelineResize).observe(timeline);
+      new ResizeObserver(() => applyZoomState({ persist: false })).observe(motionStage);
+    } else {
+      window.addEventListener('resize', () => { handleTimelineResize(); applyZoomState({ persist: false }); });
+    }
+
+    updatePlayButton();
+    applyZoomState({ persist: false });
+    updateSolarLocationState();
+    activateFeed();
+    setInterval(() => activateFeed(), 120000);
+
+    selectMetric('temperature');
+    selectPeriod(activePeriod, {initial: true});
+  </script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-130XL1G0EL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-130XL1G0EL');
+  </script>
+</body>
+</html>
